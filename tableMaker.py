@@ -2,14 +2,14 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
-
 # makes a single histogram from a given data frame column
 #   - data: pandas dataframe to input into a table
 #   - master: which frame of the gui to add the table to
 #   - row: which row to add canvas to
 #   - col: which column to add canvas to
 def makeTable(data, master, row, col):
-    fig = Figure(dpi=100)
+    data = data.round(decimals=3)
+    fig = Figure(dpi=60)
     ax = fig.add_subplot()
     fig.patch.set_visible(False)
     ax.axis('off')
