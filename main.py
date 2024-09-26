@@ -1,5 +1,6 @@
 import pandas as pd
 import tkinter as tk
+from tkinter import ttk
 from matplotlib.figure import Figure
 from histogramMaker import *
 from tableMaker import *
@@ -15,7 +16,7 @@ class Application(tk.Tk):
 
     def __init__(self, df):
         super().__init__()
-        self.title("Test")
+        self.title("Histogram Maker")
         self.minsize(200, 200)
         self.df = df
         self.frame = tk.Frame(self, background='white')
@@ -41,43 +42,90 @@ class Application(tk.Tk):
         self.startButton.destroy()
 
         efretCalculator(self.df)
-        self.table()
+        #self.table()
+        self.emptyHis()
         self.makeFeatures()
 
     def makeFeatures(self):
-        self.makeButtons()
+        self.makeFormat()
         self.makeOptions()
+        self.makeButtons()
+
+    def makeFormat(self):
+        self.tabControl = ttk.Notebook(master=self.subframe3)
+        self.tab1 = tk.Frame(self.tabControl)
+        self.tab2 = tk.Frame(self.tabControl)
+
+        self.tabControl.add(self.tab1, text="Format")
+        self.tabControl.add(self.tab2, text="Style")
+        self.tabControl.grid(row=0, column=0, padx=10)
 
     def makeButtons(self):
-        makeHist = tk.Button(self.subframe1, text="Make Histogram from:", command=self.his)
-        makeHist.grid(row=1, column=0)
+        makeHist = tk.Button(self.tab1, text="Generate from:", command=self.his)
+        makeHist.grid(row=0, column=0, padx="10")
 
-        self.clearButton = tk.Button(self.subframe3, text="Clear", command=self.emptyHis)
-        self.clearButton.grid(row=0, column=0, sticky="ew", padx="100", pady="20")
-        
+        self.clearButton = tk.Button(self.tab1, text="Clear", command=self.emptyHis)
+        self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+
     def makeOptions(self):
         labels = self.df.columns
         self.ref_col = tk.StringVar(self)
         self.ref_col.set("Reference Column")
 
-        self.combo = tk.OptionMenu(self.subframe1, self.ref_col, *labels)
+        self.combo = tk.OptionMenu(self.tab1, self.ref_col, *labels)
         self.combo.config(width=20)
-        self.combo.grid(row=2, column=0)
+        self.combo.grid(row=0, column=1)
 
-
-
-        self.bin_label = tk.Label(self.subframe3, text="Bins:")
-        self.bin_label.grid(row=0, column=1)
+        self.bin_label = tk.Label(self.tab1, text="Bins:")
+        self.bin_label.grid(row=1, column=0)
         self.ref_bins = tk.StringVar(self)
         self.ref_bins.set("10")
 
-        self.combo = tk.Entry(self.subframe3, textvariable=self.ref_bins)
-        self.combo.config(width=20)
-        self.combo.grid(row=0, column=2, sticky="ew", padx=(0, 100), pady="20")
+        self.combo1 = tk.Entry(self.tab1, textvariable=self.ref_bins)
+        self.combo1.config(width=10)
+        self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        self.title_label = tk.Label(self.tab2, text="Title:")
+        self.title_label.grid(row=0, column=0)
+        self.ref_title = tk.StringVar(self)
+        self.ref_title.set("Title")
+
+        self.combo2 = tk.Entry(self.tab2, textvariable=self.ref_title)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+
+        self.x_label = tk.Label(self.tab2, text="X-Axis Label:")
+        self.x_label.grid(row=0, column=2)
+        self.ref_x = tk.StringVar(self)
+        self.ref_x.set("X-Axis")
+
+        self.combo2 = tk.Entry(self.tab2, textvariable=self.ref_x)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=0, column=3, sticky="ew", padx=(0, 10), pady="10")
+
+        self.y_label = tk.Label(self.tab2, text="Y-Axis Label:")
+        self.y_label.grid(row=0, column=4)
+        self.ref_y = tk.StringVar(self)
+        self.ref_y.set("Y-Axis")
+
+        self.combo2 = tk.Entry(self.tab2, textvariable=self.ref_y)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=0, column=5, sticky="ew", padx=(0, 10), pady="10")
+
+        self.color_label = tk.Label(self.tab2, text="Color:")
+        self.color_label.grid(row=1, column=0)
+        self.ref_color = tk.StringVar(self)
+        self.ref_color.set("0")
+
+        self.combo2 = tk.Entry(self.tab2, textvariable=self.ref_color)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+
     
     def table(self): # i may want to turn this into a class
         makeTable(self.df, self.subframe1, 0, 0)
-        self.emptyHis()
     
     def emptyHis(self):
         emptyHistogram(self.subframe2, 0, 0)
@@ -85,11 +133,15 @@ class Application(tk.Tk):
     def his(self): #creates histogram from sample data
         col = self.ref_col.get()
         bins = int(self.ref_bins.get())
+        title = str(self.ref_title.get())
+        x_ax = str(self.ref_x.get())
+        y_ax = str(self.ref_y.get())
+        color = str(self.ref_color.get())
         if col == "Reference Column":
             pass
         else:
             print(col)
-            makeHistogram(self.df[col], self.subframe2, 0, 0, bins)
+            makeHistogram(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color)
 
     def emptyFig(self):
         fig = Figure()

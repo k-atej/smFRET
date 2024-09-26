@@ -12,13 +12,17 @@ from matplotlib.figure import Figure
 #   - row: which row to add canvas to
 #   - col: which column to add canvas to
 #   - bins: number of bins for histogram to recognize
-def makeHistogram(data, master, row, col, bins):
+#   - title: graph title
+#   - x: x-axis label
+#   - y: y-axis label
+#   - color: color of bins in histogram
+def makeHistogram(data, master, row, col, bins, title, x, y, color):
     fig = Figure(dpi=60)
     f = fig.gca() #gca = get current axes
-    f.hist(data, bins=bins)
-    f.set_xlabel("x label")
-    f.set_ylabel("y label")
-    f.set_title("______")
+    f.hist(data, bins=bins, color=color)
+    f.set_xlabel(x)
+    f.set_ylabel(y)
+    f.set_title(title)
     fig.tight_layout()
     hist_canvas = FigureCanvasTkAgg(fig, master=master)
     hist_canvas.draw()
