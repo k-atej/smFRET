@@ -4,7 +4,13 @@ from tkinter import ttk
 from matplotlib.figure import Figure
 from histogramMaker import *
 from tableMaker import *
+from tkinter.filedialog import askopenfile
 
+#file name
+eFRET_FILE_NAME = "FRETresult.dat"
+
+#MacOS filepath
+path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl"
 
 def main():
     data =  {'time': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'donor': [2, 4, 6, 8, 4, 1, 3, 9, 2, 5], 'acceptor': [3, 6, 9, 12, 3, 2, 4, 5, 3, 2]}
@@ -19,29 +25,42 @@ class Application(tk.Tk):
         self.title("Histogram Maker")
         self.minsize(200, 200)
         self.df = df
+
+        #full window 
         self.frame = tk.Frame(self, background='white')
         self.frame.grid(row=0, column=0)
 
+        # left half of window
         self.subframe1 = tk.Frame(self.frame, background='white')
         self.subframe1.grid(row=0, column=0)
 
+        # right half of window
         self.subframeright = tk.Frame(self.frame, background='white')
         self.subframeright.grid(row=0, column=1)
 
+        # upper half of subframeright
         self.subframe2 = tk.Frame(self.subframeright, background='white')
         self.subframe2.grid(row=0, column=0)
-
+        
+        # lower half of subframeright
         self.subframe3 = tk.Frame(self.subframeright, background='white')
         self.subframe3.grid(row=1, column=0)
         
+        #placeholder button
         self.startButton = tk.Button(self.subframe1, text="start", command=self.start)
         self.startButton.grid(row=1, column=1)
         #where did this button go? 
 
+    def get_data(self, path):
+        FRETresult = open(path + "/" + eFRET_FILE_NAME, "r") 
+        data = pd.read_fwf(FRETresult, header=None)
+        data.columns = ["eFRET", "other"]
+        self.df = data
+
     def start(self):
         self.startButton.destroy()
-
-        efretCalculator(self.df)
+        self.get_data(path)
+        #efretCalculator(self.df)
         #self.table()
         self.emptyHis()
         self.makeFeatures()
@@ -85,6 +104,17 @@ class Application(tk.Tk):
         self.combo1.config(width=10)
         self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+
+        self.offset_label = tk.Label(self.tab1, text="Offset:")
+        self.offset_label.grid(row=1, column=2)
+        self.ref_offset = tk.StringVar(self)
+        self.ref_offset.set('Auto')
+
+        self.combo3 = tk.Entry(self.tab1, textvariable=self.ref_offset)
+        self.combo3.config(width=10)
+        self.combo3.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+
+
         self.title_label = tk.Label(self.tab2, text="Title:")
         self.title_label.grid(row=0, column=0)
         self.ref_title = tk.StringVar(self)
@@ -122,8 +152,6 @@ class Application(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-
-    
     def table(self): # i may want to turn this into a class
         makeTable(self.df, self.subframe1, 0, 0)
     
@@ -137,11 +165,11 @@ class Application(tk.Tk):
         x_ax = str(self.ref_x.get())
         y_ax = str(self.ref_y.get())
         color = str(self.ref_color.get())
+        offset = self.ref_offset.get()
         if col == "Reference Column":
             pass
         else:
-            print(col)
-            makeHistogram(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color)
+            makeHistogram(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, offset)
 
     def emptyFig(self):
         fig = Figure()
