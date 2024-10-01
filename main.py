@@ -51,6 +51,7 @@ class Application(tk.Tk):
         self.startButton.grid(row=1, column=1)
         #where did this button go? 
 
+
     def get_data(self, path):
         FRETresult = open(path + "/" + eFRET_FILE_NAME, "r") 
         data = pd.read_fwf(FRETresult, header=None)
@@ -69,6 +70,7 @@ class Application(tk.Tk):
         self.makeFormat()
         self.makeOptions()
         self.makeButtons()
+        self.bind('<Return>', self.his)
 
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.subframe3)
@@ -103,7 +105,6 @@ class Application(tk.Tk):
         self.combo1 = tk.Entry(self.tab1, textvariable=self.ref_bins)
         self.combo1.config(width=10)
         self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
-
 
         self.offset_label = tk.Label(self.tab1, text="Offset:")
         self.offset_label.grid(row=1, column=2)
@@ -158,7 +159,7 @@ class Application(tk.Tk):
     def emptyHis(self):
         emptyHistogram(self.subframe2, 0, 0)
 
-    def his(self): #creates histogram from sample data
+    def his(self, event=None): #creates histogram from sample data
         col = self.ref_col.get()
         bins = int(self.ref_bins.get())
         title = str(self.ref_title.get())
