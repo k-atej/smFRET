@@ -1,5 +1,7 @@
 import numpy as np
+import math
 import pandas as pd
+import matplotlib as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
@@ -15,19 +17,41 @@ from matplotlib.figure import Figure
 #   - x: x-axis label
 #   - y: y-axis label
 #   - color: color of bins in histogram
-#   - shift: how much to shift the data by in order to zero the first column
-def makeHistogram(data, master, row, col, bins, title, x, y, color, shift=None):
+#   - edgecolor: color of bin edges in histogram
+#   - edgecolor: linewidth of bin edges in histogram
+#   - xmax: upper limit of x-axis
+#   - xmin: lower limit of x-axis
+#   - shift (optional): how much to shift the data by in order to zero the first column
+def makeHistogram(data, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, shift=None):
+    #zero data points
     data = zero_data(data, shift)
+
+    #create figure
     fig = Figure(dpi=60)
     f = fig.gca() #gca = get current axes
-    f.hist(data, bins=bins, color=color)
+
+    # set number of bins
+    if bins == 'Auto':
+        bins = int(auto_bin(data))
+    else:
+        bins = int(bins)
+    f.hist(data, bins=bins, color=color, edgecolor=edgecolor, linewidth=edgewidth)
+    
+    #set axis titles
     f.set_xlabel(x)
     f.set_ylabel(y)
+
+    #set axis ranges, doesn't actually change the scale
+    f.set_xlim([xmin, xmax])
+    f.set_ylim([None, None])
+
+    #set title & append figure to canvas
     f.set_title(title)
     fig.tight_layout()
     hist_canvas = FigureCanvasTkAgg(fig, master=master)
     hist_canvas.draw()
     hist_canvas.get_tk_widget().grid(row=row, column=col)
+    return bins
 
 # zeroes the first peak of the data
 #   - data: pandas df column
@@ -44,7 +68,6 @@ def zero_data(data, offset):
     # subtract that midpoint of from all of the eFRET data
     data = data.astype(float)
     data = data - float(offset)
-    print(f"Offset: {offset}")
     return data
 
 # returns the count of the highest bin
@@ -72,3 +95,11 @@ def emptyHistogram(master, row, col):
     hist_canvas.draw()
     hist_canvas.get_tk_widget().grid(row=row, column=col)
 
+
+# calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 10
+#   - data: pandas dataframe column to input into a histogram
+def auto_bin(data):
+    n = data.count()
+    logn = math.ceil(math.log2(n))
+    print(str(logn + 1))
+    return str(10*(logn + 1))
