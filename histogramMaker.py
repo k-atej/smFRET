@@ -21,8 +21,10 @@ from matplotlib.figure import Figure
 #   - edgecolor: linewidth of bin edges in histogram
 #   - xmax: upper limit of x-axis
 #   - xmin: lower limit of x-axis
+#   - ymax: upper limit of y-axis
+#   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
-def makeHistogram(data, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, shift=None):
+def makeHistogram(data, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
     #zero data points
     data = zero_data(data, shift)
 
@@ -38,12 +40,12 @@ def makeHistogram(data, master, row, col, bins, title, x, y, color, edgecolor, e
     f.hist(data, bins=bins, color=color, edgecolor=edgecolor, linewidth=edgewidth)
     
     #set axis titles
-    f.set_xlabel(x)
-    f.set_ylabel(y)
+    f.set_xlabel(x, fontsize=xfontsize)
+    f.set_ylabel(y, fontsize=yfontsize)
 
     #set axis ranges, doesn't actually change the scale
     f.set_xlim([xmin, xmax])
-    f.set_ylim([None, None])
+    f.set_ylim([ymin, ymax])
 
     #set title & append figure to canvas
     f.set_title(title)
@@ -102,4 +104,4 @@ def auto_bin(data):
     n = data.count()
     logn = math.ceil(math.log2(n))
     print(str(logn + 1))
-    return str(10*(logn + 1))
+    return str(5*(logn + 1))
