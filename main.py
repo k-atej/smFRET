@@ -110,6 +110,27 @@ class Application(tk.Tk):
         self.tabControl.add(self.tabText, text="Text")
         self.tabControl.grid(row=0, column=0, rowspan=3, padx=10)
 
+        self.tabFormat_0 = tk.Frame(self.tabFormat)
+        self.tabFormat_0.grid(row=0, column = 0)
+        self.tabFormat_1 = tk.Frame(self.tabFormat)
+        self.tabFormat_1.grid(row=1, column = 0)
+        self.tabFormat_2 = tk.Frame(self.tabFormat)
+        self.tabFormat_2.grid(row=2, column = 0)
+
+        self.tabStyle_0 = tk.Frame(self.tabStyle)
+        self.tabStyle_0.grid(row=0, column = 0)
+        self.tabStyle_1 = tk.Frame(self.tabStyle)
+        self.tabStyle_1.grid(row=1, column = 0)
+        self.tabStyle_2 = tk.Frame(self.tabStyle)
+        self.tabStyle_2.grid(row=2, column = 0)
+
+        self.tabText_0 = tk.Frame(self.tabText)
+        self.tabText_0.grid(row=0, column = 0)
+        self.tabText_1 = tk.Frame(self.tabText)
+        self.tabText_1.grid(row=1, column = 0)
+        self.tabText_2 = tk.Frame(self.tabText)
+        self.tabText_2.grid(row=2, column = 0)
+
     def makeButtons(self):
         makeHist = tk.Button(self.subframe3, text="Generate", command=self.his)
         makeHist.grid(row=0, column=0, padx="10")
@@ -118,149 +139,149 @@ class Application(tk.Tk):
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
     def makeOptions(self):
-        self.lbl_label = tk.Label(self.tabFormat, text="Data Column:")
+        self.lbl_label = tk.Label(self.tabFormat_0, text="Data Column:")
         self.lbl_label.grid(row=0, column=0)
         labels = self.df.columns
         self.ref_col = tk.StringVar(self)
         self.ref_col.set("eFRET")
 
-        self.combo = tk.OptionMenu(self.tabFormat, self.ref_col, *labels)
+        self.combo = tk.OptionMenu(self.tabFormat_0, self.ref_col, *labels)
         self.combo.config(width=10)
         self.combo.grid(row=0, column=1)
 
-        self.bin_label = tk.Label(self.tabFormat, text="Bins:")
-        self.bin_label.grid(row=1, column=0)
+        self.bin_label = tk.Label(self.tabFormat_1, text="Bins:")
+        self.bin_label.grid(row=0, column=0, columnspan=2)
         self.ref_bins = tk.StringVar(self)
         self.ref_bins.set("Auto")
 
-        self.combo1 = tk.Entry(self.tabFormat, textvariable=self.ref_bins)
+        self.combo1 = tk.Entry(self.tabFormat_1, textvariable=self.ref_bins)
         self.combo1.config(width=10)
-        self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo1.grid(row=0, column=2, sticky="ew", padx=(0, 0), pady="10", columnspan=2)
 
-        self.offset_label = tk.Label(self.tabFormat, text="Offset:")
-        self.offset_label.grid(row=1, column=2)
+        self.offset_label = tk.Label(self.tabFormat_2, text="Offset:")
+        self.offset_label.grid(row=0, column=0, columnspan=2)
         self.ref_offset = tk.StringVar(self)
         self.ref_offset.set('0.0')
 
-        self.combo3 = tk.Entry(self.tabFormat, textvariable=self.ref_offset)
+        self.combo3 = tk.Entry(self.tabFormat_2, textvariable=self.ref_offset)
         self.combo3.config(width=10)
-        self.combo3.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.combo3.grid(row=0, column=2, sticky="ew", padx=(0, 0), pady="10", columnspan=2)
 
 
-        self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
-        self.xmax_label.grid(row=0, column=4)
+        self.xmax_label = tk.Label(self.tabFormat_2, text="X Max:")
+        self.xmax_label.grid(row=1, column=0)
         self.ref_xmax = tk.StringVar(self)
         self.ref_xmax.set('None')
 
-        self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
+        self.comboxmax = tk.Entry(self.tabFormat_2, textvariable=self.ref_xmax)
         self.comboxmax.config(width=5)
-        self.comboxmax.grid(row=0, column=5, sticky="ew", padx=(0, 10), pady="10")
+        self.comboxmax.grid(row=1, column=1, sticky="ew", padx=(0, 0), pady="10")
 
-        self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
-        self.xmin_label.grid(row=1, column=4)
+        self.xmin_label = tk.Label(self.tabFormat_2, text="X Min:")
+        self.xmin_label.grid(row=2, column=0)
         self.ref_xmin = tk.StringVar(self)
         self.ref_xmin.set('None')
 
-        self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
+        self.comboxmin = tk.Entry(self.tabFormat_2, textvariable=self.ref_xmin)
         self.comboxmin.config(width=5)
-        self.comboxmin.grid(row=1, column=5, sticky="ew", padx=(0, 10), pady="10")
+        self.comboxmin.grid(row=2, column=1, sticky="ew", padx=(0, 0), pady="10")
 
 
-        self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
-        self.ymax_label.grid(row=0, column=6)
+        self.ymax_label = tk.Label(self.tabFormat_2, text="Y Max:")
+        self.ymax_label.grid(row=1, column=2)
         self.ref_ymax = tk.StringVar(self)
         self.ref_ymax.set('None')
 
-        self.comboymax = tk.Entry(self.tabFormat, textvariable=self.ref_ymax)
+        self.comboymax = tk.Entry(self.tabFormat_2, textvariable=self.ref_ymax)
         self.comboymax.config(width=5)
-        self.comboymax.grid(row=0, column=7, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymax.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
 
-        self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
-        self.ymin_label.grid(row=1, column=6)
+        self.ymin_label = tk.Label(self.tabFormat_2, text="Y Min:")
+        self.ymin_label.grid(row=2, column=2)
         self.ref_ymin = tk.StringVar(self)
         self.ref_ymin.set('None')
 
-        self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
+        self.comboymin = tk.Entry(self.tabFormat_2, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
-        self.comboymin.grid(row=1, column=7, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymin.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
 
 
 
         # second tab = style
 
+        self.color_label = tk.Label(self.tabStyle_0, text="Color:")
+        self.color_label.grid(row=0, column=0)
+        self.ref_color = tk.StringVar(self)
+        self.ref_color.set("0")
 
-        self.title_label = tk.Label(self.tabText, text="Title:")
+        self.combo2 = tk.Entry(self.tabStyle_0, textvariable=self.ref_color)
+        self.combo2.config(width=5)
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        self.edgecolor_label = tk.Label(self.tabStyle_1, text="Edge Color:")
+        self.edgecolor_label.grid(row=1, column=0)
+        self.ref_edgecolor = tk.StringVar(self)
+        self.ref_edgecolor.set("0")
+
+        self.combo5 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgecolor)
+        self.combo5.config(width=5)
+        self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
+        self.edgewidth_label.grid(row=1, column=2)
+        self.ref_edgewidth = tk.StringVar(self)
+        self.ref_edgewidth.set("1")
+
+        self.combo6 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgewidth)
+        self.combo6.config(width=5)
+        self.combo6.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+
+        # third tab: text
+
+        self.title_label = tk.Label(self.tabText_0, text="Title:")
         self.title_label.grid(row=0, column=0)
         self.ref_title = tk.StringVar(self)
         self.ref_title.set("Title")
 
-        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
+        self.combo2 = tk.Entry(self.tabText_0, textvariable=self.ref_title)
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-
-        self.x_label = tk.Label(self.tabText, text="X-Axis Label:")
-        self.x_label.grid(row=0, column=2)
+        self.x_label = tk.Label(self.tabText_1, text="X-Axis Label:")
+        self.x_label.grid(row=0, column=0)
         self.ref_x = tk.StringVar(self)
         self.ref_x.set("X-Axis")
 
-        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x)
+        self.combo2 = tk.Entry(self.tabText_1, textvariable=self.ref_x)
         self.combo2.config(width=10)
-        self.combo2.grid(row=0, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        self.y_label = tk.Label(self.tabText, text="Y-Axis Label:")
-        self.y_label.grid(row=0, column=4)
+        self.y_label = tk.Label(self.tabText_2, text="Y-Axis Label:")
+        self.y_label.grid(row=0, column=0)
         self.ref_y = tk.StringVar(self)
         self.ref_y.set("Y-Axis")
 
-        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_y)
+        self.combo2 = tk.Entry(self.tabText_2, textvariable=self.ref_y)
         self.combo2.config(width=10)
-        self.combo2.grid(row=0, column=5, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        self.color_label = tk.Label(self.tabStyle, text="Color:")
-        self.color_label.grid(row=1, column=0)
-        self.ref_color = tk.StringVar(self)
-        self.ref_color.set("0")
-
-        self.combo2 = tk.Entry(self.tabStyle, textvariable=self.ref_color)
-        self.combo2.config(width=10)
-        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
-
-        self.edgecolor_label = tk.Label(self.tabStyle, text="Edge Color:")
-        self.edgecolor_label.grid(row=1, column=2)
-        self.ref_edgecolor = tk.StringVar(self)
-        self.ref_edgecolor.set("0")
-
-        self.combo5 = tk.Entry(self.tabStyle, textvariable=self.ref_edgecolor)
-        self.combo5.config(width=10)
-        self.combo5.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
-
-        self.edgewidth_label = tk.Label(self.tabStyle, text="Edge Width:")
-        self.edgewidth_label.grid(row=1, column=4)
-        self.ref_edgewidth = tk.StringVar(self)
-        self.ref_edgewidth.set("1")
-
-        self.combo6 = tk.Entry(self.tabStyle, textvariable=self.ref_edgewidth)
-        self.combo6.config(width=10)
-        self.combo6.grid(row=1, column=5, sticky="ew", padx=(0, 10), pady="10")
-
-        self.xfontsize_label = tk.Label(self.tabText, text="X Font Size:")
-        self.xfontsize_label.grid(row=0, column=6)
+        self.xfontsize_label = tk.Label(self.tabText_1, text="X Font Size:")
+        self.xfontsize_label.grid(row=1, column=0)
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("10")
 
-        self.combo7 = tk.Entry(self.tabText, textvariable=self.ref_xfontsize)
+        self.combo7 = tk.Entry(self.tabText_1, textvariable=self.ref_xfontsize)
         self.combo7.config(width=10)
-        self.combo7.grid(row=0, column=7, sticky="ew", padx=(0, 10), pady="10")
+        self.combo7.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        self.yfontsize_label = tk.Label(self.tabText, text="Y Font Size:")
-        self.yfontsize_label.grid(row=1, column=6)
+        self.yfontsize_label = tk.Label(self.tabText_2, text="Y Font Size:")
+        self.yfontsize_label.grid(row=1, column=0)
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("10")
 
-        self.combo8 = tk.Entry(self.tabText, textvariable=self.ref_yfontsize)
+        self.combo8 = tk.Entry(self.tabText_2, textvariable=self.ref_yfontsize)
         self.combo8.config(width=10)
-        self.combo8.grid(row=1, column=7, sticky="ew", padx=(0, 10), pady="10")
+        self.combo8.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
     def table(self): # i may want to turn this into a class
         makeTable(self.df, self.subframe1, 0, 0)
