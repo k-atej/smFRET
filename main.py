@@ -57,12 +57,17 @@ class Application(tk.Tk):
         # bottom of window0
         self.subframe4 = tk.Frame(self.window0, background='white')
         self.subframe4.grid(row=2, column=0)
-        
+
+
+        #Title
+        self.title_label = tk.Label(self.subframe1, text="Open A File:")
+        self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
+
         #placeholder button
         self.startButton = tk.Button(self.subframe1, text="start", command=self.start)
-        self.startButton.grid(row=0, column=0)
+        self.startButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        
         #where did this button go? 
-
         self.input_label = tk.Label(self.subframe1, text="File Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
@@ -70,7 +75,7 @@ class Application(tk.Tk):
 
         self.combo4 = tk.Entry(self.subframe1, textvariable=self.ref_input)
         self.combo4.config(width=30)
-        self.combo4.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
 
     def get_data(self, path):
