@@ -6,7 +6,6 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
-
 # makes a single histogram from a given data frame column
 #   - data: pandas dataframe column to input into a histogram
 #   - master: which frame of the gui to add the histogram to
@@ -29,7 +28,7 @@ def makeHistogram(data, master, row, col, bins, title, x, y, color, edgecolor, e
     data = zero_data(data, shift)
 
     #create figure
-    fig = Figure(dpi=60)
+    fig = Figure(dpi=80)
     f = fig.gca() #gca = get current axes
 
     # set number of bins
@@ -98,7 +97,7 @@ def emptyHistogram(master, row, col):
     hist_canvas.get_tk_widget().grid(row=row, column=col)
 
 
-# calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 10
+# calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
 #   - data: pandas dataframe column to input into a histogram
 def auto_bin(data):
     n = data.count()
