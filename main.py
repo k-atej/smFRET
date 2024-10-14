@@ -2,7 +2,9 @@ import pandas as pd
 import tkinter as tk
 from histogramMaker import *
 from tableMaker import *
-from histogramwindow import *
+from histogramWindow import *
+from stackedHistogramWindow import *
+import os
 
 #file name
 eFRET_FILE_NAME = "FRETresult.dat"
@@ -38,7 +40,6 @@ class Application(tk.Tk):
         self.startButton = tk.Button(self.subframe1, text="start", command=self.start)
         self.startButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
-        #where did this button go? 
         self.input_label = tk.Label(self.subframe1, text="File Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
@@ -49,17 +50,20 @@ class Application(tk.Tk):
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
 
-    def get_data(self, path):
-        FRETresult = open(path + "/" + eFRET_FILE_NAME, "r") 
-        data = pd.read_fwf(FRETresult, header=None)
-        data.columns = ["eFRET", "other"]
-        self.df = data
-
     def start(self):
         self.path = self.ref_input.get()
-        self.get_data(self.path)
-        histapp = HistApplication(self.df, self.getTitle())
-        histapp.mainloop()
+        keys = []
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file.endswith("FRETresult.dat"):
+                    keys.append(file)
+        if len(keys) == 1:
+            histapp = HistApplication(self.path, self.getTitle())
+            histapp.mainloop()
+        elif len(keys) > 1:
+            stackedhistapp = StackedHistApplication(self.path, self.getTitle())
+            stackedhistapp.mainloop()
+
     
     def getTitle(self):
         path = self.path.split("/")

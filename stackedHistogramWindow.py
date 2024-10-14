@@ -3,25 +3,24 @@ import tkinter as tk
 from tkinter import ttk
 from matplotlib.figure import Figure
 from histogramMaker import *
+from stackedHistogramMaker import *
 from tableMaker import *
 import os
 
-
-#Example MacOS filepath
-path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl"
+path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11"
 
 filename = "FRETresult.dat"
 
-#YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
-
-class HistApplication(tk.Tk):
+class StackedHistApplication(tk.Tk):
 
     def __init__(self, path, title):
         super().__init__()
         self.title(title)
         self.minsize(200, 200)
-        self.path = path + "/" + filename
-        self.get_data()
+        self.path = path
+
+        self.find_files()
+
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -51,16 +50,27 @@ class HistApplication(tk.Tk):
         self.subframe4 = tk.Frame(self.window0, background='white')
         self.subframe4.grid(row=2, column=0)
 
-        self.start()         
-           
-    def get_data(self):
-        FRETresult = open(self.path, "r") 
-        data = pd.read_fwf(FRETresult, header=None)
-        data.columns = ["eFRET", "other"]
-        self.df = data
+        
+        self.start()
+
+    def find_files(self):
+        keys = []
+        for root, dirs, files in os.walk(self.path):
+            for file in files:
+                if file.endswith("FRETresult.dat"):
+                    key, value = os.path.split(root)
+                    keys.append(value)
+        # this is a list of subfolders which have an FRETResult.dat file in them
+        
+        self.files = []
+        for key in keys:
+            self.files.append(self.path + "/" + key)
+
 
     def start(self):
         self.emptyHis()
+
+        #need to read in files and data before you can make the features!
         self.makeFeatures()
 
     def makeFeatures(self):
@@ -111,7 +121,7 @@ class HistApplication(tk.Tk):
     def makeOptions(self):
         self.lbl_label = tk.Label(self.tabFormat_0, text="Data Column:")
         self.lbl_label.grid(row=0, column=0)
-        labels = self.df.columns
+        labels = ["eFRET", "other"]
         self.ref_col = tk.StringVar(self)
         self.ref_col.set("eFRET")
 
@@ -253,15 +263,14 @@ class HistApplication(tk.Tk):
         self.combo8.config(width=10)
         self.combo8.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-    def table(self): # i may want to turn this into a class
-        makeTable(self.df, self.subframe1, 0, 0)
     
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
         HistMaker(df_empty, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
 
     def his(self, event=None): #creates histogram from sample data
-        col = self.ref_col.get()
+        # need to check that this column is present in all files?
+        datacol = self.ref_col.get()
         bins = self.ref_bins.get()
         title = str(self.ref_title.get())
         x_ax = str(self.ref_x.get())
@@ -277,8 +286,8 @@ class HistApplication(tk.Tk):
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
-        hist = HistMaker(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
-        self.ref_bins.set(hist.getBins())
+        stackedhist = StackedHistMaker(self.files, datacol, self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
+        self.ref_bins.set(stackedhist.getBins())
 
     def checkMinMax(self, val):
         if val != 'None':
@@ -287,9 +296,3 @@ class HistApplication(tk.Tk):
             val = None
         return val
     
-    def emptyFig(self):
-        fig = Figure()
-        canvas = FigureCanvasTkAgg(fig, master=self.subframe2)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=1)
-        
