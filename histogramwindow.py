@@ -254,7 +254,7 @@ class HistApplication(tk.Tk):
     
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
-        HistMaker(df_empty, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", "1", 1, 0, 1, 0, 10.0, 10.0, 0)
+        HistMaker(df_empty, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
 
     def his(self, event=None): #creates histogram from sample data
         col = self.ref_col.get()
@@ -273,8 +273,8 @@ class HistApplication(tk.Tk):
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
-        bin_num = HistMaker(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
-        self.ref_bins.set(bin_num)
+        hist = HistMaker(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
+        self.ref_bins.set(hist.getBins())
 
     def checkMinMax(self, val):
         if val != 'None':

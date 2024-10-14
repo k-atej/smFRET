@@ -43,7 +43,7 @@ class HistMaker():
         self.ymin = ymin
         self.xfontsize = xfontsize
         self.yfontsize = yfontsize
-        self.shift = shift
+        self.offset = shift
 
         self.makeHistogram()
 
@@ -51,7 +51,7 @@ class HistMaker():
 # makes a single histogram from a given data frame column
     def makeHistogram(self):
         #zero data points
-        self.data = self.zero_data(self.data, self.shift)
+        self.data = self.zero_data()
 
         #create figure
         fig = Figure(dpi=80)
@@ -78,24 +78,26 @@ class HistMaker():
         hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         hist_canvas.draw()
         hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+    
+    def getBins(self):
         return self.bins
 
     # zeroes the first peak of the data
     #   - data: pandas df column
     #   - offset: how far to shift the data by
-    def zero_data(data, offset):
+    def zero_data(self):
         # Make a histogram with two bins
         # so one bin in actual fret and the other is photobleaching
-        if offset == 'Auto':
-            bin_edges = np.histogram(data, bins=2)[1]
+        if self.offset == 'Auto':
+            bin_edges = np.histogram(self.data, bins=2)[1]
             # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
-            offset = bin_edges[1] / 2
-        elif offset == 'None':
-            offset = 0.0
+            self.offset = bin_edges[1] / 2
+        elif self.offset == 'None':
+            self.offset = 0.0
         # subtract that midpoint of from all of the eFRET data
-        data = data.astype(float)
-        data = data - float(offset)
-        return data
+        self.data = self.data.astype(float)
+        self.data = self.data - float(self.offset)
+        return self.data
 
     # returns the count of the highest bin
     #   - data: pandas dataframe column 
@@ -109,5 +111,4 @@ class HistMaker():
     def auto_bin(self):
         n = self.data.count()
         logn = math.ceil(math.log2(n))
-        print(str(logn + 1))
         return str(5*(logn + 1))

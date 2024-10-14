@@ -1,11 +1,8 @@
 import pandas as pd
 import tkinter as tk
-from tkinter import ttk
-from matplotlib.figure import Figure
 from histogramMaker import *
 from tableMaker import *
 from histogramwindow import *
-from tkinter.filedialog import askopenfile
 
 #file name
 eFRET_FILE_NAME = "FRETresult.dat"
