@@ -6,7 +6,8 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
-# makes a single histogram from a given data frame column
+class HistMaker():
+
 #   - data: pandas dataframe column to input into a histogram
 #   - master: which frame of the gui to add the histogram to
 #   - row: which row to add canvas to
@@ -23,84 +24,90 @@ from matplotlib.figure import Figure
 #   - ymax: upper limit of y-axis
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
-def makeHistogram(data, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
-    #zero data points
-    data = zero_data(data, shift)
 
-    #create figure
-    fig = Figure(dpi=80)
-    f = fig.gca() #gca = get current axes
+    def __init__(self, data, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+        self.data = data
+        self.master = master
+        self.row = row
+        self.col = col
+        self.bins = bins
+        self.title = title
+        self.x = x
+        self.y = y
+        self.color = color
+        self.edgecolor = edgecolor
+        self.edgewidth = edgewidth
+        self.xmax = xmax
+        self.xmin = xmin
+        self.ymax = ymax
+        self.ymin = ymin
+        self.xfontsize = xfontsize
+        self.yfontsize = yfontsize
+        self.shift = shift
 
-    # set number of bins
-    if bins == 'Auto':
-        bins = int(auto_bin(data))
-    else:
-        bins = int(bins)
-    f.hist(data, bins=bins, color=color, edgecolor=edgecolor, linewidth=edgewidth)
-    
-    #set axis titles
-    f.set_xlabel(x, fontsize=xfontsize)
-    f.set_ylabel(y, fontsize=yfontsize)
-
-    #set axis ranges, doesn't actually change the scale
-    f.set_xlim([xmin, xmax])
-    f.set_ylim([ymin, ymax])
-
-    #set title & append figure to canvas
-    f.set_title(title)
-    fig.tight_layout()
-    hist_canvas = FigureCanvasTkAgg(fig, master=master)
-    hist_canvas.draw()
-    hist_canvas.get_tk_widget().grid(row=row, column=col)
-    return bins
-
-# zeroes the first peak of the data
-#   - data: pandas df column
-#   - offset: how far to shift the data by
-def zero_data(data, offset):
-    # Make a histogram with two bins
-    # so one bin in actual fret and the other is photobleaching
-    if offset == 'Auto':
-        bin_edges = np.histogram(data, bins=2)[1]
-        # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
-        offset = bin_edges[1] / 2
-    elif offset == 'None':
-        offset = 0.0
-    # subtract that midpoint of from all of the eFRET data
-    data = data.astype(float)
-    data = data - float(offset)
-    return data
-
-# returns the count of the highest bin
-#   - data: pandas dataframe column 
-def getHighestCount(data):
-    hist = np.histogram(data)
-    sizes = hist[0]
-    return max(sizes)
-
-# returns an empty histogram
-#   - master: which frame of the gui to add the histogram to
-#   - row: which row to add canvas to
-#   - col: which column to add canvas to
-def emptyHistogram(master, row, col):
-    df_empty = pd.DataFrame({'A' : []})
-    fig = Figure(dpi=60)
-    f = fig.gca() #gca = get current axes
-    f.hist(df_empty, bins=10)
-    f.set_xlabel(" ")
-    f.set_ylabel(" ")
-    f.set_title(" ")
-    fig.tight_layout()
-
-    hist_canvas = FigureCanvasTkAgg(fig, master=master)
-    hist_canvas.draw()
-    hist_canvas.get_tk_widget().grid(row=row, column=col)
+        self.makeHistogram()
 
 
-# calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
-#   - data: pandas dataframe column to input into a histogram
-def auto_bin(data):
-    n = data.count()
-    logn = math.ceil(math.log2(n))
-    print(str(logn + 1))
-    return str(5*(logn + 1))
+# makes a single histogram from a given data frame column
+    def makeHistogram(self):
+        #zero data points
+        self.data = self.zero_data(self.data, self.shift)
+
+        #create figure
+        fig = Figure(dpi=80)
+        f = fig.gca() #gca = get current axes
+
+        # set number of bins
+        if self.bins == 'Auto':
+            self.bins = int(self.auto_bin())
+        else:
+            self.bins = int(self.bins)
+        f.hist(self.data, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+        
+        #set axis titles
+        f.set_xlabel(self.x, fontsize=self.xfontsize)
+        f.set_ylabel(self.y, fontsize=self.yfontsize)
+
+        #set axis ranges, doesn't actually change the scale
+        f.set_xlim([self.xmin, self.xmax])
+        f.set_ylim([self.ymin, self.ymax])
+
+        #set title & append figure to canvas
+        f.set_title(self.title)
+        fig.tight_layout()
+        hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
+        hist_canvas.draw()
+        hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+        return self.bins
+
+    # zeroes the first peak of the data
+    #   - data: pandas df column
+    #   - offset: how far to shift the data by
+    def zero_data(data, offset):
+        # Make a histogram with two bins
+        # so one bin in actual fret and the other is photobleaching
+        if offset == 'Auto':
+            bin_edges = np.histogram(data, bins=2)[1]
+            # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
+            offset = bin_edges[1] / 2
+        elif offset == 'None':
+            offset = 0.0
+        # subtract that midpoint of from all of the eFRET data
+        data = data.astype(float)
+        data = data - float(offset)
+        return data
+
+    # returns the count of the highest bin
+    #   - data: pandas dataframe column 
+    def getHighestCount(data):
+        hist = np.histogram(data)
+        sizes = hist[0]
+        return max(sizes)
+
+    # calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
+    #   - data: pandas dataframe column to input into a histogram
+    def auto_bin(self):
+        n = self.data.count()
+        logn = math.ceil(math.log2(n))
+        print(str(logn + 1))
+        return str(5*(logn + 1))
