@@ -1,19 +1,12 @@
 import numpy as np
 import math
 import pandas as pd
-import matplotlib as plt
+from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
 filename = "FRETresult.dat"
-X_LABEL = "Time (s)"
-Y_LABEL = "E FRET"
-eFRET_FILE_NAME = "eFRET.dat"
-FIG_NAME = "eFRET_plot.png"
-# Width and Height of saved picture in inches
-FIG_WIDTH = 20
-FIG_HEIGHT = 10
 
 class StackedHistMaker():
 
@@ -54,13 +47,12 @@ class StackedHistMaker():
         self.xfontsize = xfontsize
         self.yfontsize = yfontsize
         self.offset = shift
+        self.minlength = float('inf')
 
         self.makeStackedHistogram()
 
-
-# DOES NOT YET ACTUALLY MAKE THE STACKED HISTOGRAM, BUT CREATES A LIST OF ALL DATAFRAMES
     def makeStackedHistogram(self):
-        all_data = [] # list of dataframes
+        self.all_data = [] # list of dataframes
         min_data = 0
         max_data = 0
         min_length = float('inf')
@@ -71,43 +63,48 @@ class StackedHistMaker():
 
             if len(data) < min_length:
                 min_length = len(data)
-            if data["eFRET"].min() < min_data:
-                min_data = data["eFRET"].min()
-            if data["eFRET"].max() > max_data:
-                max_data = data["eFRET"].max()
-            all_data.append(data)
-        print(all_data)
+            self.all_data.append(data)
+            self.minlength = min_length
+
+        #zeroes the data in each individual dataframe
+        self.zero_data()
+
+        # set number of bins
+        if self.bins == 'Auto':
+            self.bins = int(self.auto_bin())
+        else:
+            self.bins = int(self.bins)
 
         #create figure
         fig = Figure(dpi=80)
-        f = fig.gca() #gca = get current axes
-
-        # set number of bins
-        #if self.bins == 'Auto':
-            #self.bins = int(self.auto_bin())
-        #else:
-            #self.bins = int(self.bins)
-
-
-        #for df in all_data:
-         #   f.hist(df[self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+        axes = []
+        for i in range(len(self.all_data)):
+            ax = fig.add_subplot(len(self.all_data), 1, i+1)
+            ax.hist(self.all_data[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+            axes.append(ax)
         
-        #set axis titles
-        #f.set_xlabel(self.x, fontsize=self.xfontsize)
-        #f.set_ylabel(self.y, fontsize=self.yfontsize)
+        #set up axis ticks, range, & scale
+        for ax in axes:
+            ax.sharey(axes[0])
+            ax.set_xticks([])
+            ax.set_xlim([self.xmin, self.xmax])
+            ax.set_ylim([self.ymin, self.ymax]) 
+            yticks = ax.yaxis.get_major_ticks()
+            yticks[0].label1.set_visible(False) # this should probably be able to be toggled on & off
+        axes[-1].xaxis.set_major_locator(plt.AutoLocator())
 
-        #set axis ranges, doesn't actually change the scale
-        #f.set_xlim([self.xmin, self.xmax])
-        #f.set_ylim([self.ymin, self.ymax])
+
+        #set axis titles
+        axes[-1].set_xlabel(self.x, fontsize=self.xfontsize)
+        fig.supylabel(self.y, fontsize=self.yfontsize)
 
         #set title & append figure to canvas
-        f.set_title(self.title)
-        fig.tight_layout()
+        fig.suptitle(self.title, y = 0.93)
+        fig.subplots_adjust(wspace=0, hspace=0)
         hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         hist_canvas.draw()
         hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
-    
     
     def getBins(self):
         return self.bins
@@ -125,16 +122,19 @@ class StackedHistMaker():
     def zero_data(self):
         # Make a histogram with two bins
         # so one bin in actual fret and the other is photobleaching
-        if self.offset == 'Auto':
-            bin_edges = np.histogram(self.data, bins=2)[1]
-            # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
-            self.offset = bin_edges[1] / 2
-        elif self.offset == 'None':
-            self.offset = 0.0
-        # subtract that midpoint of from all of the eFRET data
-        self.data = self.data.astype(float)
-        self.data = self.data - float(self.offset)
-        return self.data
+        zeroed_data = []
+        for df in self.all_data:
+            if self.offset == 'Auto':
+                bin_edges = np.histogram(self.data, bins=2)[1]
+                # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
+                self.offset = bin_edges[1] / 2
+            elif self.offset == 'None':
+                self.offset = 0.0
+            # subtract that midpoint of from all of the eFRET data
+            df[self.datacolumn] = df[self.datacolumn].astype(float)
+            df[self.datacolumn] = df[self.datacolumn] - float(self.offset)
+            zeroed_data.append(df)
+        self.all_data = zeroed_data
 
     # returns the count of the highest bin
     #   - data: pandas dataframe column 
@@ -146,6 +146,6 @@ class StackedHistMaker():
     # calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
     #   - data: pandas dataframe column to input into a histogram
     def auto_bin(self):
-        n = self.data.count()
+        n = self.minlength
         logn = math.ceil(math.log2(n))
         return str(5*(logn + 1))

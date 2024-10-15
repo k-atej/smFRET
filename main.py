@@ -6,11 +6,12 @@ from histogramWindow import *
 from stackedHistogramWindow import *
 import os
 
+
 #file name
 eFRET_FILE_NAME = "FRETresult.dat"
 
 #MacOS filepath
-path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl"
+path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
 
 def main():
     app = Application()
