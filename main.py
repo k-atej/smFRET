@@ -7,16 +7,17 @@ from stackedHistogramWindow import *
 import os
 
 
-#file name
+#file name to look for results in
 eFRET_FILE_NAME = "FRETresult.dat"
 
-#MacOS filepath
+#example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
 
 def main():
     app = Application()
     app.mainloop()
 
+# opens a small window. takes a file path and decides whether to open a histogram or stacked histogram window based on the number of eFRET_FILE_NAMEs found. 
 class Application(tk.Tk):
 
     def __init__(self):
@@ -37,10 +38,11 @@ class Application(tk.Tk):
         self.title_label = tk.Label(self.subframe1, text="Open A File:")
         self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
 
-        #placeholder button
+        #start button
         self.startButton = tk.Button(self.subframe1, text="start", command=self.start)
         self.startButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
+        #input area for file path
         self.input_label = tk.Label(self.subframe1, text="File Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
@@ -50,13 +52,14 @@ class Application(tk.Tk):
         self.combo4.config(width=30)
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
-
+    # walks through folders in the file path and identifies that number of eFRET_FILE_NAMEs present. decides whether a single or stacked histogram is appropriate,
+    # and opens the corresponding window. 
     def start(self):
         self.path = self.ref_input.get()
         keys = []
         for root, dirs, files in os.walk(self.path):
             for file in files:
-                if file.endswith("FRETresult.dat"):
+                if file.endswith(eFRET_FILE_NAME):
                     keys.append(file)
         if len(keys) == 1:
             histapp = HistApplication(self.path, self.getTitle())
@@ -65,7 +68,7 @@ class Application(tk.Tk):
             stackedhistapp = StackedHistApplication(self.path, self.getTitle())
             stackedhistapp.mainloop()
 
-    
+    #returns the name of the final folder in the file path, to set as the window title
     def getTitle(self):
         path = self.path.split("/")
         title = path[-1]

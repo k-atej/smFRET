@@ -7,12 +7,18 @@ from stackedHistogramMaker import *
 from tableMaker import *
 import os
 
+#Example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11"
 
 filename = "FRETresult.dat"
 
+#YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
+
+#opens a window that displays a stacked histogram based on the files procided
 class StackedHistApplication(tk.Tk):
 
+    # path - filepath provided in entry box in main menu
+    # title - name to set as the window title
     def __init__(self, path, title):
         super().__init__()
         self.title(title)
@@ -21,6 +27,7 @@ class StackedHistApplication(tk.Tk):
 
         self.find_files()
 
+        #setting up the layout of the window!
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -49,36 +56,35 @@ class StackedHistApplication(tk.Tk):
         # bottom of window0
         self.subframe4 = tk.Frame(self.window0, background='white')
         self.subframe4.grid(row=2, column=0)
-
         
         self.start()
 
+    # parses the folders into list of folders with the designated filename in them
     def find_files(self):
         keys = []
         for root, dirs, files in os.walk(self.path):
             for file in files:
-                if file.endswith("FRETresult.dat"):
+                if file.endswith(filename):
                     key, value = os.path.split(root)
                     keys.append(value)
-        # this is a list of subfolders which have an FRETResult.dat file in them
         
         self.files = []
         for key in keys:
             self.files.append(self.path + "/" + key)
 
-
+# initializes an empty histogram and creates the customizability options in the side menu
     def start(self):
         self.emptyHis()
-
-        #need to read in files and data before you can make the features!
         self.makeFeatures()
 
+# creates the dropdowns & buttons available in the customizability menu, binds 'Enter' to the generation of a histogram
     def makeFeatures(self):
         self.makeFormat()
         self.makeOptions()
         self.makeButtons()
         self.bind('<Return>', self.his)
 
+    # sets up the layout of the customizability menu
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.window1)
         self.tabFormat = tk.Frame(self.tabControl)
@@ -111,6 +117,7 @@ class StackedHistApplication(tk.Tk):
         self.tabText_2 = tk.Frame(self.tabText)
         self.tabText_2.grid(row=2, column = 0)
 
+    # sets up the generate and clear buttons beneath the histogram
     def makeButtons(self):
         makeHist = tk.Button(self.subframe3, text="Generate", command=self.his)
         makeHist.grid(row=0, column=0, padx="10")
@@ -118,7 +125,12 @@ class StackedHistApplication(tk.Tk):
         self.clearButton = tk.Button(self.subframe3, text="Clear", command=self.emptyHis)
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
+    # sets up options in the customizability window
     def makeOptions(self):
+
+        # first tab = format
+
+        # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
         self.lbl_label = tk.Label(self.tabFormat_0, text="Data Column:")
         self.lbl_label.grid(row=0, column=0)
         labels = ["eFRET", "other"]
@@ -129,6 +141,7 @@ class StackedHistApplication(tk.Tk):
         self.combo.config(width=10)
         self.combo.grid(row=0, column=1)
 
+        # input area that allows entry of the preferred number of bins to use in the histogram
         self.bin_label = tk.Label(self.tabFormat_1, text="Bins:")
         self.bin_label.grid(row=0, column=0, columnspan=2)
         self.ref_bins = tk.StringVar(self)
@@ -138,6 +151,7 @@ class StackedHistApplication(tk.Tk):
         self.combo1.config(width=10)
         self.combo1.grid(row=0, column=2, sticky="ew", padx=(0, 0), pady="10", columnspan=2)
 
+        # input area that allows entry of the distance to shift data to the left (zeroing)
         self.offset_label = tk.Label(self.tabFormat_2, text="Offset:")
         self.offset_label.grid(row=0, column=0, columnspan=2)
         self.ref_offset = tk.StringVar(self)
@@ -147,7 +161,7 @@ class StackedHistApplication(tk.Tk):
         self.combo3.config(width=10)
         self.combo3.grid(row=0, column=2, sticky="ew", padx=(0, 0), pady="10", columnspan=2)
 
-
+        # input area to designate maximum value on x axis
         self.xmax_label = tk.Label(self.tabFormat_2, text="X Max:")
         self.xmax_label.grid(row=1, column=0)
         self.ref_xmax = tk.StringVar(self)
@@ -157,6 +171,7 @@ class StackedHistApplication(tk.Tk):
         self.comboxmax.config(width=5)
         self.comboxmax.grid(row=1, column=1, sticky="ew", padx=(0, 0), pady="10")
 
+        # input area to designate minimum value on x axis
         self.xmin_label = tk.Label(self.tabFormat_2, text="X Min:")
         self.xmin_label.grid(row=2, column=0)
         self.ref_xmin = tk.StringVar(self)
@@ -166,7 +181,7 @@ class StackedHistApplication(tk.Tk):
         self.comboxmin.config(width=5)
         self.comboxmin.grid(row=2, column=1, sticky="ew", padx=(0, 0), pady="10")
 
-
+        # input area to designate maximum value on y axis
         self.ymax_label = tk.Label(self.tabFormat_2, text="Y Max:")
         self.ymax_label.grid(row=1, column=2)
         self.ref_ymax = tk.StringVar(self)
@@ -176,6 +191,7 @@ class StackedHistApplication(tk.Tk):
         self.comboymax.config(width=5)
         self.comboymax.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area to designate minimum value on y axis
         self.ymin_label = tk.Label(self.tabFormat_2, text="Y Min:")
         self.ymin_label.grid(row=2, column=2)
         self.ref_ymin = tk.StringVar(self)
@@ -189,6 +205,7 @@ class StackedHistApplication(tk.Tk):
 
         # second tab = style
 
+        # input area for designation of column fill color
         self.color_label = tk.Label(self.tabStyle_0, text="Color:")
         self.color_label.grid(row=0, column=0)
         self.ref_color = tk.StringVar(self)
@@ -198,6 +215,7 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=5)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for designation of column edge color
         self.edgecolor_label = tk.Label(self.tabStyle_1, text="Edge Color:")
         self.edgecolor_label.grid(row=1, column=0)
         self.ref_edgecolor = tk.StringVar(self)
@@ -207,6 +225,7 @@ class StackedHistApplication(tk.Tk):
         self.combo5.config(width=5)
         self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for designation of column edge line width
         self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
         self.edgewidth_label.grid(row=1, column=2)
         self.ref_edgewidth = tk.StringVar(self)
@@ -218,6 +237,7 @@ class StackedHistApplication(tk.Tk):
 
         # third tab: text
 
+        # input area for designation of graph title
         self.title_label = tk.Label(self.tabText_0, text="Title:")
         self.title_label.grid(row=0, column=0)
         self.ref_title = tk.StringVar(self)
@@ -227,6 +247,7 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for designation of x-axis label
         self.x_label = tk.Label(self.tabText_1, text="X-Axis Label:")
         self.x_label.grid(row=0, column=0)
         self.ref_x = tk.StringVar(self)
@@ -236,6 +257,7 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for designation of y-axis label
         self.y_label = tk.Label(self.tabText_2, text="Y-Axis Label:")
         self.y_label.grid(row=0, column=0)
         self.ref_y = tk.StringVar(self)
@@ -245,6 +267,7 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for designation of x-axis font size
         self.xfontsize_label = tk.Label(self.tabText_1, text="X Font Size:")
         self.xfontsize_label.grid(row=1, column=0)
         self.ref_xfontsize = tk.StringVar(self)
@@ -254,6 +277,7 @@ class StackedHistApplication(tk.Tk):
         self.combo7.config(width=10)
         self.combo7.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for designation of y-axis font size
         self.yfontsize_label = tk.Label(self.tabText_2, text="Y Font Size:")
         self.yfontsize_label.grid(row=1, column=0)
         self.ref_yfontsize = tk.StringVar(self)
@@ -263,11 +287,12 @@ class StackedHistApplication(tk.Tk):
         self.combo8.config(width=10)
         self.combo8.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-    
+    # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
         HistMaker(df_empty, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
 
+    # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
         # need to check that this column is present in all files?
         datacol = self.ref_col.get()
@@ -289,6 +314,7 @@ class StackedHistApplication(tk.Tk):
         stackedhist = StackedHistMaker(self.files, datacol, self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
         self.ref_bins.set(stackedhist.getBins())
 
+    # type checks the designation of x/y mins and maxes
     def checkMinMax(self, val):
         if val != 'None':
             val = float(val)

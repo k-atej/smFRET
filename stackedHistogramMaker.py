@@ -6,8 +6,10 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
+# name of the files to parse
 filename = "FRETresult.dat"
 
+# creates a stack of histograms to display in the stackedHistogramWindow
 class StackedHistMaker():
 
 #   - data: pandas dataframe column to input into a histogram
@@ -51,36 +53,16 @@ class StackedHistMaker():
 
         self.makeStackedHistogram()
 
+    # generates the stack of histograms based on the parameters set in the customizability window
     def makeStackedHistogram(self):
-        self.all_data = [] # list of dataframes
-        min_data = 0
-        max_data = 0
-        min_length = float('inf')
-
-        for file in self.files:
-            path = file + "/" + filename
-            data = self.get_eFRET_data(path)
-
-            if len(data) < min_length:
-                min_length = len(data)
-            self.all_data.append(data)
-            self.minlength = min_length
-
-        #zeroes the data in each individual dataframe
-        self.zero_data()
-
-        # set number of bins
-        if self.bins == 'Auto':
-            self.bins = int(self.auto_bin())
-        else:
-            self.bins = int(self.bins)
+        self.processData()
 
         #create figure
         fig = Figure(dpi=80)
         axes = []
-        for i in range(len(self.all_data)):
-            ax = fig.add_subplot(len(self.all_data), 1, i+1)
-            ax.hist(self.all_data[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+        for i in range(len(self.all_data_shifted)):
+            ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
+            ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
             axes.append(ax)
         
         #set up axis ticks, range, & scale
@@ -93,7 +75,6 @@ class StackedHistMaker():
             yticks[0].label1.set_visible(False) # this should probably be able to be toggled on & off
         axes[-1].xaxis.set_major_locator(plt.AutoLocator())
 
-
         #set axis titles
         axes[-1].set_xlabel(self.x, fontsize=self.xfontsize)
         fig.supylabel(self.y, fontsize=self.yfontsize)
@@ -105,7 +86,30 @@ class StackedHistMaker():
         hist_canvas.draw()
         hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
-    
+    # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
+    def processData(self):
+        self.all_data = [] # list of dataframes
+        min_length = float('inf')
+
+        for file in self.files:
+            path = file + "/" + filename
+            data = self.get_eFRET_data(path)
+
+            if len(data) < min_length:
+                min_length = len(data)
+            self.all_data.append(data)
+            self.minlength = min_length
+
+        self.zero_data()
+
+        # set number of bins
+        if self.bins == 'Auto':
+            self.bins = int(self.auto_bin())
+        else:
+            self.bins = int(self.bins)
+
+
+    # returns the number of bins used in a histogram
     def getBins(self):
         return self.bins
 
@@ -116,15 +120,13 @@ class StackedHistMaker():
         data.columns = ["eFRET", "other"]
         return data
 
-    # zeroes the first peak of the data
-    #   - data: pandas df column
-    #   - offset: how far to shift the data by
+    # zeroes the data in each dataframe generated; can shift by a designated value or do it automatically
     def zero_data(self):
-        # Make a histogram with two bins
-        # so one bin in actual fret and the other is photobleaching
         zeroed_data = []
         for df in self.all_data:
             if self.offset == 'Auto':
+                # Make a histogram with two bins
+                # so one bin in actual fret and the other is photobleaching
                 bin_edges = np.histogram(self.data, bins=2)[1]
                 # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
                 self.offset = bin_edges[1] / 2
@@ -134,7 +136,7 @@ class StackedHistMaker():
             df[self.datacolumn] = df[self.datacolumn].astype(float)
             df[self.datacolumn] = df[self.datacolumn] - float(self.offset)
             zeroed_data.append(df)
-        self.all_data = zeroed_data
+        self.all_data_shifted = zeroed_data
 
     # returns the count of the highest bin
     #   - data: pandas dataframe column 
@@ -144,7 +146,6 @@ class StackedHistMaker():
         return max(sizes)
 
     # calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
-    #   - data: pandas dataframe column to input into a histogram
     def auto_bin(self):
         n = self.minlength
         logn = math.ceil(math.log2(n))

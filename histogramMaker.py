@@ -6,6 +6,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
+# creates a histogram to display in the histogramWindow
 class HistMaker():
 
 #   - data: pandas dataframe column to input into a histogram
@@ -50,8 +51,7 @@ class HistMaker():
 
 # makes a single histogram from a given data frame column
     def makeHistogram(self):
-        #zero data points
-        self.data = self.zero_data()
+        self.zero_data()
 
         #create figure
         fig = Figure(dpi=80)
@@ -62,7 +62,8 @@ class HistMaker():
             self.bins = int(self.auto_bin())
         else:
             self.bins = int(self.bins)
-        f.hist(self.data, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+
+        f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
         #set axis titles
         f.set_xlabel(self.x, fontsize=self.xfontsize)
@@ -79,12 +80,11 @@ class HistMaker():
         hist_canvas.draw()
         hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
     
+    #returns number of bins used in the histogram
     def getBins(self):
         return self.bins
 
-    # zeroes the first peak of the data
-    #   - data: pandas df column
-    #   - offset: how far to shift the data by
+    # zeroes the data in the dataframe; can shift by a designated value or do it automatically
     def zero_data(self):
         # Make a histogram with two bins
         # so one bin in actual fret and the other is photobleaching
@@ -96,8 +96,7 @@ class HistMaker():
             self.offset = 0.0
         # subtract that midpoint of from all of the eFRET data
         self.data = self.data.astype(float)
-        self.data = self.data - float(self.offset)
-        return self.data
+        self.data_shifted = self.data - float(self.offset)
 
     # returns the count of the highest bin
     #   - data: pandas dataframe column 
@@ -107,7 +106,6 @@ class HistMaker():
         return max(sizes)
 
     # calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
-    #   - data: pandas dataframe column to input into a histogram
     def auto_bin(self):
         n = self.data.count()
         logn = math.ceil(math.log2(n))
