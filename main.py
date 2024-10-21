@@ -7,7 +7,7 @@ from stackedHistogramWindow import *
 import os
 
 
-#file name to look for results in
+#file name to look for results in, should probably be able to change this
 eFRET_FILE_NAME = "FRETresult.dat"
 
 #example MacOS filepath

@@ -24,6 +24,7 @@ class HistApplication(tk.Tk):
         self.title(title)
         self.minsize(200, 200)
         self.path = path + "/" + filename
+        self.savepath = path
         
         self.get_data()
 
@@ -120,6 +121,10 @@ class HistApplication(tk.Tk):
         # clear button, bound to the generation of an empty histogram
         self.clearButton = tk.Button(self.subframe3, text="Clear", command=self.emptyHis)
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+
+        # save button
+        self.saveButton = tk.Button(self.subframe3, text="Save", command=self.save)
+        self.saveButton.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
 
     # sets up options in the customizability window
     def makeOptions(self):
@@ -291,7 +296,7 @@ class HistApplication(tk.Tk):
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
-        HistMaker(df_empty, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
+        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
 
     # generates a histogram based on the parameters set in the customizability menu
     def his(self, event=None): 
@@ -311,8 +316,8 @@ class HistApplication(tk.Tk):
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
-        hist = HistMaker(self.df[col], self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
-        self.ref_bins.set(hist.getBins())
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
+        self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
     def checkMinMax(self, val):
@@ -328,4 +333,7 @@ class HistApplication(tk.Tk):
         canvas = FigureCanvasTkAgg(fig, master=self.subframe2)
         canvas.draw()
         canvas.get_tk_widget().grid(row=0, column=1)
+
+    def save(self):
+        self.hist.save()
         

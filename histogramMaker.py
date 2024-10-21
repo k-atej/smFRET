@@ -1,10 +1,15 @@
 import numpy as np
 import math
 import pandas as pd
-import matplotlib as plt
+import matplotlib as plt 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
+
+
+#should be able to change this
+savefilename = "FREThistogram.png"
+
 
 # creates a histogram to display in the histogramWindow
 class HistMaker():
@@ -26,8 +31,9 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
         self.data = data
+        self.savepath = savepath
         self.master = master
         self.row = row
         self.col = col
@@ -46,7 +52,7 @@ class HistMaker():
         self.yfontsize = yfontsize
         self.offset = shift
 
-        self.makeHistogram()
+        self.fig = self.makeHistogram()
 
 
 # makes a single histogram from a given data frame column
@@ -79,6 +85,8 @@ class HistMaker():
         hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         hist_canvas.draw()
         hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+
+        return fig
     
     #returns number of bins used in the histogram
     def getBins(self):
@@ -110,3 +118,8 @@ class HistMaker():
         n = self.data.count()
         logn = math.ceil(math.log2(n))
         return str(5*(logn + 1))
+    
+    def save(self):
+        self.fig.savefig(self.savepath + '/' + savefilename)
+        print("SAVED!")
+
