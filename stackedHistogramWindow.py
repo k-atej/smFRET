@@ -24,6 +24,7 @@ class StackedHistApplication(tk.Tk):
         self.title(title)
         self.minsize(200, 200)
         self.path = path
+        self.savepath = path
 
         self.find_files()
 
@@ -124,6 +125,10 @@ class StackedHistApplication(tk.Tk):
 
         self.clearButton = tk.Button(self.subframe3, text="Clear", command=self.emptyHis)
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+
+        # save button
+        self.saveButton = tk.Button(self.subframe3, text="Save", command=self.save)
+        self.saveButton.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
 
     # sets up options in the customizability window
     def makeOptions(self):
@@ -290,7 +295,7 @@ class StackedHistApplication(tk.Tk):
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
-        HistMaker(df_empty, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
+        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
@@ -311,8 +316,8 @@ class StackedHistApplication(tk.Tk):
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
-        stackedhist = StackedHistMaker(self.files, datacol, self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
-        self.ref_bins.set(stackedhist.getBins())
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
+        self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
     def checkMinMax(self, val):
@@ -322,3 +327,5 @@ class StackedHistApplication(tk.Tk):
             val = None
         return val
     
+    def save(self):
+        self.hist.save()

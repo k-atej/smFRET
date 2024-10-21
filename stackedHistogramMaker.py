@@ -9,6 +9,8 @@ from matplotlib.figure import Figure
 # name of the files to parse
 filename = "FRETresult.dat"
 
+savefilename = "FREThistogram_stacked.png"
+
 # creates a stack of histograms to display in the stackedHistogramWindow
 class StackedHistMaker():
 
@@ -29,8 +31,9 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, datacolumn, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
         self.files = files
+        self.savepath = savepath
         self.datacolumn = datacolumn
         self.master = master
         self.row = row
@@ -51,7 +54,7 @@ class StackedHistMaker():
         self.offset = shift
         self.minlength = float('inf')
 
-        self.makeStackedHistogram()
+        self.fig = self.makeStackedHistogram()
 
     # generates the stack of histograms based on the parameters set in the customizability window
     def makeStackedHistogram(self):
@@ -85,6 +88,8 @@ class StackedHistMaker():
         hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         hist_canvas.draw()
         hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+
+        return fig
 
     # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
     def processData(self):
@@ -150,3 +155,7 @@ class StackedHistMaker():
         n = self.minlength
         logn = math.ceil(math.log2(n))
         return str(5*(logn + 1))
+    
+    def save(self):
+        self.fig.savefig(self.savepath + '/' + savefilename)
+        print("SAVED!")
