@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -40,6 +40,7 @@ class HistMaker():
         self.col = col
         self.bins = bins
         self.title = title
+        self.titlesize = titlefontsize
         self.x = x
         self.y = y
         self.color = color
@@ -67,8 +68,15 @@ class HistMaker():
         # set number of bins
         if self.bins == 'Auto':
             self.bins = int(self.auto_bin())
+            self.return_bins = self.bins
+        elif float(self.bins) < 1:
+            bin_width = float(self.bins)
+            bins = np.arange(min(self.data), max(self.data) + bin_width, bin_width)
+            self.bins = bins 
+            self.return_bins = len(bins) - 1
         else:
             self.bins = int(self.bins)
+            self.return_bins = int(self.bins)
 
         f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
@@ -81,7 +89,7 @@ class HistMaker():
         f.set_ylim([self.ymin, self.ymax])
 
         #set title & append figure to canvas
-        f.set_title(self.title)
+        f.set_title(self.title, fontsize=self.titlesize)
         fig.tight_layout()
         hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         hist_canvas.draw()
@@ -91,7 +99,7 @@ class HistMaker():
     
     #returns number of bins used in the histogram
     def getBins(self):
-        return self.bins
+        return self.return_bins
 
     # zeroes the data in the dataframe; can shift by a designated value or do it automatically
     def zero_data(self):

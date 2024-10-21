@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -40,6 +40,7 @@ class StackedHistMaker():
         self.col = col
         self.bins = bins
         self.title = title
+        self.titlesize = titlefontsize
         self.x = x
         self.y = y
         self.color = color
@@ -83,7 +84,7 @@ class StackedHistMaker():
         fig.supylabel(self.y, fontsize=self.yfontsize)
 
         #set title & append figure to canvas
-        fig.suptitle(self.title, y = 0.93)
+        fig.suptitle(self.title, y = 0.93, fontsize=self.titlesize)
         fig.subplots_adjust(wspace=0, hspace=0)
         hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         hist_canvas.draw()
@@ -95,6 +96,8 @@ class StackedHistMaker():
     def processData(self):
         self.all_data = [] # list of dataframes
         min_length = float('inf')
+        min_data = float('inf')
+        max_data = 0
 
         for file in self.files:
             path = file + "/" + filename
@@ -102,6 +105,10 @@ class StackedHistMaker():
 
             if len(data) < min_length:
                 min_length = len(data)
+            if data["eFRET"].min() < min_data:
+                min_data = data["eFRET"].min()
+            if data["eFRET"].max() > max_data:
+                max_data = data["eFRET"].max()
             self.all_data.append(data)
             self.minlength = min_length
 
@@ -110,13 +117,20 @@ class StackedHistMaker():
         # set number of bins
         if self.bins == 'Auto':
             self.bins = int(self.auto_bin())
+            self.return_bins = self.bins
+        elif float(self.bins) < 1:
+            bin_width = float(self.bins)
+            bins = np.arange(min_data, max_data + bin_width, bin_width)
+            self.bins = bins 
+            self.return_bins = len(bins) - 1
         else:
             self.bins = int(self.bins)
+            self.return_bins = int(self.bins)
 
 
     # returns the number of bins used in a histogram
     def getBins(self):
-        return self.bins
+        return self.return_bins
 
     # returns dataframe from one file
     def get_eFRET_data(self, path):

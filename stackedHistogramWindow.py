@@ -253,6 +253,16 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        #input area for designation of graph title font size
+        self.titlefontsize_label = tk.Label(self.tabText_0, text="Title Font Size:")
+        self.titlefontsize_label.grid(row=1, column=0)
+        self.ref_titlefontsize = tk.StringVar(self)
+        self.ref_titlefontsize.set("12")
+
+        self.combo0 = tk.Entry(self.tabText_0, textvariable=self.ref_titlefontsize)
+        self.combo0.config(width=10)
+        self.combo0.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
         # input area for designation of x-axis label
         self.x_label = tk.Label(self.tabText_1, text="X-Axis Label:")
         self.x_label.grid(row=0, column=0)
@@ -296,7 +306,7 @@ class StackedHistApplication(tk.Tk):
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
-        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
+        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
@@ -317,7 +327,8 @@ class StackedHistApplication(tk.Tk):
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
+        titlefontsize = float(self.ref_titlefontsize.get())
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
         self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
