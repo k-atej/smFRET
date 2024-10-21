@@ -9,7 +9,7 @@ import os
 
 #Example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11"
-
+savefilename = "FREThistogram_stacked.png"
 filename = "FRETresult.dat"
 
 #YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
@@ -84,6 +84,7 @@ class StackedHistApplication(tk.Tk):
         self.makeOptions()
         self.makeButtons()
         self.bind('<Return>', self.his)
+        self.his()
 
     # sets up the layout of the customizability menu
     def makeFormat(self):
@@ -127,7 +128,7 @@ class StackedHistApplication(tk.Tk):
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
         # save button
-        self.saveButton = tk.Button(self.subframe3, text="Save", command=self.save)
+        self.saveButton = tk.Button(self.subframe3, text="Save", command=self.savewindow)
         self.saveButton.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
 
     # sets up options in the customizability window
@@ -326,6 +327,27 @@ class StackedHistApplication(tk.Tk):
         else:
             val = None
         return val
+
     
+    def savewindow(self):
+        self.win = tk.Tk()
+        self.win.title("Set Filepath: ")
+        
+        #input area for file name
+        self.path_label = tk.Label(self.win, text="Save File Path:")
+        self.path_label.grid(row=0, column=0)
+        self.ref_path = tk.StringVar(self.win)
+        self.ref_path.set(self.savepath + '/' + savefilename)
+
+        self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
+        self.combo6.config(width=50)
+        self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 10), pady="10")
+
+        self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
+        self.saveButton.grid(row=1, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        self.win.mainloop()
+
+
     def save(self):
-        self.hist.save()
+        self.hist.save(self.ref_path.get())
+        self.win.destroy()

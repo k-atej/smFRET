@@ -39,8 +39,8 @@ class Application(tk.Tk):
         self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
 
         #start button
-        self.startButton = tk.Button(self.subframe1, text="start", command=self.start)
-        self.startButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        self.startButton = tk.Button(self.subframe1, text="START", command=self.start)
+        self.startButton.grid(row=3, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
         #input area for file path
         self.input_label = tk.Label(self.subframe1, text="File Path:")
@@ -52,6 +52,16 @@ class Application(tk.Tk):
         self.combo4.config(width=30)
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
+        #input area for file name
+        self.file_label = tk.Label(self.subframe1, text="Data File Name:")
+        self.file_label.grid(row=2, column=0)
+        self.ref_file = tk.StringVar(self)
+        self.ref_file.set('FRETresult.dat')
+
+        self.combo4 = tk.Entry(self.subframe1, textvariable=self.ref_file)
+        self.combo4.config(width=30)
+        self.combo4.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady="10")
+
     # walks through folders in the file path and identifies that number of eFRET_FILE_NAMEs present. decides whether a single or stacked histogram is appropriate,
     # and opens the corresponding window. 
     def start(self):
@@ -59,7 +69,7 @@ class Application(tk.Tk):
         keys = []
         for root, dirs, files in os.walk(self.path):
             for file in files:
-                if file.endswith(eFRET_FILE_NAME):
+                if file.endswith(self.ref_file.get()):
                     keys.append(file)
         if len(keys) == 1:
             histapp = HistApplication(self.path, self.getTitle())

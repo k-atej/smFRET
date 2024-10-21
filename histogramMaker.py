@@ -5,6 +5,7 @@ import matplotlib as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
+import tkinter as tk
 
 
 #should be able to change this
@@ -118,8 +119,13 @@ class HistMaker():
         n = self.data.count()
         logn = math.ceil(math.log2(n))
         return str(5*(logn + 1))
-    
-    def save(self):
-        self.fig.savefig(self.savepath + '/' + savefilename)
+
+
+    def save(self, refpath):
+        self.fig.savefig(refpath)
         print("SAVED!")
+
+
+
+
 
