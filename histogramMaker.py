@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -53,6 +53,8 @@ class HistMaker():
         self.xfontsize = xfontsize
         self.yfontsize = yfontsize
         self.offset = shift
+        self.width = width
+        self.height = height
 
         self.fig = self.makeHistogram()
 
@@ -63,6 +65,8 @@ class HistMaker():
 
         #create figure
         fig = Figure(dpi=80)
+        fig.set_figwidth(self.width)
+        fig.set_figheight(self.height)
         f = fig.gca() #gca = get current axes
 
         # set number of bins
@@ -91,9 +95,9 @@ class HistMaker():
         #set title & append figure to canvas
         f.set_title(self.title, fontsize=self.titlesize)
         fig.tight_layout()
-        hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
-        hist_canvas.draw()
-        hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+        self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
+        self.hist_canvas.draw()
+        self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
         return fig
     
@@ -133,6 +137,9 @@ class HistMaker():
         self.fig.savefig(refpath)
         print("SAVED!")
 
+    def destroy(self):
+        self.hist_canvas.get_tk_widget().destroy()
+        
 
 
 

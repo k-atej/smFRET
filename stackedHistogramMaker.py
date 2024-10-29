@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -54,6 +54,8 @@ class StackedHistMaker():
         self.yfontsize = yfontsize
         self.offset = shift
         self.minlength = float('inf')
+        self.width = width
+        self.height = height
 
         self.fig = self.makeStackedHistogram()
 
@@ -63,6 +65,8 @@ class StackedHistMaker():
 
         #create figure
         fig = Figure(dpi=80)
+        fig.set_figwidth(self.width)
+        fig.set_figheight(self.height)
         axes = []
         for i in range(len(self.all_data_shifted)):
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
@@ -81,14 +85,16 @@ class StackedHistMaker():
 
         #set axis titles
         axes[-1].set_xlabel(self.x, fontsize=self.xfontsize)
-        fig.supylabel(self.y, fontsize=self.yfontsize)
-
+        fig.supylabel(self.y, fontsize=self.yfontsize, x = self.width / 50)
+        
+        
         #set title & append figure to canvas
         fig.suptitle(self.title, y = 0.93, fontsize=self.titlesize)
-        fig.subplots_adjust(wspace=0, hspace=0)
-        hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
-        hist_canvas.draw()
-        hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+        fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
+
+        self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
+        self.hist_canvas.draw()
+        self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
         return fig
 
@@ -173,3 +179,6 @@ class StackedHistMaker():
     def save(self, refpath):
         self.fig.savefig(refpath)
         print("SAVED!")
+
+    def destroy(self):
+        self.hist_canvas.get_tk_widget().destroy()

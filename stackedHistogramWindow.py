@@ -207,6 +207,26 @@ class StackedHistApplication(tk.Tk):
         self.comboymin.config(width=5)
         self.comboymin.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
 
+        # input area for figure width
+        self.width_label = tk.Label(self.tabFormat_2, text="Width:")
+        self.width_label.grid(row=3, column=0)
+        self.ref_width = tk.StringVar(self)
+        self.ref_width.set('5')
+
+        self.combowidth = tk.Entry(self.tabFormat_2, textvariable=self.ref_width)
+        self.combowidth.config(width=5)
+        self.combowidth.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+         # input area for figure height
+        self.height_label = tk.Label(self.tabFormat_2, text="Height:")
+        self.height_label.grid(row=3, column=2)
+        self.ref_height = tk.StringVar(self)
+        self.ref_height.set('5')
+
+        self.comboheight = tk.Entry(self.tabFormat_2, textvariable=self.ref_height)
+        self.comboheight.config(width=5)
+        self.comboheight.grid(row=3, column=3, sticky="ew", padx=(0, 10), pady="10")
+
 
 
         # second tab = style
@@ -306,10 +326,12 @@ class StackedHistApplication(tk.Tk):
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
-        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 0)
+        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 5.0, 5.0, 0)
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
+        self.hist.destroy()
+
         # need to check that this column is present in all files?
         datacol = self.ref_col.get()
         bins = self.ref_bins.get()
@@ -325,10 +347,13 @@ class StackedHistApplication(tk.Tk):
         ymax = self.checkMinMax(self.ref_ymax.get())
         ymin = self.checkMinMax(self.ref_ymin.get())
 
+        width = float(self.ref_width.get())
+        height = float(self.ref_height.get())
+
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, offset)
         self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
