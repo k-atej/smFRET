@@ -273,15 +273,16 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        #input area for designation of graph title font size
-        self.titlefontsize_label = tk.Label(self.tabText_0, text="Title Font Size:")
-        self.titlefontsize_label.grid(row=1, column=0)
+        #title font size
+        self.titlef_label = tk.Label(self.tabText_0, text="Title Font Size:")
+        self.titlef_label.grid(row=1, column=0)
+        titlef = [8, 10, 12, 15, 20, 24]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
-        self.combo0 = tk.Entry(self.tabText_0, textvariable=self.ref_titlefontsize)
-        self.combo0.config(width=10)
-        self.combo0.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo = tk.OptionMenu(self.tabText_0, self.ref_titlefontsize, *titlef)
+        self.combo.config(width=10)
+        self.combo.grid(row=1, column=1)
 
         # input area for designation of x-axis label
         self.x_label = tk.Label(self.tabText_1, text="X-Axis Label:")
@@ -303,25 +304,27 @@ class StackedHistApplication(tk.Tk):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        # input area for designation of x-axis font size
-        self.xfontsize_label = tk.Label(self.tabText_1, text="X Font Size:")
-        self.xfontsize_label.grid(row=1, column=0)
+        #x font size
+        self.titlex_label = tk.Label(self.tabText_1, text="X Font Size:")
+        self.titlex_label.grid(row=1, column=0)
+        titlex = [8, 10, 12, 15, 20, 24]
         self.ref_xfontsize = tk.StringVar(self)
-        self.ref_xfontsize.set("10")
+        self.ref_xfontsize.set("12")
 
-        self.combo7 = tk.Entry(self.tabText_1, textvariable=self.ref_xfontsize)
-        self.combo7.config(width=10)
-        self.combo7.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
+        self.combo.config(width=10)
+        self.combo.grid(row=1, column=1)
 
-        # input area for designation of y-axis font size
-        self.yfontsize_label = tk.Label(self.tabText_2, text="Y Font Size:")
-        self.yfontsize_label.grid(row=1, column=0)
+        #y font size
+        self.titley_label = tk.Label(self.tabText_2, text="Y Font Size:")
+        self.titley_label.grid(row=1, column=0)
+        titley = [8, 10, 12, 15, 20, 24]
         self.ref_yfontsize = tk.StringVar(self)
-        self.ref_yfontsize.set("10")
+        self.ref_yfontsize.set("12")
 
-        self.combo8 = tk.Entry(self.tabText_2, textvariable=self.ref_yfontsize)
-        self.combo8.config(width=10)
-        self.combo8.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo = tk.OptionMenu(self.tabText_2, self.ref_yfontsize, *titley)
+        self.combo.config(width=10)
+        self.combo.grid(row=1, column=1)
 
     # generates histogram without data
     def emptyHis(self):

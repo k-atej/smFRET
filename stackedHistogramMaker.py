@@ -68,7 +68,7 @@ class StackedHistMaker():
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
         axes = []
-        for i in range(len(self.all_data_shifted)):
+        for i in reversed(range(len(self.all_data_shifted))):
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
             axes.append(ax)
@@ -81,15 +81,20 @@ class StackedHistMaker():
             ax.set_ylim([self.ymin, self.ymax]) 
             yticks = ax.yaxis.get_major_ticks()
             yticks[0].label1.set_visible(False) # this should probably be able to be toggled on & off
-        axes[-1].xaxis.set_major_locator(plt.AutoLocator())
+        axes[0].xaxis.set_major_locator(plt.AutoLocator())
+
+        for i in range(1, len(self.all_data_shifted)):
+           axes[i].xaxis.set_major_locator(plt.AutoLocator())
+           axes[i].set_xticklabels([])
+
 
         #set axis titles
-        axes[-1].set_xlabel(self.x, fontsize=self.xfontsize)
+        axes[0].set_xlabel(self.x, fontsize=self.xfontsize)
         fig.supylabel(self.y, fontsize=self.yfontsize, x = self.width / 50)
         
         
         #set title & append figure to canvas
-        fig.suptitle(self.title, y = 0.93, fontsize=self.titlesize)
+        fig.suptitle(self.title, y = 0.93, x=0.57, fontsize=self.titlesize)
         fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
 
         self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
