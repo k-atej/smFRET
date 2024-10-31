@@ -1,6 +1,7 @@
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk
+from tkinter import colorchooser
 from matplotlib.figure import Figure
 from histogramMaker import *
 from stackedHistogramMaker import *
@@ -247,6 +248,9 @@ class StackedHistApplication(tk.Toplevel):
         self.combo2.config(width=5)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        self.colorbutton = tk.Button(self.tabStyle_0, text="Select Color", command=self.choose_fillcolor)
+        self.colorbutton.grid(row=0, column=3)
+
         # input area for designation of column edge color
         self.edgecolor_label = tk.Label(self.tabStyle_1, text="Edge Color:")
         self.edgecolor_label.grid(row=1, column=0)
@@ -256,6 +260,9 @@ class StackedHistApplication(tk.Toplevel):
         self.combo5 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgecolor)
         self.combo5.config(width=5)
         self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        self.edgecolorbutton = tk.Button(self.tabStyle_1, text="Select Edge Color", command=self.choose_edgecolor)
+        self.edgecolorbutton.grid(row=2, column=0, columnspan=2, sticky='ew')
 
         # input area for designation of column edge line width
         self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
@@ -354,8 +361,15 @@ class StackedHistApplication(tk.Toplevel):
         title = str(self.ref_title.get())
         x_ax = str(self.ref_x.get())
         y_ax = str(self.ref_y.get())
+
         color = str(self.ref_color.get())
+        if color == "None":
+            color = 0
+
         edgecolor = str(self.ref_edgecolor.get())
+        if edgecolor == "None":
+            edgecolor = 0
+        
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -418,3 +432,11 @@ class StackedHistApplication(tk.Toplevel):
         else:
             self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
             self.bin_label.grid(row=0, column=0)
+
+    def choose_fillcolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_color.set(hexcode)
+
+    def choose_edgecolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_edgecolor.set(hexcode)
