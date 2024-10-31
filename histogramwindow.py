@@ -4,7 +4,6 @@ from tkinter import ttk
 from tkinter import colorchooser
 from matplotlib.figure import Figure
 from histogramMaker import *
-from tableMaker import *
 import os
 
 
@@ -340,10 +339,6 @@ class HistApplication(tk.Toplevel):
         self.combo.config(width=10)
         self.combo.grid(row=1, column=1)
 
-    # currently unused, makes a table to display data
-    def table(self): # i may want to turn this into a class
-        makeTable(self.df, self.subframe1, 0, 0)
-    
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})

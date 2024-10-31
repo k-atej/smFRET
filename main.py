@@ -1,7 +1,6 @@
 import pandas as pd
 import tkinter as tk
 from histogramMaker import *
-from tableMaker import *
 from histogramWindow import *
 from stackedHistogramWindow import *
 import os

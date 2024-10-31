@@ -69,9 +69,7 @@ class HistMaker():
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
         f = fig.gca() #gca = get current axes
-
-        print(self.bins)
-        print(self.bintype)
+        
         # set number of bins
         if self.bins != 'Auto':
             if 'Auto' in str(self.bins):

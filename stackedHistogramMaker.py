@@ -128,9 +128,6 @@ class StackedHistMaker():
             self.minlength = min_length
 
         self.zero_data()
-
-        print(self.bins)
-        print(self.bintype)
         # set number of bins
         if self.bins != 'Auto':
             if 'Auto' in str(self.bins):
@@ -202,7 +199,6 @@ class StackedHistMaker():
     def auto_bin_width(self):
         hist, bin_edges = np.histogram(self.all_data_shifted[0][self.datacolumn])
         binwidths = bin_edges[1] - bin_edges[0]
-        print(self.all_data_shifted[0])
         return binwidths
     
     def save(self, refpath):

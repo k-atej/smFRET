@@ -5,7 +5,6 @@ from tkinter import colorchooser
 from matplotlib.figure import Figure
 from histogramMaker import *
 from stackedHistogramMaker import *
-from tableMaker import *
 import os
 
 #Example MacOS filepath
