@@ -32,13 +32,14 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
         self.row = row
         self.col = col
         self.bins = bins
+        self.bintype = bin1
         self.title = title
         self.titlesize = titlefontsize
         self.x = x
@@ -69,15 +70,29 @@ class HistMaker():
         fig.set_figheight(self.height)
         f = fig.gca() #gca = get current axes
 
+        print(self.bins)
+        print(self.bintype)
         # set number of bins
+        if self.bins != 'Auto':
+            if 'Auto' in str(self.bins):
+                self.bins = 'Auto'
+            elif float(self.bins) < 1.0:
+                if self.bintype == 0:
+                    self.bins = 'Auto'
         if self.bins == 'Auto':
-            self.bins = int(self.auto_bin())
-            self.return_bins = self.bins
-        elif float(self.bins) < 1:
+            if self.bintype == 0:
+                self.bins = int(self.auto_bin())
+                self.return_bins = f'Auto:{self.bins}'
+            else:
+                bin_width = float(self.auto_bin_width())
+                bins = np.arange(min(self.data), max(self.data) + bin_width, bin_width)
+                self.bins = bins 
+                self.return_bins = bin_width
+        elif self.bintype == 1:
             bin_width = float(self.bins)
             bins = np.arange(min(self.data), max(self.data) + bin_width, bin_width)
             self.bins = bins 
-            self.return_bins = len(bins) - 1
+            self.return_bins = bin_width
         else:
             self.bins = int(self.bins)
             self.return_bins = int(self.bins)
@@ -132,6 +147,10 @@ class HistMaker():
         logn = math.ceil(math.log2(n))
         return str(5*(logn + 1))
 
+    def auto_bin_width(self):
+        hist, bin_edges = np.histogram(self.data_shifted)
+        binwidths = bin_edges[1] - bin_edges[0]
+        return binwidths
 
     def save(self, refpath):
         self.fig.savefig(refpath)

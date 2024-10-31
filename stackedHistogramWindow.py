@@ -261,16 +261,11 @@ class StackedHistApplication(tk.Toplevel):
         self.combo6.config(width=5)
         self.combo6.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
 
-
+        #check box for toggling zero on y axis
         self.toggle = tk.IntVar()
-
-        def print_togg():
-            print(self.toggle.get())
-
-        #check box for toggling final value on y axis
-        
-        self.toggle1 = tk.Checkbutton(self.tabStyle_2, text="Toggle Zero on Y-Axis", variable=self.toggle, onvalue=1, offvalue=0, command=print_togg)
+        self.toggle1 = tk.Checkbutton(self.tabStyle_2, text="Toggle Zero on Y-Axis", variable=self.toggle, onvalue=1, offvalue=0)
         self.toggle1.grid(row=0, column=0)
+
 
         
         # third tab: text
@@ -366,7 +361,6 @@ class StackedHistApplication(tk.Toplevel):
         height = float(self.ref_height.get())
 
         toggle = self.toggle.get()
-        print(toggle)
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())

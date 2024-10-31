@@ -79,6 +79,7 @@ class HistApplication(tk.Toplevel):
         self.makeButtons()
         self.bind('<Return>', self.his)
         self.his()
+    
 
     # sets up the layout of the customizability menu
     def makeFormat(self):
@@ -145,14 +146,21 @@ class HistApplication(tk.Toplevel):
 
         # input area that allows entry of the preferred number of bins to use in the histogram
         # any value less than 1 will be considered the "bin width" and # of bins will be calculated and displayed
-        self.bin_label = tk.Label(self.tabFormat_1, text="Bins:")
-        self.bin_label.grid(row=0, column=0, columnspan=2)
+        self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
+        self.bin_label.grid(row=0, column=0)
         self.ref_bins = tk.StringVar(self)
         self.ref_bins.set("Auto")
 
+        #check box for toggling zero on y axis
+        self.bin1 = tk.IntVar()
+        self.toggle1 = tk.Checkbutton(self.tabFormat_1, text="Input Bin Width Instead of Number of Bins?", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
+        self.toggle1.grid(row=1, column=0, sticky="ew", padx=(10,10), pady="10", columnspan=2)
+        
+       
+
         self.combo1 = tk.Entry(self.tabFormat_1, textvariable=self.ref_bins)
         self.combo1.config(width=10)
-        self.combo1.grid(row=0, column=2, sticky="ew", padx=(0, 0), pady="10", columnspan=2)
+        self.combo1.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # input area that allows entry of the distance to shift data to the left (zeroing)
         self.offset_label = tk.Label(self.tabFormat_2, text="Offset:")
@@ -332,7 +340,7 @@ class HistApplication(tk.Toplevel):
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
-        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0,  5.0, 5.0, 0)
+        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0,  5.0, 5.0, 0)
 
     # generates a histogram based on the parameters set in the customizability menu
     def his(self, event=None): 
@@ -356,10 +364,12 @@ class HistApplication(tk.Toplevel):
         width = float(self.ref_width.get())
         height = float(self.ref_height.get())
 
+        bin1 = self.bin1.get()
+
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, offset)
         self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
@@ -399,3 +409,15 @@ class HistApplication(tk.Toplevel):
         self.hist.save(self.ref_path.get())
         self.win.destroy()
         
+
+    def changeLabel(self):
+            if self.bin1.get() == 1:
+                self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
+                self.bin_label.grid(row=0, column=0)
+
+            elif self.bin1.get() == 0:
+                self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
+                self.bin_label.grid(row=0, column=0)
+            else:
+                self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
+                self.bin_label.grid(row=0, column=0)

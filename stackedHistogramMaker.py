@@ -57,7 +57,6 @@ class StackedHistMaker():
         self.width = width
         self.height = height
         self.toggle = toggle
-        #print(self.toggle)
 
         self.fig = self.makeStackedHistogram()
 
@@ -81,9 +80,10 @@ class StackedHistMaker():
             ax.set_xticks([])
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_ylim([self.ymin, self.ymax]) 
-            yticks = ax.yaxis.get_major_ticks()
+            yticks = ax.get_yticklabels()
             if self.toggle == 1:
-                yticks[0].label1.set_visible(False)
+                yticks[0].set_visible(False)
+    
         axes[0].xaxis.set_major_locator(plt.AutoLocator())
 
         for i in range(1, len(self.all_data_shifted)):
