@@ -15,7 +15,7 @@ filename = "FRETresult.dat"
 #YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
 
 #opens a window that displays a histogram based on the file provided
-class HistApplication(tk.Tk):
+class HistApplication(tk.Toplevel):
 
     # path - filepath provided in entry box in main menu
     # title - name to set as the window title
@@ -378,7 +378,7 @@ class HistApplication(tk.Tk):
         canvas.get_tk_widget().grid(row=0, column=1)
 
     def savewindow(self):
-        self.win = tk.Tk()
+        self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
         
         #input area for file name
@@ -393,7 +393,7 @@ class HistApplication(tk.Tk):
 
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=1, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
-        self.win.mainloop()
+        #self.win.mainloop()
     
     def save(self):
         self.hist.save(self.ref_path.get())

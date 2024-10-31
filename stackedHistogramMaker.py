@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -56,6 +56,8 @@ class StackedHistMaker():
         self.minlength = float('inf')
         self.width = width
         self.height = height
+        self.toggle = toggle
+        #print(self.toggle)
 
         self.fig = self.makeStackedHistogram()
 
@@ -80,7 +82,8 @@ class StackedHistMaker():
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_ylim([self.ymin, self.ymax]) 
             yticks = ax.yaxis.get_major_ticks()
-            yticks[0].label1.set_visible(False) # this should probably be able to be toggled on & off
+            if self.toggle == 1:
+                yticks[0].label1.set_visible(False)
         axes[0].xaxis.set_major_locator(plt.AutoLocator())
 
         for i in range(1, len(self.all_data_shifted)):

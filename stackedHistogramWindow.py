@@ -15,7 +15,7 @@ filename = "FRETresult.dat"
 #YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
 
 #opens a window that displays a stacked histogram based on the files procided
-class StackedHistApplication(tk.Tk):
+class StackedHistApplication(tk.Toplevel):
 
     # path - filepath provided in entry box in main menu
     # title - name to set as the window title
@@ -261,6 +261,18 @@ class StackedHistApplication(tk.Tk):
         self.combo6.config(width=5)
         self.combo6.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
 
+
+        self.toggle = tk.IntVar()
+
+        def print_togg():
+            print(self.toggle.get())
+
+        #check box for toggling final value on y axis
+        
+        self.toggle1 = tk.Checkbutton(self.tabStyle_2, text="Toggle Zero on Y-Axis", variable=self.toggle, onvalue=1, offvalue=0, command=print_togg)
+        self.toggle1.grid(row=0, column=0)
+
+        
         # third tab: text
 
         # input area for designation of graph title
@@ -353,10 +365,13 @@ class StackedHistApplication(tk.Tk):
         width = float(self.ref_width.get())
         height = float(self.ref_height.get())
 
+        toggle = self.toggle.get()
+        print(toggle)
+
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, offset)
         self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
@@ -369,7 +384,7 @@ class StackedHistApplication(tk.Tk):
 
     
     def savewindow(self):
-        self.win = tk.Tk()
+        self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
         
         #input area for file name
@@ -384,7 +399,7 @@ class StackedHistApplication(tk.Tk):
 
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=1, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
-        self.win.mainloop()
+        #self.win.mainloop()
 
 
     def save(self):

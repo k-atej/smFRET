@@ -73,10 +73,10 @@ class Application(tk.Tk):
                     keys.append(file)
         if len(keys) == 1:
             histapp = HistApplication(self.path, self.getTitle())
-            histapp.mainloop()
+            #histapp.mainloop()
         elif len(keys) > 1:
             stackedhistapp = StackedHistApplication(self.path, self.getTitle())
-            stackedhistapp.mainloop()
+            #stackedhistapp.mainloop()
 
     #returns the name of the final folder in the file path, to set as the window title
     def getTitle(self):
