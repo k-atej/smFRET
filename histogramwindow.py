@@ -25,6 +25,8 @@ class HistApplication(tk.Toplevel):
         self.minsize(200, 200)
         self.path = path + "/" + filename
         self.savepath = path
+        self.annotations =[]
+        self.hist = None
         
         self.get_data()
 
@@ -69,8 +71,8 @@ class HistApplication(tk.Toplevel):
 
     # initializes an empty histogram and creates the customizability options in the side menu
     def start(self):
-        self.emptyHis()
         self.makeFeatures()
+        self.emptyHis()
 
     # creates the dropdowns & buttons available in the customizability menu, binds 'Enter' to the generation of a histogram
     def makeFeatures(self):
@@ -78,7 +80,7 @@ class HistApplication(tk.Toplevel):
         self.makeOptions()
         self.makeButtons()
         self.bind('<Return>', self.his)
-        self.his()
+        #self.his()
     
 
     # sets up the layout of the customizability menu
@@ -341,13 +343,16 @@ class HistApplication(tk.Toplevel):
 
     # generates histogram without data
     def emptyHis(self):
-        df_empty = pd.DataFrame({'A' : []})
-        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0,  5.0, 5.0, 0)
+        #df_empty = pd.DataFrame({'A' : []})
+        #self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0,  5.0, 5.0, [], 0)
+        self.annotations = []
+        self.his()
 
     # generates a histogram based on the parameters set in the customizability menu
     def his(self, event=None): 
 
-        self.hist.destroy()
+        if self.hist is not None:
+            self.hist.destroy()
 
         col = self.ref_col.get()
         bins = self.ref_bins.get()
@@ -378,8 +383,9 @@ class HistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, offset)
         self.ref_bins.set(self.hist.getBins())
+        self.annotations = self.hist.getAnnotations()
 
     # type checks the designation of x/y mins and maxes
     def checkMinMax(self, val):

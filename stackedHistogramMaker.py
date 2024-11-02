@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -58,7 +58,7 @@ class StackedHistMaker():
         self.width = width
         self.height = height
         self.toggle = toggle
-        self.annotations = []
+        self.annotations = annotations
 
         self.fig = self.makeStackedHistogram()
 
@@ -70,15 +70,15 @@ class StackedHistMaker():
         fig = Figure(dpi=80)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
-        axes = []
+        self.axes = []
         for i in reversed(range(len(self.all_data_shifted))):
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
-            axes.append(ax)
+            self.axes.append(ax)
         
         #set up axis ticks, range, & scale
-        for ax in axes:
-            ax.sharey(axes[0])
+        for ax in self.axes:
+            ax.sharey(self.axes[0])
             ax.set_xticks([])
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_ylim([self.ymin, self.ymax]) 
@@ -88,15 +88,15 @@ class StackedHistMaker():
             if self.toggle == 1:
                 yticks[0].set_visible(False)
     
-        axes[0].xaxis.set_major_locator(plt.AutoLocator())
+        self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
 
         for i in range(1, len(self.all_data_shifted)):
-           axes[i].xaxis.set_major_locator(plt.AutoLocator())
-           axes[i].set_xticklabels([])
+           self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
+           self.axes[i].set_xticklabels([])
 
 
         #set axis titles
-        axes[0].set_xlabel(self.x, fontsize=self.xfontsize)
+        self.axes[0].set_xlabel(self.x, fontsize=self.xfontsize)
         fig.supylabel(self.y, fontsize=self.yfontsize, x = self.width / 50)
         
         
@@ -107,9 +107,21 @@ class StackedHistMaker():
         self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+        #print(self.hist_canvas)
 
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
 
+        if len(self.annotations) != 0:
+            for annotation in self.annotations:
+                axis, x, y, ymax = annotation
+                for ax in self.axes:
+                    #print(f"comparing {axis} and {ax}")
+                    ax_pos = ax.get_position()
+                    axis_pos = axis.get_position()
+                    ax0 = ax_pos.y0
+                    axis0 = axis_pos.y0
+                    if (ax0 == axis0):
+                        self.draw_annotations(ax, x, y, ymax)
 
         return fig
 
@@ -271,14 +283,17 @@ class StackedHistMaker():
 
     # regenerating the figure after changing the parameters by entering or pressing generate removes text
     def onclick(self, event, canvas):
+        #print(canvas)
         if event.inaxes:
+            axis = (event.inaxes)
+            #print(axis)
             x, y = event.xdata, event.ydata
-            self.draw_annotations(event, x, y)
-            self.annotations.append((event, x, y))
-            print(self.annotations)
+            ymin, ymax = self.ylim
+            self.draw_annotations(axis, x, y, ymax,)
+            self.annotations.append((axis, x, y, ymax))
+            #print(self.annotations)
     
-    def draw_annotations(self, axis, x, y):
-        canvas = self.hist_canvas
-        ymin, ymax = self.ylim
-        axis.inaxes.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
-        canvas.draw()
+    def draw_annotations(self, axis, x, y, ymax):
+        #print(f"drawing on {axis}, with {x}, {y}")
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
+        self.hist_canvas.draw()

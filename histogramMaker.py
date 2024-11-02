@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -56,6 +56,7 @@ class HistMaker():
         self.offset = shift
         self.width = width
         self.height = height
+        self.annotations = annotations
 
         self.fig = self.makeHistogram()
 
@@ -115,11 +116,20 @@ class HistMaker():
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
+        if len(self.annotations) != 0:
+            for annotation in self.annotations:
+                self.draw_annotations(f, annotation)
+
+        fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
+
         return fig
     
     #returns number of bins used in the histogram
     def getBins(self):
         return self.return_bins
+    
+    def getAnnotations(self):
+        return self.annotations
 
     # zeroes the data in the dataframe; can shift by a designated value or do it automatically
     def zero_data(self):
@@ -206,6 +216,19 @@ class HistMaker():
         """
         return text
     
+    # 'clear' button removes annotations
+    def onclick(self, event, canvas):
+        if event.inaxes:
+            x = event.xdata
+            self.draw_annotations(event.inaxes, x)
+            self.annotations.append(x)
+            #print(self.annotations)
+    
+    def draw_annotations(self, axis, x):
+        canvas = self.hist_canvas
+        ymin, ymax = self.ylim
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
+        canvas.draw()
         
 
 

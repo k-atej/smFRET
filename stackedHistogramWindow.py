@@ -26,6 +26,7 @@ class StackedHistApplication(tk.Toplevel):
         self.path = path
         self.savepath = path
         self.annotations = []
+        self.hist = None
 
         self.find_files()
 
@@ -76,8 +77,9 @@ class StackedHistApplication(tk.Toplevel):
 
 # initializes an empty histogram and creates the customizability options in the side menu
     def start(self):
-        self.emptyHis()
         self.makeFeatures()
+        self.emptyHis()
+        
 
 # creates the dropdowns & buttons available in the customizability menu, binds 'Enter' to the generation of a histogram
     def makeFeatures(self):
@@ -358,13 +360,15 @@ class StackedHistApplication(tk.Toplevel):
 
     # generates histogram without data
     def emptyHis(self):
-        df_empty = pd.DataFrame({'A' : []})
-        self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 5.0, 5.0, 0)
+        #df_empty = pd.DataFrame({'A' : []})
+        #self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 5.0, 5.0, 0)
         self.annotations = []
+        self.his()
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
-        self.hist.destroy()
+        if self.hist is not None:
+            self.hist.destroy()
 
         # need to check that this column is present in all files?
         datacol = self.ref_col.get()
@@ -397,8 +401,9 @@ class StackedHistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, offset)
-
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, offset)
+        self.annotations = self.hist.get_annotations()
+        #print(self.annotations)
         self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
