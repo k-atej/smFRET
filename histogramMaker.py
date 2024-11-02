@@ -105,6 +105,9 @@ class HistMaker():
         f.set_xlim([self.xmin, self.xmax])
         f.set_ylim([self.ymin, self.ymax])
 
+        self.xlim = f.get_xlim()
+        self.ylim = f.get_ylim()
+
         #set title & append figure to canvas
         f.set_title(self.title, fontsize=self.titlesize)
         fig.tight_layout()
@@ -152,10 +155,57 @@ class HistMaker():
 
     def save(self, refpath):
         self.fig.savefig(refpath)
+        self.annotate(refpath)
         print("SAVED!")
 
     def destroy(self):
         self.hist_canvas.get_tk_widget().destroy()
+
+    def annotate(self, refpath):
+        text = self.getText()
+        refpath = refpath.split(".")[:-1]
+        pathway = ""
+        for path in refpath:
+            pathway += path
+        path = str(pathway) + ".txt"
+        f = open(path, "w")
+        f.write(text)
+
+    def getText(self):
+        # if bintype = 1, bin width; otherwise bin number
+        if self.bintype == 1:
+            binny = "bin width"
+        elif self.bintype == 0:
+            binny = "bin number"
+        
+        xmin, xmax = self.xlim
+        ymin, ymax = self.ylim
+
+        text = f"""
+        data: {self.data}
+        savepath: {self.savepath}
+        bins: {self.bins}
+        bintype: {binny}
+        title: {self.title}
+        title fontsize: {self.titlesize}
+        x-axis label: {self.x}
+        y-axis label: {self.y}
+        fill color: {self.color}
+        edge color: {self.edgecolor} 
+        edge width: {self.edgewidth}
+        x-axis max: {xmax}
+        x-axis min: {xmin}
+        y-axis max: {ymax}
+        y-axis min: {ymin}
+        x-axis label fontsize: {self.xfontsize}
+        y-axis label fontsize: {self.yfontsize}
+        offset: {self.offset}
+        figure width: {self.width}
+        figure height: {self.height} 
+
+        """
+        return text
+    
         
 
 

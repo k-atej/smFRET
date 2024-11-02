@@ -81,6 +81,8 @@ class StackedHistMaker():
             ax.set_xticks([])
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_ylim([self.ymin, self.ymax]) 
+            self.xlim = ax.get_xlim()
+            self.ylim = ax.get_ylim()
             yticks = ax.get_yticklabels()
             if self.toggle == 1:
                 yticks[0].set_visible(False)
@@ -203,7 +205,58 @@ class StackedHistMaker():
     
     def save(self, refpath):
         self.fig.savefig(refpath)
+        self.annotate(refpath)
         print("SAVED!")
 
     def destroy(self):
         self.hist_canvas.get_tk_widget().destroy()
+
+    def annotate(self, refpath):
+        text = self.getText()
+        refpath = refpath.split(".")[:-1]
+        pathway = ""
+        for path in refpath:
+            pathway += path
+        path = str(pathway) + ".txt"
+        f = open(path, "w")
+        f.write(text)
+
+    def getText(self):
+        # if bintype = 1, bin width; otherwise bin number
+        if self.bintype == 1:
+            binny = "bin width"
+        elif self.bintype == 0:
+            binny = "bin number"
+        
+        xmin, xmax = self.xlim
+        ymin, ymax = self.ylim
+
+        if self.toggle == 1:
+            togg = "off"
+        else:
+            togg = "on"
+
+        text = f"""
+        data: {self.datacolumn}
+        savepath: {self.savepath}
+        bins: {self.bins}
+        bintype: {binny}
+        title: {self.title}
+        title fontsize: {self.titlesize}
+        x-axis label: {self.x}
+        y-axis label: {self.y}
+        fill color: {self.color}
+        edge color: {self.edgecolor} 
+        edge width: {self.edgewidth}
+        x-axis max: {xmax}
+        x-axis min: {xmin}
+        y-axis max: {ymax}
+        y-axis min: {ymin}
+        x-axis label fontsize: {self.xfontsize}
+        y-axis label fontsize: {self.yfontsize}
+        offset: {self.offset}
+        figure width: {self.width}
+        figure height: {self.height} 
+        zero tick: {togg}
+        """
+        return text
