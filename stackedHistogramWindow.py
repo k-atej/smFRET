@@ -8,7 +8,7 @@ from stackedHistogramMaker import *
 import os
 
 #Example MacOS filepath
-path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11"
+path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
 savefilename = "FREThistogram_stacked.png"
 filename = "FRETresult.dat"
 
@@ -25,6 +25,7 @@ class StackedHistApplication(tk.Toplevel):
         self.minsize(200, 200)
         self.path = path
         self.savepath = path
+        self.annotations = []
 
         self.find_files()
 
@@ -293,15 +294,15 @@ class StackedHistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         #title font size
-        self.titlef_label = tk.Label(self.tabText_0, text="Title Font Size:")
-        self.titlef_label.grid(row=1, column=0)
+        self.titlef_label = tk.Label(self.tabText_0, text="Size:")
+        self.titlef_label.grid(row=0, column=2)
         titlef = [8, 10, 12, 15, 20, 24]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_0, self.ref_titlefontsize, *titlef)
-        self.combo.config(width=10)
-        self.combo.grid(row=1, column=1)
+        self.combo.config(width=5)
+        self.combo.grid(row=0, column=3)
 
         # input area for designation of x-axis label
         self.x_label = tk.Label(self.tabText_1, text="X-Axis Label:")
@@ -324,31 +325,42 @@ class StackedHistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         #x font size
-        self.titlex_label = tk.Label(self.tabText_1, text="X Font Size:")
-        self.titlex_label.grid(row=1, column=0)
+        self.titlex_label = tk.Label(self.tabText_1, text="Size:")
+        self.titlex_label.grid(row=0, column=2)
         titlex = [8, 10, 12, 15, 20, 24]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
-        self.combo.config(width=10)
-        self.combo.grid(row=1, column=1)
+        self.combo.config(width=5)
+        self.combo.grid(row=0, column=3)
 
         #y font size
-        self.titley_label = tk.Label(self.tabText_2, text="Y Font Size:")
-        self.titley_label.grid(row=1, column=0)
+        self.titley_label = tk.Label(self.tabText_2, text="Size:")
+        self.titley_label.grid(row=0, column=2)
         titley = [8, 10, 12, 15, 20, 24]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_2, self.ref_yfontsize, *titley)
-        self.combo.config(width=10)
-        self.combo.grid(row=1, column=1)
+        self.combo.config(width=5)
+        self.combo.grid(row=0, column=13)
+
+        # input area for subplot title
+        #self.sub_label = tk.Label(self.tabText_2, text="Subtitle 1:")
+        #self.sub_label.grid(row=0, column=0)
+        #self.ref_sublabel = tk.StringVar(self)
+        #self.ref_sublabel.set("Y-Axis")
+
+        #self.combo0 = tk.Entry(self.tabText_2, textvariable=self.ref_y)
+        #self.combo0.config(width=10)
+        #self.combo0.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
     # generates histogram without data
     def emptyHis(self):
         df_empty = pd.DataFrame({'A' : []})
         self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 5.0, 5.0, 0)
+        self.annotations = []
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
@@ -386,6 +398,7 @@ class StackedHistApplication(tk.Toplevel):
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
         self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, offset)
+
         self.ref_bins.set(self.hist.getBins())
 
     # type checks the designation of x/y mins and maxes
@@ -439,3 +452,5 @@ class StackedHistApplication(tk.Toplevel):
     def choose_edgecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_edgecolor.set(hexcode)
+
+    

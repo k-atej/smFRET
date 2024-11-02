@@ -58,6 +58,7 @@ class StackedHistMaker():
         self.width = width
         self.height = height
         self.toggle = toggle
+        self.annotations = []
 
         self.fig = self.makeStackedHistogram()
 
@@ -107,7 +108,13 @@ class StackedHistMaker():
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
+        fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
+
+
         return fig
+
+    def get_annotations(self):
+        return self.annotations
 
     # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
     def processData(self):
@@ -258,5 +265,20 @@ class StackedHistMaker():
         figure width: {self.width}
         figure height: {self.height} 
         zero tick: {togg}
+        annotations: {self.annotations}
         """
         return text
+
+    # regenerating the figure after changing the parameters by entering or pressing generate removes text
+    def onclick(self, event, canvas):
+        if event.inaxes:
+            x, y = event.xdata, event.ydata
+            self.draw_annotations(event, x, y)
+            self.annotations.append((event, x, y))
+            print(self.annotations)
+    
+    def draw_annotations(self, axis, x, y):
+        canvas = self.hist_canvas
+        ymin, ymax = self.ylim
+        axis.inaxes.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
+        canvas.draw()
