@@ -69,7 +69,8 @@ class StackedHistApplication(tk.Toplevel):
     def find_files(self):
         keys = []
         for root, dirs, files in os.walk(self.path):
-            for file in files:
+            dirs.sort()
+            for file in sorted(files):
                 if file.endswith(self.filename):
                     key, value = os.path.split(root)
                     keys.append(value)
@@ -78,10 +79,12 @@ class StackedHistApplication(tk.Toplevel):
         for key in keys:
             self.files.append(self.path + "/" + key)
 
+        print(self.files)
+
 # initializes an empty histogram and creates the customizability options in the side menu
     def start(self):
         self.makeFeatures()
-        self.emptyHis()
+        #self.emptyHis()
         
 
 # creates the dropdowns & buttons available in the customizability menu, binds 'Enter' to the generation of a histogram
@@ -320,14 +323,14 @@ class StackedHistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # input area for designation of y-axis label
-        self.y_label = tk.Label(self.tabText_2, text="Y-Axis Label:")
-        self.y_label.grid(row=0, column=0)
+        self.y_label = tk.Label(self.tabText_1, text="Y-Axis Label:")
+        self.y_label.grid(row=1, column=0)
         self.ref_y = tk.StringVar(self)
         self.ref_y.set("Y-Axis")
 
-        self.combo2 = tk.Entry(self.tabText_2, textvariable=self.ref_y)
+        self.combo2 = tk.Entry(self.tabText_1, textvariable=self.ref_y)
         self.combo2.config(width=10)
-        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         #x font size
         self.titlex_label = tk.Label(self.tabText_1, text="Size:")
@@ -341,15 +344,15 @@ class StackedHistApplication(tk.Toplevel):
         self.combo.grid(row=0, column=3)
 
         #y font size
-        self.titley_label = tk.Label(self.tabText_2, text="Size:")
-        self.titley_label.grid(row=0, column=2)
+        self.titley_label = tk.Label(self.tabText_1, text="Size:")
+        self.titley_label.grid(row=1, column=2)
         titley = [8, 10, 12, 15, 20, 24]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
-        self.combo = tk.OptionMenu(self.tabText_2, self.ref_yfontsize, *titley)
+        self.combo = tk.OptionMenu(self.tabText_1, self.ref_yfontsize, *titley)
         self.combo.config(width=5)
-        self.combo.grid(row=0, column=13)
+        self.combo.grid(row=1, column=3)
 
         # input area for subplot title
         #self.sub_label = tk.Label(self.tabText_2, text="Subtitle 1:")
@@ -417,6 +420,11 @@ class StackedHistApplication(tk.Toplevel):
         self.subtitles = self.hist.get_subtitles()
         if self.generation == 1:
             self.makeSubtitleInputs()
+            folders = self.hist.get_lastfolder()
+            for i in range(len(self.subtitle_inputs)):
+                j, jtext = self.subtitle_inputs[i]
+                jtext.set(folders[i])
+
         self.ref_bins.set(self.hist.getBins())
 
         if len(self.subtitle_inputs) == len(self.subtitles):
@@ -429,15 +437,15 @@ class StackedHistApplication(tk.Toplevel):
     def makeSubtitleInputs(self):
         self.subtitle_inputs = []
         k = tk.Label(self.tabText_2,text="Plot Subtitles: ")
-        k.grid(row=1, column=0)
+        k.grid(row=0, column=0, columnspan=2)
         for i in range(self.subtitle_length):
             l = tk.Label(self.tabText_2, text=f"Label {i+1}: ")
-            l.grid(row=i + 2, column=0)
+            l.grid(row=i + 1, column=0, padx=(10,10))
 
             jtext = tk.StringVar(self)
             j = tk.Entry(self.tabText_2, textvariable=jtext)
-            j.config(width=10)
-            j.grid(row=i+2, column=1, sticky="ew")
+            j.config(width=20)
+            j.grid(row=i+1, column=1, sticky="ew", padx=(0, 10))
             self.subtitle_inputs.append((j, jtext))
 
 

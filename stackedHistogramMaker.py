@@ -76,7 +76,9 @@ class StackedHistMaker():
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
             if len(self.subtitles) != 0:
-                ax.annotate(text=self.subtitles[i], xy=(0.05, 0.75), xycoords='axes fraction')
+                ax.annotate(text=self.subtitles[i], xy=(0.03, 0.75), xycoords='axes fraction')
+            else:
+                ax.annotate(text=self.lastFolder[i], xy=(0.03, 0.75), xycoords='axes fraction')
             self.axes.append(ax)
 
         
@@ -137,6 +139,9 @@ class StackedHistMaker():
     
     def get_subtitles(self):
         return self.subtitles
+    
+    def get_lastfolder(self):
+        return self.lastFolder
 
     # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
     def processData(self):
@@ -145,7 +150,9 @@ class StackedHistMaker():
         min_data = float('inf')
         max_data = 0
 
+        self.lastFolder = []
         for file in self.files:
+            self.lastFolder.append(file.split("/")[-1])
             path = file + "/" + filename
             data = self.get_eFRET_data(path)
 
@@ -287,6 +294,7 @@ class StackedHistMaker():
         figure height: {self.height} 
         zero tick: {togg}
         annotations: {self.annotations}
+        subtitles: {self.subtitles}
         """
         return text
 
