@@ -130,7 +130,7 @@ class StackedHistApplication(tk.Toplevel):
         makeHist = tk.Button(self.subframe3, text="Generate", command=self.his)
         makeHist.grid(row=0, column=0, padx="10")
 
-        self.clearButton = tk.Button(self.subframe3, text="Clear", command=self.emptyHis)
+        self.clearButton = tk.Button(self.subframe3, text="Clear Lines", command=self.emptyHis)
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
         # save button
@@ -366,7 +366,7 @@ class StackedHistApplication(tk.Toplevel):
         #df_empty = pd.DataFrame({'A' : []})
         #self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 5.0, 5.0, 0)
         self.annotations = []
-        #self.his()
+        self.his()
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
@@ -423,6 +423,8 @@ class StackedHistApplication(tk.Toplevel):
             for i in range(len(self.subtitle_inputs)):
                 j, jtext = self.subtitle_inputs[i]
                 jtext.set(self.subtitles[i])
+
+        print(subtitles)
 
     def makeSubtitleInputs(self):
         self.subtitle_inputs = []

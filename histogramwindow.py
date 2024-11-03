@@ -125,7 +125,7 @@ class HistApplication(tk.Toplevel):
         makeHist.grid(row=0, column=0, padx="10")
 
         # clear button, bound to the generation of an empty histogram
-        self.clearButton = tk.Button(self.subframe3, text="Clear", command=self.emptyHis)
+        self.clearButton = tk.Button(self.subframe3, text="Clear Lines", command=self.emptyHis)
         self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
         # save button

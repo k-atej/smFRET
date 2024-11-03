@@ -111,7 +111,6 @@ class StackedHistMaker():
         self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
-        #print(self.hist_canvas)
 
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
 
@@ -119,7 +118,6 @@ class StackedHistMaker():
             for annotation in self.annotations:
                 axis, x, y = annotation
                 for ax in self.axes:
-                    #print(f"comparing {axis} and {ax}")
                     ax_pos = ax.get_position()
                     axis_pos = axis.get_position()
                     ax0 = ax_pos.y0
@@ -253,7 +251,6 @@ class StackedHistMaker():
         f.write(text)
 
     def getText(self):
-        # if bintype = 1, bin width; otherwise bin number
         if self.bintype == 1:
             binny = "bin width"
         elif self.bintype == 0:
@@ -295,22 +292,18 @@ class StackedHistMaker():
 
     # regenerating the figure after changing the parameters by entering or pressing generate removes text
     def onclick(self, event, canvas):
-        #print(canvas)
         if event.inaxes:
             axis = (event.inaxes)
-            #print(axis)
             x, y = event.xdata, event.ydata
             ymin, ymax = self.ylim
 
             self.draw_annotations(axis, x, y)
             self.annotations.append((axis, x, y))
-            #print(self.annotations)
     
     def draw_annotations(self, axis, x, y):
         ymin, ymax = self.ylim
-        #print(f"drawing on {axis}, with {x}, {y}")
         axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red', linestyle="dashed"))
         self.hist_canvas.draw()
 
-        #double click and draw a line across al subplots?
-        #change line to be dotted?
+        #double click and draw a line across all subplots?
+
