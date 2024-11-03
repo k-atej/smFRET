@@ -251,7 +251,7 @@ class StackedHistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         self.colorbutton = tk.Button(self.tabStyle_0, text="Select Color", command=self.choose_fillcolor)
-        self.colorbutton.grid(row=0, column=3)
+        self.colorbutton.grid(row=0, column=3, columnspan=2)
 
         # input area for designation of column edge color
         self.edgecolor_label = tk.Label(self.tabStyle_1, text="Edge Color:")
@@ -264,22 +264,22 @@ class StackedHistApplication(tk.Toplevel):
         self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         self.edgecolorbutton = tk.Button(self.tabStyle_1, text="Select Edge Color", command=self.choose_edgecolor)
-        self.edgecolorbutton.grid(row=2, column=0, columnspan=2, sticky='ew')
+        self.edgecolorbutton.grid(row=1, column=2, sticky='ew', columnspan=2)
 
         # input area for designation of column edge line width
         self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
-        self.edgewidth_label.grid(row=1, column=2)
+        self.edgewidth_label.grid(row=2, column=0)
         self.ref_edgewidth = tk.StringVar(self)
         self.ref_edgewidth.set("1")
 
         self.combo6 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgewidth)
         self.combo6.config(width=5)
-        self.combo6.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.combo6.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         #check box for toggling zero on y axis
         self.toggle = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.tabStyle_2, text="Toggle Zero on Y-Axis", variable=self.toggle, onvalue=1, offvalue=0)
-        self.toggle1.grid(row=0, column=0)
+        self.toggle1.grid(row=0, column=0, pady=(20,20))
 
 
         
