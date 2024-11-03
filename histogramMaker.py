@@ -227,7 +227,7 @@ class HistMaker():
     def draw_annotations(self, axis, x):
         canvas = self.hist_canvas
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red', linestyle="dashed"))
         canvas.draw()
         
 

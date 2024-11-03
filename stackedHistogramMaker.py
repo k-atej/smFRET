@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -59,6 +59,7 @@ class StackedHistMaker():
         self.height = height
         self.toggle = toggle
         self.annotations = annotations
+        self.subtitles = subtitles
 
         self.fig = self.makeStackedHistogram()
 
@@ -74,7 +75,10 @@ class StackedHistMaker():
         for i in reversed(range(len(self.all_data_shifted))):
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+            if len(self.subtitles) != 0:
+                ax.annotate(text=self.subtitles[i], xy=(0.05, 0.75), xycoords='axes fraction')
             self.axes.append(ax)
+
         
         #set up axis ticks, range, & scale
         for ax in self.axes:
@@ -123,10 +127,18 @@ class StackedHistMaker():
                     if (ax0 == axis0):
                         self.draw_annotations(ax, x, y)
 
+        
+
         return fig
 
     def get_annotations(self):
         return self.annotations
+    
+    def get_height(self):
+        return len(self.all_data_shifted)
+    
+    def get_subtitles(self):
+        return self.subtitles
 
     # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
     def processData(self):
@@ -297,7 +309,7 @@ class StackedHistMaker():
     def draw_annotations(self, axis, x, y):
         ymin, ymax = self.ylim
         #print(f"drawing on {axis}, with {x}, {y}")
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red', linestyle="dashed"))
         self.hist_canvas.draw()
 
         #double click and draw a line across al subplots?

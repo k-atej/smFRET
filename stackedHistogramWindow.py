@@ -28,6 +28,8 @@ class StackedHistApplication(tk.Toplevel):
         self.annotations = []
         self.hist = None
         self.filename = filename
+        self.subtitle_inputs = []
+        self.generation = 0
 
         self.find_files()
 
@@ -364,12 +366,14 @@ class StackedHistApplication(tk.Toplevel):
         #df_empty = pd.DataFrame({'A' : []})
         #self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0, 5.0, 5.0, 0)
         self.annotations = []
-        self.his()
+        #self.his()
 
     # generates a stacked histogram based on the parameters set in the customizability menu
     def his(self, event=None): #creates histogram from sample data
         if self.hist is not None:
             self.hist.destroy()
+        self.generation += 1
+        print(self.generation)
 
         # need to check that this column is present in all files?
         datacol = self.ref_col.get()
@@ -402,10 +406,38 @@ class StackedHistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, offset)
+        subtitles = []
+        for subtitle in self.subtitle_inputs:
+            j, jtext = subtitle
+            subtitles.append(j.get())
+
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, offset)
         self.annotations = self.hist.get_annotations()
-        #print(self.annotations)
+        self.subtitle_length = self.hist.get_height()
+        self.subtitles = self.hist.get_subtitles()
+        if self.generation == 1:
+            self.makeSubtitleInputs()
         self.ref_bins.set(self.hist.getBins())
+
+        if len(self.subtitle_inputs) == len(self.subtitles):
+            for i in range(len(self.subtitle_inputs)):
+                j, jtext = self.subtitle_inputs[i]
+                jtext.set(self.subtitles[i])
+
+    def makeSubtitleInputs(self):
+        self.subtitle_inputs = []
+        k = tk.Label(self.tabText_2,text="Plot Subtitles: ")
+        k.grid(row=1, column=0)
+        for i in range(self.subtitle_length):
+            l = tk.Label(self.tabText_2, text=f"Label {i+1}: ")
+            l.grid(row=i + 2, column=0)
+
+            jtext = tk.StringVar(self)
+            j = tk.Entry(self.tabText_2, textvariable=jtext)
+            j.config(width=10)
+            j.grid(row=i+2, column=1, sticky="ew")
+            self.subtitle_inputs.append((j, jtext))
+
 
     # type checks the designation of x/y mins and maxes
     def checkMinMax(self, val):
