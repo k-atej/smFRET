@@ -4,6 +4,7 @@ from histogramMaker import *
 from histogramWindow import *
 from stackedHistogramWindow import *
 from histogramMain import *
+from trajectoryMain import *
 import os
 
 
@@ -34,9 +35,15 @@ class Application(tk.Tk):
         self.chooseHists = tk.Button(self, text="Make Histograms", command=self.makeHistograms)
         self.chooseHists.grid(row=1, column=0, sticky="nsew", padx=(50, 50), pady=(10,50))
 
+        self.chooseTraj = tk.Button(self, text="View Trajectories", command=self.makeTrajectories)
+        self.chooseTraj.grid(row=2, column=0, sticky="nsew", padx=(50, 50), pady=(10,50))
+
 
     def makeHistograms(self):
         histogramHandler = HistogramMainApplication()
+
+    def makeTrajectories(self):
+        trajectoryHandler = TrajectoryMainApplication()
 
 
 if __name__ == "__main__":
