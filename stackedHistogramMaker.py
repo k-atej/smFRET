@@ -113,7 +113,7 @@ class StackedHistMaker():
 
         if len(self.annotations) != 0:
             for annotation in self.annotations:
-                axis, x, y, ymax = annotation
+                axis, x, y = annotation
                 for ax in self.axes:
                     #print(f"comparing {axis} and {ax}")
                     ax_pos = ax.get_position()
@@ -121,7 +121,7 @@ class StackedHistMaker():
                     ax0 = ax_pos.y0
                     axis0 = axis_pos.y0
                     if (ax0 == axis0):
-                        self.draw_annotations(ax, x, y, ymax)
+                        self.draw_annotations(ax, x, y)
 
         return fig
 
@@ -289,11 +289,16 @@ class StackedHistMaker():
             #print(axis)
             x, y = event.xdata, event.ydata
             ymin, ymax = self.ylim
-            self.draw_annotations(axis, x, y, ymax,)
-            self.annotations.append((axis, x, y, ymax))
+
+            self.draw_annotations(axis, x, y)
+            self.annotations.append((axis, x, y))
             #print(self.annotations)
     
-    def draw_annotations(self, axis, x, y, ymax):
+    def draw_annotations(self, axis, x, y):
+        ymin, ymax = self.ylim
         #print(f"drawing on {axis}, with {x}, {y}")
         axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red'))
         self.hist_canvas.draw()
+
+        #double click and draw a line across al subplots?
+        #change line to be dotted?

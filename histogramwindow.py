@@ -1,6 +1,8 @@
 import pandas as pd
 import tkinter as tk
+import matplotlib as plt
 from tkinter import ttk
+from tkinter import PhotoImage
 from tkinter import colorchooser
 from matplotlib.figure import Figure
 from histogramMaker import *
@@ -261,18 +263,18 @@ class HistApplication(tk.Toplevel):
         self.combo5.config(width=5)
         self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        self.edgecolorbutton = tk.Button(self.tabStyle_1, text="Select Edge Color", command=self.choose_edgecolor)
-        self.edgecolorbutton.grid(row=2, column=0, columnspan=2, sticky='ew')
+        self.edgecolorbutton = tk.Button(self.tabStyle_1, text='Select Color', command=self.choose_edgecolor)
+        self.edgecolorbutton.grid(row=1, column=2)
 
         # input area for designation of column edge line width
         self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
-        self.edgewidth_label.grid(row=1, column=2)
+        self.edgewidth_label.grid(row=2, column=0)
         self.ref_edgewidth = tk.StringVar(self)
         self.ref_edgewidth.set("1")
 
         self.combo6 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgewidth)
         self.combo6.config(width=5)
-        self.combo6.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.combo6.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
 
         # third tab: text
@@ -288,15 +290,15 @@ class HistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         #title font size
-        self.titlef_label = tk.Label(self.tabText_0, text="Title Font Size:")
-        self.titlef_label.grid(row=1, column=0)
+        self.titlef_label = tk.Label(self.tabText_0, text="Size:")
+        self.titlef_label.grid(row=0, column=2)
         titlef = [8, 10, 12, 15, 20, 24]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_0, self.ref_titlefontsize, *titlef)
-        self.combo.config(width=10)
-        self.combo.grid(row=1, column=1)
+        self.combo.config(width=5)
+        self.combo.grid(row=0, column=3)
 
 
         # input area for designation of x-axis label
@@ -315,31 +317,31 @@ class HistApplication(tk.Toplevel):
         self.ref_y = tk.StringVar(self)
         self.ref_y.set("Y-Axis")
 
-        self.combo2 = tk.Entry(self.tabText_2, textvariable=self.ref_y)
-        self.combo2.config(width=10)
-        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo3 = tk.Entry(self.tabText_2, textvariable=self.ref_y)
+        self.combo3.config(width=10)
+        self.combo3.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         #x font size
-        self.titlex_label = tk.Label(self.tabText_1, text="X Font Size:")
-        self.titlex_label.grid(row=1, column=0)
+        self.titlex_label = tk.Label(self.tabText_1, text="Size:")
+        self.titlex_label.grid(row=0, column=2)
         titlex = [8, 10, 12, 15, 20, 24]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
-        self.combo = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
-        self.combo.config(width=10)
-        self.combo.grid(row=1, column=1)
+        self.combo4 = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
+        self.combo4.config(width=5)
+        self.combo4.grid(row=0, column=3)
 
         #y font size
-        self.titley_label = tk.Label(self.tabText_2, text="Y Font Size:")
-        self.titley_label.grid(row=1, column=0)
+        self.titley_label = tk.Label(self.tabText_2, text="Size:")
+        self.titley_label.grid(row=0, column=2)
         titley = [8, 10, 12, 15, 20, 24]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_2, self.ref_yfontsize, *titley)
-        self.combo.config(width=10)
-        self.combo.grid(row=1, column=1)
+        self.combo.config(width=5)
+        self.combo.grid(row=0, column=3)
 
     # generates histogram without data
     def emptyHis(self):
