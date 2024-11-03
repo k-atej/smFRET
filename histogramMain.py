@@ -71,10 +71,10 @@ class HistogramMainApplication(tk.Toplevel):
                 if file.endswith(self.ref_file.get()):
                     keys.append(file)
         if len(keys) == 1:
-            histapp = HistApplication(self.path, self.getTitle())
+            histapp = HistApplication(self.path, self.ref_file.get(), self.getTitle())
             #histapp.mainloop()
         elif len(keys) > 1:
-            stackedhistapp = StackedHistApplication(self.path, self.getTitle())
+            stackedhistapp = StackedHistApplication(self.path, self.ref_file.get(), self.getTitle())
             #stackedhistapp.mainloop()
 
     #returns the name of the final folder in the file path, to set as the window title

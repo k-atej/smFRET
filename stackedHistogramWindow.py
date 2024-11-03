@@ -10,7 +10,7 @@ import os
 #Example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
 savefilename = "FREThistogram_stacked.png"
-filename = "FRETresult.dat"
+#filename = "FRETresult.dat"
 
 #YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
 
@@ -19,7 +19,7 @@ class StackedHistApplication(tk.Toplevel):
 
     # path - filepath provided in entry box in main menu
     # title - name to set as the window title
-    def __init__(self, path, title):
+    def __init__(self, path, filename, title):
         super().__init__()
         self.title(title)
         self.minsize(200, 200)
@@ -27,6 +27,7 @@ class StackedHistApplication(tk.Toplevel):
         self.savepath = path
         self.annotations = []
         self.hist = None
+        self.filename = filename
 
         self.find_files()
 
@@ -67,7 +68,7 @@ class StackedHistApplication(tk.Toplevel):
         keys = []
         for root, dirs, files in os.walk(self.path):
             for file in files:
-                if file.endswith(filename):
+                if file.endswith(self.filename):
                     key, value = os.path.split(root)
                     keys.append(value)
         

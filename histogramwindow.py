@@ -12,7 +12,7 @@ import os
 #Example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl"
 savefilename = "FREThistogram.png"
-filename = "FRETresult.dat"
+#filename = "FRETresult.dat"
 
 #YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
 
@@ -21,7 +21,7 @@ class HistApplication(tk.Toplevel):
 
     # path - filepath provided in entry box in main menu
     # title - name to set as the window title
-    def __init__(self, path, title):
+    def __init__(self, path, filename, title):
         super().__init__()
         self.title(title)
         self.minsize(200, 200)
