@@ -19,7 +19,7 @@ import os
  #   app = Application()
   #  app.mainloop()
 
-# opens a small window. takes a file path and decides whether to open a histogram or stacked histogram window based on the number of eFRET_FILE_NAMEs found. 
+#currently, the filepath needs to be the direct parent of the trace files
 class TrajectoryMainApplication(tk.Toplevel):
     def __init__(self):
         super().__init__()

@@ -46,6 +46,8 @@ class TrajectoryWindow(tk.Toplevel):
         #self.makeFormat() not visible, for now
         self.makeButtons()
         self.maketrajectory()
+        self.bind('<Left>', self.back)
+        self.bind('<Right>', self.next1)
     
     def makeButtons(self):
 
@@ -89,14 +91,14 @@ class TrajectoryWindow(tk.Toplevel):
         self.trajectory = TrajectoryMaker(title, self.df, self.subframeleft)
         self.makeLabel()
 
-    def back(self):
+    def back(self, event=None):
         self.index -= 1
         if self.index < 0:
             self.index = self.numfiles - 1
         self.maketrajectory()
 
 
-    def next1(self):
+    def next1(self, event=None):
         self.index += 1
         if self.index >= self.numfiles:
             self.index = 0

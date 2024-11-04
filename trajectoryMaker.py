@@ -30,9 +30,9 @@ class TrajectoryMaker():
 
         f.plot(time, donor, color="lime", label="Donor")
         f.plot(time, acceptor, color="red", label="Acceptor")
-        #f.set_ylim([None, 400])
+        f.set_ylim([0, None]) #should be able to standardize this across a set?
         f.legend()
-        f.set_title("Intensity over Time")
+        f.set_title("Intensity")
         f.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
         fig.tight_layout()
         
@@ -51,8 +51,8 @@ class TrajectoryMaker():
         efret = self.data["efret"]
 
         f.plot(time, efret, color="black")
-        f.set_ylim([None, None])
-        f.set_title("Efficiency over Time")
+        f.set_ylim([0, 1]) 
+        f.set_title("FRET Efficiency")
         f.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
         fig.tight_layout()
         
