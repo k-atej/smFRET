@@ -93,6 +93,7 @@ class StackedHistApplication(tk.Toplevel):
         self.makeOptions()
         self.makeButtons()
         self.bind('<Return>', self.his)
+        self.bind('<BackSpace>', self.undoLastLine)
         self.his()
 
     # sets up the layout of the customizability menu
@@ -134,11 +135,15 @@ class StackedHistApplication(tk.Toplevel):
         makeHist.grid(row=0, column=0, padx="10")
 
         self.clearButton = tk.Button(self.subframe3, text="Clear Lines", command=self.emptyHis)
-        self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+        self.clearButton.grid(row=0, column=1, sticky="ew", padx="10", pady="10")
+
+        # undo button, bound to the generation of an empty histogram
+        self.undoButton = tk.Button(self.subframe3, text="Undo Line", command=self.undoLastLine)
+        self.undoButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
         # save button
         self.saveButton = tk.Button(self.subframe3, text="Save", command=self.savewindow)
-        self.saveButton.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
+        self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
     # sets up options in the customizability window
     def makeOptions(self):
@@ -186,7 +191,7 @@ class StackedHistApplication(tk.Toplevel):
         self.xmax_label = tk.Label(self.tabFormat_2, text="X Max:")
         self.xmax_label.grid(row=1, column=0)
         self.ref_xmax = tk.StringVar(self)
-        self.ref_xmax.set('None')
+        self.ref_xmax.set('1.0')
 
         self.comboxmax = tk.Entry(self.tabFormat_2, textvariable=self.ref_xmax)
         self.comboxmax.config(width=5)
@@ -196,7 +201,7 @@ class StackedHistApplication(tk.Toplevel):
         self.xmin_label = tk.Label(self.tabFormat_2, text="X Min:")
         self.xmin_label.grid(row=2, column=0)
         self.ref_xmin = tk.StringVar(self)
-        self.ref_xmin.set('None')
+        self.ref_xmin.set('-0.1')
 
         self.comboxmin = tk.Entry(self.tabFormat_2, textvariable=self.ref_xmin)
         self.comboxmin.config(width=5)
@@ -206,7 +211,7 @@ class StackedHistApplication(tk.Toplevel):
         self.ymax_label = tk.Label(self.tabFormat_2, text="Y Max:")
         self.ymax_label.grid(row=1, column=2)
         self.ref_ymax = tk.StringVar(self)
-        self.ref_ymax.set('None')
+        self.ref_ymax.set('900')
 
         self.comboymax = tk.Entry(self.tabFormat_2, textvariable=self.ref_ymax)
         self.comboymax.config(width=5)
@@ -216,7 +221,7 @@ class StackedHistApplication(tk.Toplevel):
         self.ymin_label = tk.Label(self.tabFormat_2, text="Y Min:")
         self.ymin_label.grid(row=2, column=2)
         self.ref_ymin = tk.StringVar(self)
-        self.ref_ymin.set('None')
+        self.ref_ymin.set('0.0')
 
         self.comboymin = tk.Entry(self.tabFormat_2, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
@@ -501,4 +506,10 @@ class StackedHistApplication(tk.Toplevel):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_edgecolor.set(hexcode)
 
+    def undoLastLine(self, event=None):
+        if len(self.annotations) > 0:
+            axis, x, y, dbl = self.annotations.pop()
+            while dbl:
+                axis, x, y, dbl = self.annotations.pop()
+            self.his()
     

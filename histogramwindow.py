@@ -82,6 +82,7 @@ class HistApplication(tk.Toplevel):
         self.makeOptions()
         self.makeButtons()
         self.bind('<Return>', self.his)
+        self.bind('<BackSpace>', self.undoLastLine)
         #self.his()
     
 
@@ -126,11 +127,15 @@ class HistApplication(tk.Toplevel):
 
         # clear button, bound to the generation of an empty histogram
         self.clearButton = tk.Button(self.subframe3, text="Clear Lines", command=self.emptyHis)
-        self.clearButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+        self.clearButton.grid(row=0, column=1, sticky="ew", padx="10", pady="10")
+
+        # undo button, bound to the generation of an empty histogram
+        self.undoButton = tk.Button(self.subframe3, text="Undo Line", command=self.undoLastLine)
+        self.undoButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
         # save button
         self.saveButton = tk.Button(self.subframe3, text="Save", command=self.savewindow)
-        self.saveButton.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
+        self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
     # sets up options in the customizability window
     def makeOptions(self):
@@ -446,3 +451,8 @@ class HistApplication(tk.Toplevel):
     def choose_edgecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_edgecolor.set(hexcode)
+
+    def undoLastLine(self, event=None):
+        if len(self.annotations) > 0:
+            self.annotations.pop()
+            self.his()

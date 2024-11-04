@@ -118,7 +118,7 @@ class StackedHistMaker():
 
         if len(self.annotations) != 0:
             for annotation in self.annotations:
-                axis, x, y = annotation
+                axis, x, y, dbl = annotation
                 for ax in self.axes:
                     ax_pos = ax.get_position()
                     axis_pos = axis.get_position()
@@ -299,14 +299,29 @@ class StackedHistMaker():
         return text
 
     # regenerating the figure after changing the parameters by entering or pressing generate removes text
+    # working on: if the event is a dblclick, take the last line and extend it across all of the subplots
     def onclick(self, event, canvas):
         if event.inaxes:
-            axis = (event.inaxes)
-            x, y = event.xdata, event.ydata
-            ymin, ymax = self.ylim
+            if event.dblclick:
+                axis, x, y, dbl = self.annotations[-1]
+                for ax in self.axes:
+                    ax_pos = ax.get_position()
+                    axis_pos = axis.get_position()
+                    ax0 = ax_pos.y0
+                    axis0 = axis_pos.y0
+                    if (ax0 != axis0):
+                        dbl=True
+                        self.draw_annotations(ax, x, y)
+                        self.annotations.append((ax, x, y, dbl))
+            
+            else:
+                axis = (event.inaxes)
+                x, y = event.xdata, event.ydata
+                ymin, ymax = self.ylim
 
-            self.draw_annotations(axis, x, y)
-            self.annotations.append((axis, x, y))
+                dbl=False
+                self.draw_annotations(axis, x, y)
+                self.annotations.append((axis, x, y, False))
     
     def draw_annotations(self, axis, x, y):
         ymin, ymax = self.ylim
@@ -314,4 +329,5 @@ class StackedHistMaker():
         self.hist_canvas.draw()
 
         #double click and draw a line across all subplots?
+
 
