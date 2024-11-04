@@ -79,7 +79,7 @@ class StackedHistApplication(tk.Toplevel):
         for key in keys:
             self.files.append(self.path + "/" + key)
 
-        print(self.files)
+        #print(self.files)
 
 # initializes an empty histogram and creates the customizability options in the side menu
     def start(self):
@@ -376,7 +376,7 @@ class StackedHistApplication(tk.Toplevel):
         if self.hist is not None:
             self.hist.destroy()
         self.generation += 1
-        print(self.generation)
+        #print(self.generation)
 
         # need to check that this column is present in all files?
         datacol = self.ref_col.get()
@@ -432,7 +432,7 @@ class StackedHistApplication(tk.Toplevel):
                 j, jtext = self.subtitle_inputs[i]
                 jtext.set(self.subtitles[i])
 
-        print(subtitles)
+        #print(subtitles)
 
     def makeSubtitleInputs(self):
         self.subtitle_inputs = []

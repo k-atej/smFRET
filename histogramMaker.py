@@ -164,7 +164,7 @@ class HistMaker():
         return binwidths
 
     def save(self, refpath):
-        self.fig.savefig(refpath)
+        self.fig.savefig(refpath, dpi=200)
         self.annotate(refpath)
         print("SAVED!")
 
