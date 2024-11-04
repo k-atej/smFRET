@@ -67,7 +67,7 @@ class HistogramMainApplication(tk.Toplevel):
         self.path = self.ref_input.get()
         keys = []
         for root, dirs, files in os.walk(self.path):
-            for file in files:
+               for file in files:
                 if file.endswith(self.ref_file.get()):
                     keys.append(file)
         if len(keys) == 1:
