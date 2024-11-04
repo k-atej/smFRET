@@ -19,7 +19,6 @@ import os
  #   app = Application()
   #  app.mainloop()
 
-#currently, the filepath needs to be the direct parent of the trace files
 class TrajectoryMainApplication(tk.Toplevel):
     def __init__(self):
         super().__init__()
@@ -54,19 +53,20 @@ class TrajectoryMainApplication(tk.Toplevel):
 
     def onclick(self):
         keys = self.processPath()
-        print(keys)
+        #print(keys)
         trajectory_window = TrajectoryWindow(self.ref_input.get(), keys)
 
     def processPath(self):
         filepath = self.ref_input.get()
-        print(filepath)
+        #print(filepath)
         filetype = '* tr*.dat'
         keys = []
         for root, dirs, files in os.walk(filepath):
+            dirs.sort()
             files.sort()
             for file in files:
                 if glob.fnmatch.fnmatch(file, filetype):
-                    keys.append(file)
+                    keys.append(os.path.join(root, file))
         return keys
 
         

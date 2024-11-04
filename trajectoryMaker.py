@@ -9,11 +9,25 @@ import tkinter as tk
 
 class TrajectoryMaker():
 
+    # title is the full file path
+    # title set is the window title aka the parent folder that was inputted
     # data should come in as a dataframe
-    def __init__(self, title, data, master):
+    def __init__(self, title, titleset, data, master):
         self.data = data
         self.master = master
-        self.title = title.split(".")[0]
+
+
+        keys = title.split("/")
+        self.title = ""
+        count = False
+        for i in range(len(keys)):
+            if count:
+                self.title += "/" + keys[i]
+            if keys[i] == titleset:
+                count = True
+
+        self.title = self.title.split(".")[0]
+        self.title = self.title.strip("/")
 
         self.intensityfig = self.makeIntensity()
         self.efficiencyfig = self.makeEfficiency()

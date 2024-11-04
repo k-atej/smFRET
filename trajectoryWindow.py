@@ -13,15 +13,15 @@ class TrajectoryWindow(tk.Toplevel):
         super().__init__()
         self.minsize(200, 200)
         self.df = []
-        self.files = files
-        self.paths = []
+        self.files = [] # name of final file
         for file in files:
-            self.paths.append(path + "/" + file)
+            self.files.append(file.split("/")[-1])
+        self.paths = files # full file path
         self.numfiles = len(self.paths)
         self.index = 0
         
-        title = path.split("/")[-1]
-        self.title(title)
+        self.titleset = path.split("/")[-1] # final folder in the input path
+        self.title(self.titleset)
 
 
         #full window 
@@ -87,8 +87,8 @@ class TrajectoryWindow(tk.Toplevel):
     def maketrajectory(self):
         self.get_data()
         self.calculateEfret()
-        title = self.files[self.index]
-        self.trajectory = TrajectoryMaker(title, self.df, self.subframeleft)
+        title = self.paths[self.index]
+        self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft)
         self.makeLabel()
 
     def back(self, event=None):
