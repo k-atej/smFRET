@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -57,6 +57,7 @@ class HistMaker():
         self.width = width
         self.height = height
         self.annotations = annotations
+        self.linecolor = linecolor
 
         self.fig = self.makeHistogram()
 
@@ -65,44 +66,16 @@ class HistMaker():
     def makeHistogram(self):
         self.zero_data()
 
-        #create figure
         fig = Figure(dpi=80)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
         f = fig.gca() #gca = get current axes
         
-        # set number of bins
-        if self.bins != 'Auto':
-            if 'Auto' in str(self.bins):
-                self.bins = 'Auto'
-            elif float(self.bins) < 1.0:
-                if self.bintype == 0:
-                    self.bins = 'Auto'
-        if self.bins == 'Auto':
-            if self.bintype == 0:
-                self.bins = int(self.auto_bin())
-                self.return_bins = f'Auto:{self.bins}'
-            else:
-                bin_width = float(self.auto_bin_width())
-                bins = np.arange(min(self.data), max(self.data) + bin_width, bin_width)
-                self.bins = bins 
-                self.return_bins = bin_width
-        elif self.bintype == 1:
-            bin_width = float(self.bins)
-            bins = np.arange(min(self.data), max(self.data) + bin_width, bin_width)
-            self.bins = bins 
-            self.return_bins = bin_width
-        else:
-            self.bins = int(self.bins)
-            self.return_bins = int(self.bins)
-
+        self.setBins()
         f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
-        #set axis titles
         f.set_xlabel(self.x, fontsize=self.xfontsize)
         f.set_ylabel(self.y, fontsize=self.yfontsize)
-
-        #set axis ranges, doesn't actually change the scale
         f.set_xlim([self.xmin, self.xmax])
         f.set_ylim([self.ymin, self.ymax])
 
@@ -116,13 +89,42 @@ class HistMaker():
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
-        if len(self.annotations) != 0:
-            for annotation in self.annotations:
-                self.draw_annotations(f, annotation)
-
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
+        self.restoreAnnotations(f)
 
         return fig
+    
+    def restoreAnnotations(self, f):
+        if len(self.annotations) != 0:
+            for annotation in self.annotations:
+                x, color = annotation
+                self.draw_annotations(f, x, color)
+    
+    def setBins(self):
+        # set number of bins
+        if self.bins != 'Auto':
+            if 'Auto' in str(self.bins):
+                self.bins = 'Auto'
+            elif float(self.bins) < 1.0:
+                if self.bintype == 0:
+                    self.bins = 'Auto'
+        if self.bins == 'Auto':
+            if self.bintype == 0:
+                self.bins = int(self.auto_bin())
+                self.return_bins = f'Auto:{self.bins}'
+            else:
+                bin_width = float(self.auto_bin_width())
+                bins = np.arange(min(self.data_shifted), max(self.data_shifted) + bin_width, bin_width)
+                self.bins = bins 
+                self.return_bins = bin_width
+        elif self.bintype == 1:
+            bin_width = float(self.bins)
+            bins = np.arange(min(self.data_shifted), max(self.data_shifted) + bin_width, bin_width)
+            self.bins = bins 
+            self.return_bins = bin_width
+        else:
+            self.bins = int(self.bins)
+            self.return_bins = int(self.bins)
     
     #returns number of bins used in the histogram
     def getBins(self):
@@ -212,6 +214,7 @@ class HistMaker():
         offset: {self.offset}
         figure width: {self.width}
         figure height: {self.height} 
+        annotations: {self.annotations}
 
         """
         return text
@@ -220,14 +223,13 @@ class HistMaker():
     def onclick(self, event, canvas):
         if event.inaxes:
             x = event.xdata
-            self.draw_annotations(event.inaxes, x)
-            self.annotations.append(x)
-            #print(self.annotations)
+            self.draw_annotations(event.inaxes, x, self.linecolor)
+            self.annotations.append((x, self.linecolor))
     
-    def draw_annotations(self, axis, x):
+    def draw_annotations(self, axis, x, color):
         canvas = self.hist_canvas
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red', linestyle="dashed"))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle="dashed"))
         canvas.draw()
         
 

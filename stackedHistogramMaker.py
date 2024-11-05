@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, linecolor, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -60,6 +60,7 @@ class StackedHistMaker():
         self.toggle = toggle
         self.annotations = annotations
         self.subtitles = subtitles
+        self.linecolor = linecolor
 
         self.fig = self.makeStackedHistogram()
 
@@ -67,7 +68,6 @@ class StackedHistMaker():
     def makeStackedHistogram(self):
         self.processData()
 
-        #create figure
         fig = Figure(dpi=80)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
@@ -81,7 +81,26 @@ class StackedHistMaker():
                 ax.annotate(text=self.lastFolder[i], xy=(0.03, 0.75), xycoords='axes fraction')
             self.axes.append(ax)
 
-        
+        self.format_axes()
+        self.axes[0].set_xlabel(self.x, fontsize=self.xfontsize)
+        fig.supylabel(self.y, fontsize=self.yfontsize, x = self.width / 50)
+        fig.suptitle(self.title, y = 0.93, x=0.57, fontsize=self.titlesize)
+        fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
+
+        self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
+        self.hist_canvas.draw()
+        self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
+
+        fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
+        self.restore_annotations()
+        return fig
+    
+    def format_axes(self):
+        if self.xmin is None:
+            self.xmin = self.min_data
+        if self.xmax is None:
+            self.xmax = self.max_data
+            
         #set up axis ticks, range, & scale
         for ax in self.axes:
             ax.sharey(self.axes[0])
@@ -96,40 +115,22 @@ class StackedHistMaker():
     
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
 
+        # remove x-tick labels on subplots, except for last one
         for i in range(1, len(self.all_data_shifted)):
            self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
            self.axes[i].set_xticklabels([])
-
-
-        #set axis titles
-        self.axes[0].set_xlabel(self.x, fontsize=self.xfontsize)
-        fig.supylabel(self.y, fontsize=self.yfontsize, x = self.width / 50)
-        
-        
-        #set title & append figure to canvas
-        fig.suptitle(self.title, y = 0.93, x=0.57, fontsize=self.titlesize)
-        fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
-
-        self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
-        self.hist_canvas.draw()
-        self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
-
-        fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
-
+    
+    def restore_annotations(self):
         if len(self.annotations) != 0:
             for annotation in self.annotations:
-                axis, x, y, dbl = annotation
+                axis, x, y, dbl, color = annotation
                 for ax in self.axes:
                     ax_pos = ax.get_position()
                     axis_pos = axis.get_position()
                     ax0 = ax_pos.y0
                     axis0 = axis_pos.y0
                     if (ax0 == axis0):
-                        self.draw_annotations(ax, x, y)
-
-        
-
-        return fig
+                        self.draw_annotations(ax, x, y, color)
 
     def get_annotations(self):
         return self.annotations
@@ -147,8 +148,8 @@ class StackedHistMaker():
     def processData(self):
         self.all_data = [] # list of dataframes
         min_length = float('inf')
-        min_data = float('inf')
-        max_data = 0
+        self.min_data = float('inf')
+        self.max_data = 0
 
         self.lastFolder = []
         for file in self.files:
@@ -158,14 +159,21 @@ class StackedHistMaker():
 
             if len(data) < min_length:
                 min_length = len(data)
-            if data["eFRET"].min() < min_data:
-                min_data = data["eFRET"].min()
-            if data["eFRET"].max() > max_data:
-                max_data = data["eFRET"].max()
+            if data["eFRET"].min() < self.min_data:
+                self.min_data = data["eFRET"].min()
+            if data["eFRET"].max() > self.max_data:
+                self.max_data = data["eFRET"].max()
             self.all_data.append(data)
             self.minlength = min_length
 
         self.zero_data()
+        print(self.min_data, self.offset)
+        self.min_data -= float(self.offset)
+        self.max_data -= float(self.offset)
+
+        self.setBins()
+    
+    def setBins(self):
         # set number of bins
         if self.bins != 'Auto':
             if 'Auto' in str(self.bins):
@@ -179,18 +187,18 @@ class StackedHistMaker():
                 self.return_bins = f'Auto:{self.bins}'
             else:
                 bin_width = float(self.auto_bin_width())
-                bins = np.arange(min_data, max_data + bin_width, bin_width)
+                bins = np.arange(self.min_data, self.max_data + bin_width, bin_width)
                 self.bins = bins 
                 self.return_bins = bin_width
         elif self.bintype == 1:
             bin_width = float(self.bins)
-            bins = np.arange(min_data, max_data + bin_width, bin_width)
+            bins = np.arange(self.min_data, self.max_data + bin_width, bin_width)
             self.bins = bins 
+            print(self.bins)
             self.return_bins = bin_width
         else:
             self.bins = int(self.bins)
             self.return_bins = int(self.bins)
-
 
     # returns the number of bins used in a histogram
     def getBins(self):
@@ -220,6 +228,7 @@ class StackedHistMaker():
             df[self.datacolumn] = df[self.datacolumn] - float(self.offset)
             zeroed_data.append(df)
         self.all_data_shifted = zeroed_data
+        print(zeroed_data)
 
     # returns the count of the highest bin
     #   - data: pandas dataframe column 
@@ -303,7 +312,7 @@ class StackedHistMaker():
     def onclick(self, event, canvas):
         if event.inaxes:
             if event.dblclick:
-                axis, x, y, dbl = self.annotations[-1]
+                axis, x, y, dbl, color = self.annotations[-1]
                 for ax in self.axes:
                     ax_pos = ax.get_position()
                     axis_pos = axis.get_position()
@@ -311,8 +320,8 @@ class StackedHistMaker():
                     axis0 = axis_pos.y0
                     if (ax0 != axis0):
                         dbl=True
-                        self.draw_annotations(ax, x, y)
-                        self.annotations.append((ax, x, y, dbl))
+                        self.draw_annotations(ax, x, y, self.linecolor)
+                        self.annotations.append((ax, x, y, dbl, self.linecolor))
             
             else:
                 axis = (event.inaxes)
@@ -320,12 +329,12 @@ class StackedHistMaker():
                 ymin, ymax = self.ylim
 
                 dbl=False
-                self.draw_annotations(axis, x, y)
-                self.annotations.append((axis, x, y, False))
+                self.draw_annotations(axis, x, y, self.linecolor)
+                self.annotations.append((axis, x, y, False, self.linecolor))
     
-    def draw_annotations(self, axis, x, y):
+    def draw_annotations(self, axis, x, y, color):
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color='red', linestyle="dashed"))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle="dashed"))
         self.hist_canvas.draw()
 
         #double click and draw a line across all subplots?

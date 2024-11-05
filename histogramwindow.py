@@ -92,6 +92,8 @@ class HistApplication(tk.Toplevel):
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
         self.tabText = tk.Frame(self.tabControl)
+        #self.tabStyle.bind('<Return>', self.his)
+        #self.tabText.bind('<Return>', self.his)
 
         self.tabControl.add(self.tabFormat, text="Format")
         self.tabControl.add(self.tabStyle, text="Style")
@@ -282,6 +284,20 @@ class HistApplication(tk.Toplevel):
         self.combo6.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
 
+        # input area for designation of line color
+        self.linecolor_label = tk.Label(self.tabStyle_2, text="Line Color:")
+        self.linecolor_label.grid(row=0, column=0)
+        self.ref_linecolor = tk.StringVar(self)
+        self.ref_linecolor.set("red")
+
+        self.combol = tk.Entry(self.tabStyle_2, textvariable=self.ref_linecolor)
+        self.combol.config(width=5)
+        self.combol.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        self.linecolorbutton = tk.Button(self.tabStyle_2, text='Select Color', command=self.choose_linecolor)
+        self.linecolorbutton.grid(row=0, column=2)
+
+
         # third tab: text
 
         # input area for designation of graph title
@@ -375,6 +391,11 @@ class HistApplication(tk.Toplevel):
         if edgecolor == "None":
             edgecolor = 0
 
+        linecolor = str(self.ref_linecolor.get())
+        if linecolor == "None":
+            linecolor = "red"
+
+
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -390,7 +411,7 @@ class HistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, offset)
         self.ref_bins.set(self.hist.getBins())
         self.annotations = self.hist.getAnnotations()
 
@@ -451,6 +472,10 @@ class HistApplication(tk.Toplevel):
     def choose_edgecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_edgecolor.set(hexcode)
+    
+    def choose_linecolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_linecolor.set(hexcode)
 
     def undoLastLine(self, event=None):
         if len(self.annotations) > 0:
