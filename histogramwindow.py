@@ -299,6 +299,18 @@ class HistApplication(tk.Toplevel):
         self.linecolorbutton = tk.Button(self.tabStyle_2, text='Select Color', command=self.choose_linecolor)
         self.linecolorbutton.grid(row=0, column=2)
 
+        # dropdown for designation of line style
+        self.linestyle_label = tk.Label(self.tabStyle_2, text="Line Style:")
+        self.linestyle_label.grid(row=1, column=0)
+        refstyle = ["solid", "dashed", "dotted", "dashdot"]
+        self.ref_linestyle = tk.StringVar(self)
+        self.ref_linestyle.set("dashed")
+
+        self.combo9 = tk.OptionMenu(self.tabStyle_2, self.ref_linestyle, *refstyle)
+        self.combo9.config(width=5)
+        self.combo9.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+
 
         # third tab: text
 
@@ -397,7 +409,7 @@ class HistApplication(tk.Toplevel):
         if linecolor == "None":
             linecolor = "red"
 
-
+        linestyle = self.ref_linestyle.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -413,7 +425,7 @@ class HistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, offset)
         self.ref_bins.set(self.hist.getBins())
         self.annotations = self.hist.getAnnotations()
 

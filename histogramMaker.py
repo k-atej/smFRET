@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, linestyle, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -58,6 +58,7 @@ class HistMaker():
         self.height = height
         self.annotations = annotations
         self.linecolor = linecolor
+        self.linestyle = linestyle
 
         self.fig = self.makeHistogram()
 
@@ -97,8 +98,8 @@ class HistMaker():
     def restoreAnnotations(self, f):
         if len(self.annotations) != 0:
             for annotation in self.annotations:
-                x, color = annotation
-                self.draw_annotations(f, x, color)
+                x, color, style = annotation
+                self.draw_annotations(f, x, color, style)
     
     def setBins(self):
         # set number of bins
@@ -223,13 +224,13 @@ class HistMaker():
     def onclick(self, event, canvas):
         if event.inaxes:
             x = event.xdata
-            self.draw_annotations(event.inaxes, x, self.linecolor)
-            self.annotations.append((x, self.linecolor))
+            self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle)
+            self.annotations.append((x, self.linecolor, self.linestyle))
     
-    def draw_annotations(self, axis, x, color):
+    def draw_annotations(self, axis, x, color, linestyle):
         canvas = self.hist_canvas
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle="dashed"))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle=linestyle))
         canvas.draw()
         
 

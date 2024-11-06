@@ -300,6 +300,18 @@ class StackedHistApplication(tk.Toplevel):
 
         self.linecolorbutton = tk.Button(self.tabStyle_1, text='Select Color', command=self.choose_linecolor)
         self.linecolorbutton.grid(row=3, column=2)
+
+
+        # dropdown for designation of line style
+        self.linestyle_label = tk.Label(self.tabStyle_1, text="Line Style:")
+        self.linestyle_label.grid(row=4, column=0)
+        refstyle = ["solid", "dashed", "dotted", "dashdot"]
+        self.ref_linestyle = tk.StringVar(self)
+        self.ref_linestyle.set("dashed")
+
+        self.combo9 = tk.OptionMenu(self.tabStyle_1, self.ref_linestyle, *refstyle)
+        self.combo9.config(width=5)
+        self.combo9.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="10")
         
         #check box for toggling zero on y axis
         self.toggle = tk.IntVar()
@@ -418,6 +430,7 @@ class StackedHistApplication(tk.Toplevel):
         if linecolor == "None":
             linecolor = "red"
         
+        linestyle = self.ref_linestyle.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -439,7 +452,7 @@ class StackedHistApplication(tk.Toplevel):
             j, jtext = subtitle
             subtitles.append(j.get())
 
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, linecolor, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, linecolor, linestyle, offset)
         self.annotations = self.hist.get_annotations()
         self.subtitle_length = self.hist.get_height()
         self.subtitles = self.hist.get_subtitles()
