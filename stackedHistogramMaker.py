@@ -167,7 +167,7 @@ class StackedHistMaker():
             self.minlength = min_length
 
         self.zero_data()
-        print(self.min_data, self.offset)
+        #print(self.min_data, self.offset)
         self.min_data -= float(self.offset)
         self.max_data -= float(self.offset)
 
@@ -194,7 +194,7 @@ class StackedHistMaker():
             bin_width = float(self.bins)
             bins = np.arange(self.min_data, self.max_data + bin_width, bin_width)
             self.bins = bins 
-            print(self.bins)
+            #print(self.bins)
             self.return_bins = bin_width
         else:
             self.bins = int(self.bins)
@@ -228,7 +228,7 @@ class StackedHistMaker():
             df[self.datacolumn] = df[self.datacolumn] - float(self.offset)
             zeroed_data.append(df)
         self.all_data_shifted = zeroed_data
-        print(zeroed_data)
+        #print(zeroed_data)
 
     # returns the count of the highest bin
     #   - data: pandas dataframe column 

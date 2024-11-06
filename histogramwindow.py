@@ -273,15 +273,17 @@ class HistApplication(tk.Toplevel):
         self.edgecolorbutton = tk.Button(self.tabStyle_1, text='Select Color', command=self.choose_edgecolor)
         self.edgecolorbutton.grid(row=1, column=2)
 
-        # input area for designation of column edge line width
+        # dropdown for designation of column edge line width
         self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
         self.edgewidth_label.grid(row=2, column=0)
+        refedge = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
         self.ref_edgewidth = tk.StringVar(self)
-        self.ref_edgewidth.set("1")
+        self.ref_edgewidth.set(1.0)
 
-        self.combo6 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgewidth)
+        self.combo6 = tk.OptionMenu(self.tabStyle_1, self.ref_edgewidth, *refedge)
         self.combo6.config(width=5)
         self.combo6.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+
 
 
         # input area for designation of line color
