@@ -449,21 +449,46 @@ class HistApplication(tk.Toplevel):
         self.win.title("Set Filepath: ")
         
         #input area for file name
+        s = ""
+        savepath = self.path.split(".")
+        for path in savepath[:-1]:
+            s+= path
         self.path_label = tk.Label(self.win, text="Save File Path:")
         self.path_label.grid(row=0, column=0)
         self.ref_path = tk.StringVar(self.win)
-        self.ref_path.set(self.savepath + '/' + savefilename)
+        self.ref_path.set(s)
 
         self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
         self.combo6.config(width=50)
-        self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 10), pady="10")
+        self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady="10")
+
+        # dropdown for designation of filetype
+        reftype = ['.pdf', '.png', '.svg', '.ps', '.eps']
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.png')
+
+        self.combo8 = tk.OptionMenu(self.win, self.ref_type, *reftype)
+        self.combo8.config(width=5)
+        self.combo8.grid(row=0, column=2, sticky="ew", padx=(0, 10), pady="10")
+
+        # dropdown for designation of file quality
+        self.qual_label = tk.Label(self.win, text="Quality:")
+        self.qual_label.grid(row= 1, column=0)
+        refqual = ["Low", "Medium", "High"]
+        self.ref_qual = tk.StringVar(self)
+        self.ref_qual.set('Medium')
+
+        self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
+        self.combo9.config(width=5)
+        self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
+
 
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
-        self.saveButton.grid(row=1, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         #self.win.mainloop()
     
     def save(self):
-        self.hist.save(self.ref_path.get())
+        self.hist.save(self.ref_path.get(), self.ref_type.get())
         self.win.destroy()
         
 

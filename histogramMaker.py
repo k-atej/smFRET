@@ -67,12 +67,13 @@ class HistMaker():
     def makeHistogram(self):
         self.zero_data()
 
-        fig = Figure(dpi=80)
+        fig = Figure(dpi=100)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
         f = fig.gca() #gca = get current axes
         
         self.setBins()
+            
         f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
         f.set_xlabel(self.x, fontsize=self.xfontsize)
@@ -115,12 +116,17 @@ class HistMaker():
                 self.return_bins = f'Auto:{self.bins}'
             else:
                 bin_width = float(self.auto_bin_width())
-                bins = np.arange(min(self.data_shifted), max(self.data_shifted) + bin_width, bin_width)
+                rangebin = max(self.data_shifted) - min(self.data_shifted)
+                numbins = rangebin // bin_width
+                bins, step = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1, retstep=True)
                 self.bins = bins 
                 self.return_bins = bin_width
         elif self.bintype == 1:
             bin_width = float(self.bins)
-            bins = np.arange(min(self.data_shifted), max(self.data_shifted) + bin_width, bin_width)
+            rangebin = max(self.data_shifted) - min(self.data_shifted)
+            numbins = rangebin // bin_width
+            bins, step = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1, retstep=True)
+            print(step)
             self.bins = bins 
             self.return_bins = bin_width
         else:
@@ -166,8 +172,15 @@ class HistMaker():
         binwidths = bin_edges[1] - bin_edges[0]
         return binwidths
 
-    def save(self, refpath):
-        self.fig.savefig(refpath, dpi=200)
+    def save(self, refpath, reftype, refqual):
+        if refqual == "Low":
+            dpi=200
+        elif refqual == "Medium":
+            dpi=400
+        elif refqual == "High":
+            dpi=600
+        refpath += reftype
+        self.fig.savefig(refpath, dpi=dpi)
         self.annotate(refpath)
         print("SAVED!")
 

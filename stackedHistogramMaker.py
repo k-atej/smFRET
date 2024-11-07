@@ -69,7 +69,7 @@ class StackedHistMaker():
     def makeStackedHistogram(self):
         self.processData()
 
-        fig = Figure(dpi=80)
+        fig = Figure(dpi=100)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
         self.axes = []
@@ -188,12 +188,16 @@ class StackedHistMaker():
                 self.return_bins = f'Auto:{self.bins}'
             else:
                 bin_width = float(self.auto_bin_width())
-                bins = np.arange(self.min_data, self.max_data + bin_width, bin_width)
+                rangebin = self.max_data - self.min_data
+                numbins = rangebin // bin_width
+                bins = np.linspace(self.min_data, self.max_data + bin_width, int(numbins) + 1)
                 self.bins = bins 
                 self.return_bins = bin_width
         elif self.bintype == 1:
             bin_width = float(self.bins)
-            bins = np.arange(self.min_data, self.max_data + bin_width, bin_width)
+            rangebin = self.max_data - self.min_data
+            numbins = rangebin // bin_width
+            bins = np.linspace(self.min_data, self.max_data + bin_width, int(numbins) + 1)
             self.bins = bins 
             #print(self.bins)
             self.return_bins = bin_width
@@ -249,8 +253,15 @@ class StackedHistMaker():
         binwidths = bin_edges[1] - bin_edges[0]
         return binwidths
     
-    def save(self, refpath):
-        self.fig.savefig(refpath, dpi=200)
+    def save(self, refpath, reftype, refqual):
+        if refqual == "Low":
+            dpi=200
+        elif refqual == "Medium":
+            dpi=400
+        elif refqual == "High":
+            dpi=600
+        refpath += reftype
+        self.fig.savefig(refpath, dpi=dpi)
         self.annotate(refpath)
         print("SAVED!")
 
