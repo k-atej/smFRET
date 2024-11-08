@@ -323,6 +323,17 @@ class HistApplication(tk.Toplevel):
         self.combo9.config(width=5)
         self.combo9.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        #dropdown for linewidth
+        self.lw_label = tk.Label(self.tabStyle_2, text="Line Width:")
+        self.lw_label.grid(row=2, column=0)
+        lw = [1.0, 2.0, 3.0, 4.0]
+        self.ref_lw = tk.IntVar(self)
+        self.ref_lw.set(1.0)
+
+        self.combolw = tk.OptionMenu(self.tabStyle_2, self.ref_lw, *lw)
+        self.combolw.config(width=5)
+        self.combolw.grid(row=2, column=1)
+
 
 
         # third tab: text
@@ -424,6 +435,7 @@ class HistApplication(tk.Toplevel):
 
         linestyle = self.ref_linestyle.get()
         linetogg = self.linetoggle.get()
+        linewidth = self.ref_lw.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -439,7 +451,7 @@ class HistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, linetogg, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, linetogg, linewidth, offset)
         self.ref_bins.set(self.hist.getBins())
         self.annotations = self.hist.getAnnotations()
 

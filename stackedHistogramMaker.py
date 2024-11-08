@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, linecolor, linestyle, linetogg, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -60,9 +60,11 @@ class StackedHistMaker():
         self.toggle = toggle
         self.annotations = annotations
         self.subtitles = subtitles
+        self.subtitlesizes = subtitlesizes
         self.linecolor = linecolor
         self.linestyle = linestyle
         self.linetogg = linetogg
+        self.linewidth = linewidth
 
         self.fig = self.makeStackedHistogram()
 
@@ -78,9 +80,10 @@ class StackedHistMaker():
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
             if len(self.subtitles) != 0:
-                ax.annotate(text=self.subtitles[i], xy=(0.03, 0.75), xycoords='axes fraction')
+                ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.75), xycoords='axes fraction')
+            
             else:
-                ax.annotate(text=self.lastFolder[i], xy=(0.03, 0.75), xycoords='axes fraction')
+                ax.annotate(text=self.lastFolder[i], fontsize=9, xy=(0.03, 0.75), xycoords='axes fraction')
             self.axes.append(ax)
 
         self.format_axes()
@@ -125,14 +128,14 @@ class StackedHistMaker():
     def restore_annotations(self):
         if len(self.annotations) != 0:
             for annotation in self.annotations:
-                axis, x, y, dbl, color, style = annotation
+                axis, x, y, dbl, color, style, lw = annotation
                 for ax in self.axes:
                     ax_pos = ax.get_position()
                     axis_pos = axis.get_position()
                     ax0 = ax_pos.y0
                     axis0 = axis_pos.y0
                     if (ax0 == axis0):
-                        self.draw_annotations(ax, x, y, color, style)
+                        self.draw_annotations(ax, x, y, color, style, lw)
 
     def get_annotations(self):
         return self.annotations
@@ -145,6 +148,9 @@ class StackedHistMaker():
     
     def get_lastfolder(self):
         return self.lastFolder
+    
+    def get_subtitlesizes(self):
+        return self.subtitlesizes
 
     # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
     def processData(self):
@@ -326,7 +332,7 @@ class StackedHistMaker():
         if self.linetogg == 1:
             if event.inaxes:
                 if event.dblclick:
-                    axis, x, y, dbl, color, style = self.annotations[-1]
+                    axis, x, y, dbl, color, style, lw = self.annotations[-1]
                     for ax in self.axes:
                         ax_pos = ax.get_position()
                         axis_pos = axis.get_position()
@@ -334,8 +340,8 @@ class StackedHistMaker():
                         axis0 = axis_pos.y0
                         if (ax0 != axis0):
                             dbl=True
-                            self.draw_annotations(ax, x, y, self.linecolor, self.linestyle)
-                            self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle))
+                            self.draw_annotations(ax, x, y, self.linecolor, self.linestyle, self.linewidth)
+                            self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle, self.linewidth))
                 
                 else:
                     axis = (event.inaxes)
@@ -343,12 +349,17 @@ class StackedHistMaker():
                     ymin, ymax = self.ylim
 
                     dbl=False
-                    self.draw_annotations(axis, x, y, self.linecolor, self.linestyle)
-                    self.annotations.append((axis, x, y, False, self.linecolor, self.linestyle))
+                    self.draw_annotations(axis, x, y, self.linecolor, self.linestyle, self.linewidth)
+                    self.annotations.append((axis, x, y, False, self.linecolor, self.linestyle, self.linewidth))
     
-    def draw_annotations(self, axis, x, y, color, style):
+    def draw_annotations(self, axis, x, y, color, style, lw):
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle=style)) #solid, dashed, dotted, dashdot
+        annotation = axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle=style, lw=lw)) #solid, dashed, dotted, dashdot
+        arrow_patch = annotation.arrow_patch
+        # Access the linewidth property
+        lw = arrow_patch.get_linewidth()
+        print(lw)
+                
         self.hist_canvas.draw()
 
         #double click and draw a line across all subplots?

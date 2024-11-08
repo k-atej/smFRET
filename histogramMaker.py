@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, linestyle, linetogg, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, linestyle, linetogg, linewidth, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -60,6 +60,7 @@ class HistMaker():
         self.linecolor = linecolor
         self.linestyle = linestyle
         self.linetogg = linetogg
+        self.linewidth = linewidth
 
         self.fig = self.makeHistogram()
 
@@ -100,8 +101,8 @@ class HistMaker():
     def restoreAnnotations(self, f):
         if len(self.annotations) != 0:
             for annotation in self.annotations:
-                x, color, style = annotation
-                self.draw_annotations(f, x, color, style)
+                x, color, style, lw = annotation
+                self.draw_annotations(f, x, color, style, lw)
     
     def simpleBins(self):
         if self.bintype == 0:
@@ -252,13 +253,13 @@ class HistMaker():
         if self.linetogg == 1:
             if event.inaxes:
                 x = event.xdata
-                self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle)
-                self.annotations.append((x, self.linecolor, self.linestyle))
+                self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle, self.linewidth)
+                self.annotations.append((x, self.linecolor, self.linestyle, self.linewidth))
     
-    def draw_annotations(self, axis, x, color, linestyle):
+    def draw_annotations(self, axis, x, color, linestyle, linewidth):
         canvas = self.hist_canvas
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle=linestyle))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle=linestyle, linewidth=linewidth))
         canvas.draw()
         
 

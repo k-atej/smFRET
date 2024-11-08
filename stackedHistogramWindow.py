@@ -327,6 +327,17 @@ class StackedHistApplication(tk.Toplevel):
         self.combo9 = tk.OptionMenu(self.tabStyle_1, self.ref_linestyle, *refstyle)
         self.combo9.config(width=5)
         self.combo9.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        #dropdown for linewidth
+        self.lw_label = tk.Label(self.tabStyle_1, text="Line Width:")
+        self.lw_label.grid(row=5, column=0)
+        lw = [1.0, 2.0, 3.0, 4.0]
+        self.ref_lw = tk.IntVar(self)
+        self.ref_lw.set(1.0)
+
+        self.combolw = tk.OptionMenu(self.tabStyle_1, self.ref_lw, *lw)
+        self.combolw.config(width=5)
+        self.combolw.grid(row=5, column=1)
         
         #check box for toggling zero on y axis
         self.toggle = tk.IntVar()
@@ -447,6 +458,7 @@ class StackedHistApplication(tk.Toplevel):
         
         linetogg = self.linetoggle.get()
         linestyle = self.ref_linestyle.get()
+        linewidth = self.ref_lw.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -464,27 +476,31 @@ class StackedHistApplication(tk.Toplevel):
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
         subtitles = []
+        subtitlesizes = []
         for subtitle in self.subtitle_inputs:
-            j, jtext = subtitle
+            j, jtext, jfontsize = subtitle
             subtitles.append(j.get())
+            subtitlesizes.append(jfontsize.get())
 
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, linecolor, linestyle, linetogg, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, offset)
         self.annotations = self.hist.get_annotations()
         self.subtitle_length = self.hist.get_height()
         self.subtitles = self.hist.get_subtitles()
+        self.subtitlesizes = self.hist.get_subtitlesizes()
         if self.generation == 1:
             self.makeSubtitleInputs()
             folders = self.hist.get_lastfolder()
             for i in range(len(self.subtitle_inputs)):
-                j, jtext = self.subtitle_inputs[i]
+                j, jtext, jfontsize = self.subtitle_inputs[i]
                 jtext.set(folders[i])
 
         self.ref_bins.set(self.hist.getBins())
 
         if len(self.subtitle_inputs) == len(self.subtitles):
             for i in range(len(self.subtitle_inputs)):
-                j, jtext = self.subtitle_inputs[i]
+                j, jtext, jfontsize = self.subtitle_inputs[i]
                 jtext.set(self.subtitles[i])
+                jfontsize.set(self.subtitlesizes[i])
 
         #print(subtitles)
 
@@ -500,7 +516,15 @@ class StackedHistApplication(tk.Toplevel):
             j = tk.Entry(self.tabText_2, textvariable=jtext)
             j.config(width=20)
             j.grid(row=i+1, column=1, sticky="ew", padx=(0, 10))
-            self.subtitle_inputs.append((j, jtext))
+
+            jfont = [6, 7, 8, 9, 10, 12]
+            jvar = tk.IntVar(self)
+            jvar.set(9)
+            jfontwidget = tk.OptionMenu(self.tabText_2, jvar, *jfont)
+            jfontwidget.grid(row=i+1, column=2)
+            jfontwidget.config(width=3)
+
+            self.subtitle_inputs.append((j, jtext, jvar))
 
 
     # type checks the designation of x/y mins and maxes
@@ -583,9 +607,9 @@ class StackedHistApplication(tk.Toplevel):
 
     def undoLastLine(self, event=None):
         if len(self.annotations) > 0:
-            axis, x, y, dbl, color, style = self.annotations.pop()
+            axis, x, y, dbl, color, style, lw = self.annotations.pop()
             while dbl:
-                axis, x, y, dbl, color, style = self.annotations.pop()
+                axis, x, y, dbl, color, style, lw = self.annotations.pop()
             self.his()
 
     def choose_linecolor(self):
