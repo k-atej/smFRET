@@ -139,6 +139,12 @@ class HistApplication(tk.Toplevel):
         self.saveButton = tk.Button(self.subframe3, text="Save", command=self.savewindow)
         self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
+        #check box for clicking to add lines
+        self.linetoggle = tk.IntVar()
+        self.toggle1 = tk.Checkbutton(self.subframe3, text="Click to Add Lines", variable=self.linetoggle, onvalue=1, offvalue=0)
+        self.toggle1.grid(row=0, column=4, sticky="ew", padx=(10,10), pady="10", columnspan=2)
+        
+
     # sets up options in the customizability window
     def makeOptions(self):
 
@@ -158,20 +164,27 @@ class HistApplication(tk.Toplevel):
         # input area that allows entry of the preferred number of bins to use in the histogram
         # any value less than 1 will be considered the "bin width" and # of bins will be calculated and displayed
         self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
-        self.bin_label.grid(row=0, column=0)
+        self.bin_label.grid(row=1, column=0)
         self.ref_bins = tk.StringVar(self)
-        self.ref_bins.set("Auto")
+        self.ref_bins.set("10")
 
-        #check box for toggling zero on y axis
+        #check box for toggling binwidth/bin num
+        self.bin2 = tk.IntVar()
+        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Num", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
+        self.toggle2.grid(row=0, column=2, sticky="ew", padx=(10,10), pady="10")
+        self.bin2.set(1)
+
+
+        #check box for toggling binwidth/bin num
         self.bin1 = tk.IntVar()
-        self.toggle1 = tk.Checkbutton(self.tabFormat_1, text="Input Bin Width Instead of Number of Bins?", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
-        self.toggle1.grid(row=1, column=0, sticky="ew", padx=(10,10), pady="10", columnspan=2)
+        self.toggle1 = tk.Checkbutton(self.tabFormat_1, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
+        self.toggle1.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        
         
        
-
         self.combo1 = tk.Entry(self.tabFormat_1, textvariable=self.ref_bins)
         self.combo1.config(width=10)
-        self.combo1.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # input area that allows entry of the distance to shift data to the left (zeroing)
         self.offset_label = tk.Label(self.tabFormat_2, text="Offset:")
@@ -410,6 +423,7 @@ class HistApplication(tk.Toplevel):
             linecolor = "red"
 
         linestyle = self.ref_linestyle.get()
+        linetogg = self.linetoggle.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
@@ -425,7 +439,7 @@ class HistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, linetogg, offset)
         self.ref_bins.set(self.hist.getBins())
         self.annotations = self.hist.getAnnotations()
 
@@ -495,14 +509,15 @@ class HistApplication(tk.Toplevel):
     def changeLabel(self):
             if self.bin1.get() == 1:
                 self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
-                self.bin_label.grid(row=0, column=0)
+                self.bin_label.grid(row=1, column=0)
+                self.bin2.set(0)
 
             elif self.bin1.get() == 0:
                 self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
-                self.bin_label.grid(row=0, column=0)
+                self.bin_label.grid(row=1, column=0)
             else:
                 self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
-                self.bin_label.grid(row=0, column=0)
+                self.bin_label.grid(row=1, column=0)
 
     def choose_fillcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
@@ -520,3 +535,7 @@ class HistApplication(tk.Toplevel):
         if len(self.annotations) > 0:
             self.annotations.pop()
             self.his()
+
+    def togglebins(self):
+        self.bin1.set(0)
+        self.changeLabel()

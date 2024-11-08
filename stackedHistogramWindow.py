@@ -146,6 +146,14 @@ class StackedHistApplication(tk.Toplevel):
         self.saveButton = tk.Button(self.subframe3, text="Save", command=self.savewindow)
         self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
+        #check box for clicking to add lines
+        self.linetoggle = tk.IntVar()
+        self.toggle1 = tk.Checkbutton(self.subframe3, text="Click to Add Lines", variable=self.linetoggle, onvalue=1, offvalue=0)
+        self.toggle1.grid(row=0, column=4, sticky="ew", padx=(10,10), pady="10", columnspan=2)
+
+        self.lbl_label = tk.Label(self.subframe3, text="Double Click to add full lines")
+        self.lbl_label.grid(row=1, column=3, columnspan=3)
+
     # sets up options in the customizability window
     def makeOptions(self):
 
@@ -164,19 +172,25 @@ class StackedHistApplication(tk.Toplevel):
 
         # input area that allows entry of the preferred number of bins to use in the histogram
         self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
-        self.bin_label.grid(row=0, column=0)
+        self.bin_label.grid(row=1, column=0)
         self.ref_bins = tk.StringVar(self)
         self.ref_bins.set("Auto")
 
-        #check box for toggling zero on y axis
+        #check box for toggling binwidth/bin num
+        self.bin2 = tk.IntVar()
+        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Num", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
+        self.toggle2.grid(row=0, column=2, sticky="ew", padx=(10,10), pady="10")
+        self.bin2.set(1)
+
+
+        #check box for toggling binwidth/bin num
         self.bin1 = tk.IntVar()
-        self.togglebin = tk.Checkbutton(self.tabFormat_1, text="Input Bin Width Instead of Number of Bins?", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
-        self.togglebin.grid(row=1, column=0, sticky="ew", padx=(10,10), pady="10", columnspan=2)
-        
+        self.toggle1 = tk.Checkbutton(self.tabFormat_1, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
+        self.toggle1.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
 
         self.combo1 = tk.Entry(self.tabFormat_1, textvariable=self.ref_bins)
         self.combo1.config(width=10)
-        self.combo1.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # input area that allows entry of the distance to shift data to the left (zeroing)
         self.offset_label = tk.Label(self.tabFormat_2, text="Offset:")
@@ -431,6 +445,7 @@ class StackedHistApplication(tk.Toplevel):
         if linecolor == "None":
             linecolor = "red"
         
+        linetogg = self.linetoggle.get()
         linestyle = self.ref_linestyle.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
@@ -453,7 +468,7 @@ class StackedHistApplication(tk.Toplevel):
             j, jtext = subtitle
             subtitles.append(j.get())
 
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, linecolor, linestyle, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, linecolor, linestyle, linetogg, offset)
         self.annotations = self.hist.get_annotations()
         self.subtitle_length = self.hist.get_height()
         self.subtitles = self.hist.get_subtitles()
@@ -546,16 +561,17 @@ class StackedHistApplication(tk.Toplevel):
         self.win.destroy()
 
     def changeLabel(self):
-        if self.bin1.get() == 1:
-            self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
-            self.bin_label.grid(row=0, column=0)
+            if self.bin1.get() == 1:
+                self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
+                self.bin_label.grid(row=1, column=0)
+                self.bin2.set(0)
 
-        elif self.bin1.get() == 0:
-            self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
-            self.bin_label.grid(row=0, column=0)
-        else:
-            self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
-            self.bin_label.grid(row=0, column=0)
+            elif self.bin1.get() == 0:
+                self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
+                self.bin_label.grid(row=1, column=0)
+            else:
+                self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
+                self.bin_label.grid(row=1, column=0)
 
     def choose_fillcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
@@ -567,11 +583,15 @@ class StackedHistApplication(tk.Toplevel):
 
     def undoLastLine(self, event=None):
         if len(self.annotations) > 0:
-            axis, x, y, dbl, color = self.annotations.pop()
+            axis, x, y, dbl, color, style = self.annotations.pop()
             while dbl:
-                axis, x, y, dbl, color = self.annotations.pop()
+                axis, x, y, dbl, color, style = self.annotations.pop()
             self.his()
 
     def choose_linecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_linecolor.set(hexcode)
+
+    def togglebins(self):
+        self.bin1.set(0)
+        self.changeLabel()

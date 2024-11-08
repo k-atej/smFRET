@@ -31,7 +31,7 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, linecolor, linestyle, shift=None):
+    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, linecolor, linestyle, linetogg, shift=None):
         self.files = files
         self.savepath = savepath
         self.datacolumn = datacolumn
@@ -62,6 +62,7 @@ class StackedHistMaker():
         self.subtitles = subtitles
         self.linecolor = linecolor
         self.linestyle = linestyle
+        self.linetogg = linetogg
 
         self.fig = self.makeStackedHistogram()
 
@@ -322,27 +323,28 @@ class StackedHistMaker():
     # regenerating the figure after changing the parameters by entering or pressing generate removes text
     # working on: if the event is a dblclick, take the last line and extend it across all of the subplots
     def onclick(self, event, canvas):
-        if event.inaxes:
-            if event.dblclick:
-                axis, x, y, dbl, color, style = self.annotations[-1]
-                for ax in self.axes:
-                    ax_pos = ax.get_position()
-                    axis_pos = axis.get_position()
-                    ax0 = ax_pos.y0
-                    axis0 = axis_pos.y0
-                    if (ax0 != axis0):
-                        dbl=True
-                        self.draw_annotations(ax, x, y, self.linecolor, self.linestyle)
-                        self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle))
-            
-            else:
-                axis = (event.inaxes)
-                x, y = event.xdata, event.ydata
-                ymin, ymax = self.ylim
+        if self.linetogg == 1:
+            if event.inaxes:
+                if event.dblclick:
+                    axis, x, y, dbl, color, style = self.annotations[-1]
+                    for ax in self.axes:
+                        ax_pos = ax.get_position()
+                        axis_pos = axis.get_position()
+                        ax0 = ax_pos.y0
+                        axis0 = axis_pos.y0
+                        if (ax0 != axis0):
+                            dbl=True
+                            self.draw_annotations(ax, x, y, self.linecolor, self.linestyle)
+                            self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle))
+                
+                else:
+                    axis = (event.inaxes)
+                    x, y = event.xdata, event.ydata
+                    ymin, ymax = self.ylim
 
-                dbl=False
-                self.draw_annotations(axis, x, y, self.linecolor, self.linestyle)
-                self.annotations.append((axis, x, y, False, self.linecolor, self.linestyle))
+                    dbl=False
+                    self.draw_annotations(axis, x, y, self.linecolor, self.linestyle)
+                    self.annotations.append((axis, x, y, False, self.linecolor, self.linestyle))
     
     def draw_annotations(self, axis, x, y, color, style):
         ymin, ymax = self.ylim

@@ -32,7 +32,7 @@ class HistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, linestyle, shift=None):
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, linestyle, linetogg, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -59,6 +59,7 @@ class HistMaker():
         self.annotations = annotations
         self.linecolor = linecolor
         self.linestyle = linestyle
+        self.linetogg = linetogg
 
         self.fig = self.makeHistogram()
 
@@ -102,8 +103,22 @@ class HistMaker():
                 x, color, style = annotation
                 self.draw_annotations(f, x, color, style)
     
+    def simpleBins(self):
+        if self.bintype == 0:
+            # this is a bin number
+            self.bins = int(self.bins)
+            self.return_bins = int(self.bins)
+        elif self.bintype == 1:
+            bin_width = float(self.bins)
+            rangebin = max(self.data_shifted) - min(self.data_shifted)
+            numbins = rangebin // bin_width
+            bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
+            self.bins = bins 
+            self.return_bins = bin_width
+
+    
     def setBins(self):
-        # set number of bins
+        # set number of bins, there must be a better way to do this!
         if self.bins != 'Auto':
             if 'Auto' in str(self.bins):
                 self.bins = 'Auto'
@@ -118,15 +133,14 @@ class HistMaker():
                 bin_width = float(self.auto_bin_width())
                 rangebin = max(self.data_shifted) - min(self.data_shifted)
                 numbins = rangebin // bin_width
-                bins, step = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1, retstep=True)
+                bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
                 self.bins = bins 
                 self.return_bins = bin_width
         elif self.bintype == 1:
             bin_width = float(self.bins)
             rangebin = max(self.data_shifted) - min(self.data_shifted)
             numbins = rangebin // bin_width
-            bins, step = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1, retstep=True)
-            print(step)
+            bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
             self.bins = bins 
             self.return_bins = bin_width
         else:
@@ -235,10 +249,11 @@ class HistMaker():
     
     # 'clear' button removes annotations
     def onclick(self, event, canvas):
-        if event.inaxes:
-            x = event.xdata
-            self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle)
-            self.annotations.append((x, self.linecolor, self.linestyle))
+        if self.linetogg == 1:
+            if event.inaxes:
+                x = event.xdata
+                self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle)
+                self.annotations.append((x, self.linecolor, self.linestyle))
     
     def draw_annotations(self, axis, x, color, linestyle):
         canvas = self.hist_canvas
