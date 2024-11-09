@@ -1,4 +1,3 @@
-import pandas as pd
 import tkinter as tk
 from histogramMaker import *
 from histogramWindow import *
@@ -7,12 +6,6 @@ from histogramMain import *
 from trajectoryMain import *
 import os
 
-
-#file name to look for results in, should probably be able to change this
-eFRET_FILE_NAME = "FRETresult.dat"
-
-#example MacOS filepath
-path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
 
 def main():
     app = Application()

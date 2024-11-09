@@ -1,16 +1,13 @@
-import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter import colorchooser
-from matplotlib.figure import Figure
 from histogramMaker import *
 from stackedHistogramMaker import *
 import os
 
 #Example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
-savefilename = "FREThistogram_stacked.png"
-#filename = "FRETresult.dat"
+
 
 #YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
 
@@ -482,7 +479,7 @@ class StackedHistApplication(tk.Toplevel):
             subtitles.append(j.get())
             subtitlesizes.append(jfontsize.get())
 
-        self.hist = StackedHistMaker(self.files, self.savepath, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, offset)
         self.annotations = self.hist.get_annotations()
         self.subtitle_length = self.hist.get_height()
         self.subtitles = self.hist.get_subtitles()

@@ -1,15 +1,8 @@
 import numpy as np
 import math
-import pandas as pd
-import matplotlib as plt 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
-import tkinter as tk
-
-
-#should be able to change this
-savefilename = "FREThistogram.png"
 
 
 # creates a histogram to display in the histogramWindow

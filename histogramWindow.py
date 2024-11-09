@@ -1,20 +1,14 @@
 import pandas as pd
 import tkinter as tk
-import matplotlib as plt
 from tkinter import ttk
-from tkinter import PhotoImage
 from tkinter import colorchooser
 from matplotlib.figure import Figure
 from histogramMaker import *
-import os
 
 
 #Example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl"
-savefilename = "FREThistogram.png"
-#filename = "FRETresult.dat"
 
-#YOU MUST PROVIDE THE EXACT FILE PATH FOR THIS TO WORK
 
 #opens a window that displays a histogram based on the file provided
 class HistApplication(tk.Toplevel):

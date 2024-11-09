@@ -6,10 +6,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
-# name of the files to parse
-filename = "FRETresult.dat"
 
-savefilename = "FREThistogram_stacked.png"
 
 # creates a stack of histograms to display in the stackedHistogramWindow
 class StackedHistMaker():
@@ -31,9 +28,10 @@ class StackedHistMaker():
 #   - ymin: lower limit of y-axis
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, files, savepath, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, shift=None):
+    def __init__(self, files, savepath, filename, datacolumn, master, row, col, bins, bintype, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, shift=None):
         self.files = files
         self.savepath = savepath
+        self.filename = filename
         self.datacolumn = datacolumn
         self.master = master
         self.row = row
@@ -162,7 +160,7 @@ class StackedHistMaker():
         self.lastFolder = []
         for file in self.files:
             self.lastFolder.append(file.split("/")[-1])
-            path = file + "/" + filename
+            path = file + "/" + self.filename
             data = self.get_eFRET_data(path)
 
             if len(data) < min_length:

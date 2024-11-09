@@ -4,7 +4,7 @@ from histogramMaker import *
 from histogramWindow import *
 from stackedHistogramWindow import *
 from trajectoryMaker import *
-import os
+
 
 
 

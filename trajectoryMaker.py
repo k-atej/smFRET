@@ -1,11 +1,7 @@
-import numpy as np
-import math
-import pandas as pd
-import matplotlib as plt 
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
-import tkinter as tk
+
 
 class TrajectoryMaker():
 

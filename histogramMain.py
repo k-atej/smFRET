@@ -1,10 +1,8 @@
-import pandas as pd
 import tkinter as tk
 from histogramMaker import *
 from histogramWindow import *
 from stackedHistogramWindow import *
 import os
-
 
 #file name to look for results in, should probably be able to change this
 eFRET_FILE_NAME = "FRETresult.dat"
@@ -12,9 +10,6 @@ eFRET_FILE_NAME = "FRETresult.dat"
 #example MacOS filepath
 path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
 
-#def main():
- #   app = Application()
-  #  app.mainloop()
 
 # opens a small window. takes a file path and decides whether to open a histogram or stacked histogram window based on the number of eFRET_FILE_NAMEs found. 
 class HistogramMainApplication(tk.Toplevel):
@@ -45,7 +40,7 @@ class HistogramMainApplication(tk.Toplevel):
         self.input_label = tk.Label(self.subframe1, text="File Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
-        self.ref_input.set('/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy')
+        self.ref_input.set('')
 
         self.combo4 = tk.Entry(self.subframe1, textvariable=self.ref_input)
         self.combo4.config(width=30)
