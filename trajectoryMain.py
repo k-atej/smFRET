@@ -5,6 +5,7 @@ from histogramWindow import *
 from stackedHistogramWindow import *
 from trajectoryMaker import *
 from trajectoryWindow import *
+from stackedTrajectoryWindow import *
 import os
 
 
@@ -50,10 +51,24 @@ class TrajectoryMainApplication(tk.Toplevel):
         self.combo4.config(width=30)
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
+        # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
+        self.choice_label = tk.Label(self.subframe1, text="View Type:")
+        self.choice_label.grid(row=2, column=0)
+        choices = ["Single", "Stacked"]
+        self.ref_choice = tk.StringVar(self)
+        self.ref_choice.set("Single")
+
+        self.combo = tk.OptionMenu(self.subframe1, self.ref_choice, *choices)
+        self.combo.config(width=10)
+        self.combo.grid(row=2, column=1, sticky="w", padx=10)
+
     def onclick(self):
         keys = self.processPath()
         #print(keys)
-        trajectory_window = TrajectoryWindow(self.ref_input.get(), keys)
+        if self.ref_choice.get() == "Single":
+            trajectory_window = TrajectoryWindow(self.ref_input.get(), keys)
+        elif self.ref_choice.get() == "Stacked":
+            stackedtrajectory_window = stackedTrajectoryWindow(self.ref_input.get(), keys)
 
     def processPath(self):
         filepath = self.ref_input.get()
