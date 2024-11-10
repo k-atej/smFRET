@@ -19,6 +19,9 @@ class TrajectoryWindow(tk.Toplevel):
         self.paths = files # full file path
         self.numfiles = len(self.paths)
         self.index = 0
+
+        self.savepath = path.rstrip("/")
+        print(self.savepath)
         
         self.titleset = path.split("/")[-1] # final folder in the input path
         self.title(self.titleset)
@@ -59,6 +62,10 @@ class TrajectoryWindow(tk.Toplevel):
         self.nextbutton = tk.Button(self.subframetop, text="Next", command=self.next1)
         self.nextbutton.grid(row=0, column=2, padx="10", pady="10")
     
+        # save button
+        self.saveButton = tk.Button(self.subframetop, text="Save", command=self.savewindow)
+        self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
+
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.subframeright)
         self.tabFormat = tk.Frame(self.tabControl)
@@ -107,3 +114,46 @@ class TrajectoryWindow(tk.Toplevel):
     def makeLabel(self):
         self.label = tk.Label(self.subframetop, text=f"{self.index + 1} of {self.numfiles}")    
         self.label.grid(row=0, column=0, padx="10")
+
+    def savewindow(self):
+        self.win = tk.Toplevel()
+        self.win.title("Set Filepath: ")
+        
+        #input area for file name
+        self.path_label = tk.Label(self.win, text="Save File Path:")
+        self.path_label.grid(row=0, column=0)
+        self.ref_path = tk.StringVar(self.win)
+        self.ref_path.set(self.savepath)
+
+        self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
+        self.combo6.config(width=50)
+        self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady="10")
+
+        # dropdown for designation of filetype
+        reftype = ['.pdf', '.png', '.svg', '.ps', '.eps']
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.png')
+
+        self.combo8 = tk.OptionMenu(self.win, self.ref_type, *reftype)
+        self.combo8.config(width=5)
+        self.combo8.grid(row=0, column=2, sticky="ew", padx=(0, 10), pady="10")
+
+        # dropdown for designation of file quality
+        self.qual_label = tk.Label(self.win, text="Quality:")
+        self.qual_label.grid(row= 1, column=0)
+        refqual = ["Low", "Medium", "High"]
+        self.ref_qual = tk.StringVar(self)
+        self.ref_qual.set('Medium')
+
+        self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
+        self.combo9.config(width=5)
+        self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
+
+
+        self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
+        self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        #self.win.mainloop()
+    
+    def save(self):
+        self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
+        self.win.destroy()
