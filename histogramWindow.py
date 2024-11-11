@@ -164,8 +164,8 @@ class HistApplication(tk.Toplevel):
 
         #check box for toggling binwidth/bin num
         self.bin2 = tk.IntVar()
-        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Num", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
-        self.toggle2.grid(row=0, column=2, sticky="ew", padx=(10,10), pady="10")
+        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
+        self.toggle2.grid(row=0, column=1, sticky="ew", padx=(10,10), pady="10")
         self.bin2.set(1)
 
 
@@ -350,7 +350,7 @@ class HistApplication(tk.Toplevel):
         self.ref_titlefontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_0, self.ref_titlefontsize, *titlef)
-        self.combo.config(width=5)
+        self.combo.config(width=3)
         self.combo.grid(row=0, column=3)
 
 
@@ -382,7 +382,7 @@ class HistApplication(tk.Toplevel):
         self.ref_xfontsize.set("12")
 
         self.combo4 = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
-        self.combo4.config(width=5)
+        self.combo4.config(width=3)
         self.combo4.grid(row=0, column=3)
 
         #y font size
@@ -393,7 +393,7 @@ class HistApplication(tk.Toplevel):
         self.ref_yfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_2, self.ref_yfontsize, *titley)
-        self.combo.config(width=5)
+        self.combo.config(width=3)
         self.combo.grid(row=0, column=3)
 
     # generates histogram without data
@@ -514,14 +514,17 @@ class HistApplication(tk.Toplevel):
 
     def changeLabel(self):
             if self.bin1.get() == 1:
+                self.bin_label.destroy()
                 self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
                 self.bin_label.grid(row=1, column=0)
                 self.bin2.set(0)
 
             elif self.bin1.get() == 0:
+                self.bin_label.destroy()
                 self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
                 self.bin_label.grid(row=1, column=0)
             else:
+                self.bin_label.destroy()
                 self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
                 self.bin_label.grid(row=1, column=0)
 

@@ -175,8 +175,8 @@ class StackedHistApplication(tk.Toplevel):
 
         #check box for toggling binwidth/bin num
         self.bin2 = tk.IntVar()
-        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Num", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
-        self.toggle2.grid(row=0, column=2, sticky="ew", padx=(10,10), pady="10")
+        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
+        self.toggle2.grid(row=0, column=1, sticky="ew", padx=(10,10), pady="10")
         self.bin2.set(1)
 
 
@@ -365,7 +365,7 @@ class StackedHistApplication(tk.Toplevel):
         self.ref_titlefontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_0, self.ref_titlefontsize, *titlef)
-        self.combo.config(width=5)
+        self.combo.config(width=3)
         self.combo.grid(row=0, column=3)
 
         # input area for designation of x-axis label
@@ -396,7 +396,7 @@ class StackedHistApplication(tk.Toplevel):
         self.ref_xfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
-        self.combo.config(width=5)
+        self.combo.config(width=3)
         self.combo.grid(row=0, column=3)
 
         #y font size
@@ -407,7 +407,7 @@ class StackedHistApplication(tk.Toplevel):
         self.ref_yfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText_1, self.ref_yfontsize, *titley)
-        self.combo.config(width=5)
+        self.combo.config(width=3)
         self.combo.grid(row=1, column=3)
 
         # input area for subplot title
@@ -506,8 +506,8 @@ class StackedHistApplication(tk.Toplevel):
         k = tk.Label(self.tabText_2,text="Plot Subtitles: ")
         k.grid(row=0, column=0, columnspan=2)
         for i in range(self.subtitle_length):
-            l = tk.Label(self.tabText_2, text=f"Label {i+1}: ")
-            l.grid(row=i + 1, column=0, padx=(10,10))
+            l = tk.Label(self.tabText_2, text=f"{i+1}: ")
+            l.grid(row=i + 1, column=0, padx=(10,5))
 
             jtext = tk.StringVar(self)
             j = tk.Entry(self.tabText_2, textvariable=jtext)
@@ -519,7 +519,7 @@ class StackedHistApplication(tk.Toplevel):
             jvar.set(9)
             jfontwidget = tk.OptionMenu(self.tabText_2, jvar, *jfont)
             jfontwidget.grid(row=i+1, column=2)
-            jfontwidget.config(width=3)
+            jfontwidget.config(width=2)
 
             self.subtitle_inputs.append((j, jtext, jvar))
 
@@ -583,14 +583,17 @@ class StackedHistApplication(tk.Toplevel):
 
     def changeLabel(self):
             if self.bin1.get() == 1:
+                self.bin_label.destroy()
                 self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
                 self.bin_label.grid(row=1, column=0)
                 self.bin2.set(0)
 
             elif self.bin1.get() == 0:
+                self.bin_label.destroy()
                 self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
                 self.bin_label.grid(row=1, column=0)
             else:
+                self.bin_label.destroy()
                 self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
                 self.bin_label.grid(row=1, column=0)
 
