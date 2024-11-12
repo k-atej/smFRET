@@ -9,14 +9,14 @@ from matplotlib.figure import Figure
 class HistMaker():
 
 #   - data: pandas dataframe column to input into a histogram
-#   - savepath:
+#   - savepath: what to set as the default save path
 #   - master: which frame of the gui to add the histogram to
 #   - row: which row to add canvas to
 #   - col: which column to add canvas to
 #   - bins: number of bins for histogram to recognize
-#   - bin1: 
+#   - bin1: whether "bins" is a number of bins or a binwidth
 #   - title: graph title
-#   - titlefontsize: 
+#   - titlefontsize: size to set title to
 #   - x: x-axis label
 #   - y: y-axis label
 #   - color: color of bins in histogram
@@ -26,15 +26,15 @@ class HistMaker():
 #   - xmin: lower limit of x-axis
 #   - ymax: upper limit of y-axis
 #   - ymin: lower limit of y-axis
-#   - xfontsize:
-#   - yfontsize:
-#   - width:
-#   - height:
-#   - annotations:
-#   - linecolor:
-#   - linestyle:
-#   - linetogg:
-#   - linewidth:
+#   - xfontsize: size to set x-axis label to
+#   - yfontsize: size to set y-axis label to
+#   - width: figure width
+#   - height: figure height
+#   - annotations: list of lines that were added to the figure (from the previous generation)
+#   - linecolor: currently selected color for vertical line annotations
+#   - linestyle: currently selected style for vertical line annotations
+#   - linetogg: whether line edits are currently toggled on
+#   - linewidth: line width for vertical line annotations
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
 

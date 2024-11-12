@@ -11,17 +11,17 @@ from matplotlib.figure import Figure
 # creates a stack of histograms to display in the stackedHistogramWindow
 class StackedHistMaker():
 
-#   - files:
-#   - savepath:
-#   - filename:
-#   - datacolumn:
+#   - files: files from which to pull data
+#   - savepath: what to set as the default save path
+#   - filename: name of the file that we were searching for
+#   - datacolumn: pandas dataframe column to input into histograms
 #   - master: which frame of the gui to add the histogram to
 #   - row: which row to add canvas to
 #   - col: which column to add canvas to
 #   - bins: number of bins for histogram to recognize
-#   - bintype:
+#   - bintype: whether "bins" is a number of bins or a binwidth
 #   - title: graph title
-#   - titlefontsize:
+#   - titlefontsize: size to set title to
 #   - x: x-axis label
 #   - y: y-axis label
 #   - color: color of bins in histogram
@@ -31,18 +31,18 @@ class StackedHistMaker():
 #   - xmin: lower limit of x-axis
 #   - ymax: upper limit of y-axis
 #   - ymin: lower limit of y-axis
-#   - xfontsize:
-#   - yfontsize:
-#   - width:
-#   - height:
-#   - toggle:
-#   - annotations:
-#   - subtitles:
-#   - subtitlesizes:
-#   - linecolor:
-#   - linestyle:
-#   - linetogg:
-#   - linewidth:
+#   - xfontsize: size to set x-axis label to
+#   - yfontsize: size to set y-axis label to
+#   - width: figure width 
+#   - height: figure height
+#   - toggle: toggle for whether to show the 0-tick on the y-axis
+#   - annotations: list of lines that were added to the figure (from the previous generation)
+#   - subtitles: list of subtitles that were added to the figure (from the previous generation)
+#   - subtitlesizes: size of subtitles that were added to the figure (from the previous generation)
+#   - linecolor: currently selected color for vertical line annotations
+#   - linestyle: currently selected style for vertical line annotations
+#   - linetogg: whether line edits are currently toggled on
+#   - linewidth: line width for vertical line annotations
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
     def __init__(self, files, savepath, filename, datacolumn, master, row, col, bins, bintype, 
