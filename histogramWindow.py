@@ -6,14 +6,15 @@ from matplotlib.figure import Figure
 from histogramMaker import *
 
 
-#Example MacOS filepath
-path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl"
+#Example MacOS filepath for a single histogram
+# /Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl
 
 
-#opens a window that displays a histogram based on the file provided
+#opens a window that displays a single histogram based on the file provided
 class HistApplication(tk.Toplevel):
 
-    # path - filepath provided in entry box in main menu
+    # path - filepath provided in entry box in histogram main menu
+    # filename - name of file that was being searched for, set in histogram main menu
     # title - name to set as the window title
     def __init__(self, path, filename, title):
         super().__init__()
@@ -77,8 +78,6 @@ class HistApplication(tk.Toplevel):
         self.makeButtons()
         self.bind('<Return>', self.his)
         self.bind('<BackSpace>', self.undoLastLine)
-        #self.his()
-    
 
     # sets up the layout of the customizability menu
     def makeFormat(self):
@@ -86,8 +85,6 @@ class HistApplication(tk.Toplevel):
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
         self.tabText = tk.Frame(self.tabControl)
-        #self.tabStyle.bind('<Return>', self.his)
-        #self.tabText.bind('<Return>', self.his)
 
         self.tabControl.add(self.tabFormat, text="Format")
         self.tabControl.add(self.tabStyle, text="Style")
@@ -115,25 +112,26 @@ class HistApplication(tk.Toplevel):
         self.tabText_2 = tk.Frame(self.tabText)
         self.tabText_2.grid(row=2, column = 0)
 
-    # sets up the generate and clear buttons beneath the histogram
+    # sets up the buttons beneath the histogram
     def makeButtons(self):
+
         # generate button, bound to the generation of a histogram
         makeHist = tk.Button(self.subframe3, text="Generate", command=self.his)
         makeHist.grid(row=0, column=0, padx="10")
 
-        # clear button, bound to the generation of an empty histogram
+        # clear button, clears all lines on histogram and regenerates histogram
         self.clearButton = tk.Button(self.subframe3, text="Clear Lines", command=self.emptyHis)
         self.clearButton.grid(row=0, column=1, sticky="ew", padx="10", pady="10")
 
-        # undo button, bound to the generation of an empty histogram
+        # undo button, removes last line on histogram and regenerates histogram
         self.undoButton = tk.Button(self.subframe3, text="Undo Line", command=self.undoLastLine)
         self.undoButton.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
 
-        # save button
+        # save button, generates new save window to insert file path to save at
         self.saveButton = tk.Button(self.subframe3, text="Save", command=self.savewindow)
         self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
-        #check box for clicking to add lines
+        #check box, toggles on click-to-add lines
         self.linetoggle = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.subframe3, text="Click to Add Lines", variable=self.linetoggle, onvalue=1, offvalue=0)
         self.toggle1.grid(row=0, column=4, sticky="ew", padx=(10,10), pady="10", columnspan=2)
@@ -155,26 +153,22 @@ class HistApplication(tk.Toplevel):
         self.combo.config(width=10)
         self.combo.grid(row=0, column=1)
 
-        # input area that allows entry of the preferred number of bins to use in the histogram
-        # any value less than 1 will be considered the "bin width" and # of bins will be calculated and displayed
+        # input area that allows entry of the preferred number of bins or bin width to use in the histogram (depends on bin1 and bin2)
         self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
         self.bin_label.grid(row=1, column=0)
         self.ref_bins = tk.StringVar(self)
         self.ref_bins.set("10")
 
-        #check box for toggling binwidth/bin num
+        #check box for toggling to bin number input
         self.bin2 = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
         self.toggle2.grid(row=0, column=1, sticky="ew", padx=(10,10), pady="10")
         self.bin2.set(1)
 
-
-        #check box for toggling binwidth/bin num
+        #check box for toggling to bin width input
         self.bin1 = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.tabFormat_1, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
         self.toggle1.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
-        
-        
        
         self.combo1 = tk.Entry(self.tabFormat_1, textvariable=self.ref_bins)
         self.combo1.config(width=10)
@@ -254,7 +248,7 @@ class HistApplication(tk.Toplevel):
 
         # second tab = style
 
-        # input area for designation of column fill color
+        # input area for designation of histogram fill color
         self.color_label = tk.Label(self.tabStyle_0, text="Color:")
         self.color_label.grid(row=0, column=0)
         self.ref_color = tk.StringVar(self)
@@ -264,6 +258,7 @@ class HistApplication(tk.Toplevel):
         self.combo2.config(width=5)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # color wheel for designation of histogram fill color
         self.colorbutton = tk.Button(self.tabStyle_0, text="Select Color", command=self.choose_fillcolor)
         self.colorbutton.grid(row=0, column=3)
 
@@ -277,6 +272,7 @@ class HistApplication(tk.Toplevel):
         self.combo5.config(width=5)
         self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # color wheel for designation of histogram edge color
         self.edgecolorbutton = tk.Button(self.tabStyle_1, text='Select Color', command=self.choose_edgecolor)
         self.edgecolorbutton.grid(row=1, column=2)
 
@@ -292,8 +288,7 @@ class HistApplication(tk.Toplevel):
         self.combo6.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
 
-
-        # input area for designation of line color
+        # input area for designation of click-to-add vertical line color
         self.linecolor_label = tk.Label(self.tabStyle_2, text="Line Color:")
         self.linecolor_label.grid(row=0, column=0)
         self.ref_linecolor = tk.StringVar(self)
@@ -303,6 +298,7 @@ class HistApplication(tk.Toplevel):
         self.combol.config(width=5)
         self.combol.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
+        # color wheel for designation of click-to-add vertical line color
         self.linecolorbutton = tk.Button(self.tabStyle_2, text='Select Color', command=self.choose_linecolor)
         self.linecolorbutton.grid(row=0, column=2)
 
@@ -342,10 +338,10 @@ class HistApplication(tk.Toplevel):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        #title font size
+        # dropdown for title font size
         self.titlef_label = tk.Label(self.tabText_0, text="Size:")
         self.titlef_label.grid(row=0, column=2)
-        titlef = [8, 10, 12, 15, 20, 24]
+        titlef = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
@@ -374,10 +370,10 @@ class HistApplication(tk.Toplevel):
         self.combo3.config(width=10)
         self.combo3.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
 
-        #x font size
+        # dropdown for x font size
         self.titlex_label = tk.Label(self.tabText_1, text="Size:")
         self.titlex_label.grid(row=0, column=2)
-        titlex = [8, 10, 12, 15, 20, 24]
+        titlex = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
@@ -385,10 +381,10 @@ class HistApplication(tk.Toplevel):
         self.combo4.config(width=3)
         self.combo4.grid(row=0, column=3)
 
-        #y font size
+        # dropdown for y font size
         self.titley_label = tk.Label(self.tabText_2, text="Size:")
         self.titley_label.grid(row=0, column=2)
-        titley = [8, 10, 12, 15, 20, 24]
+        titley = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
@@ -396,19 +392,20 @@ class HistApplication(tk.Toplevel):
         self.combo.config(width=3)
         self.combo.grid(row=0, column=3)
 
-    # generates histogram without data
+    # generates histogram without data, not currently in use
     def emptyHis(self):
-        #df_empty = pd.DataFrame({'A' : []})
-        #self.hist = HistMaker(df_empty, self.savepath, self.subframe2, 0, 0, 1, 0, "None", 12, " ", " ", "b", "b", 1, 1, 0, 1, 0, 10.0, 10.0,  5.0, 5.0, [], 0)
         self.annotations = []
         self.his()
 
     # generates a histogram based on the parameters set in the customizability menu
+    # - event: press of the enter key (optional)
     def his(self, event=None): 
 
+        # clear any existing histogram
         if self.hist is not None:
             self.hist.destroy()
 
+        # collect new parameters from customization menu
         col = self.ref_col.get()
         bins = self.ref_bins.get()
         title = str(self.ref_title.get())
@@ -445,11 +442,18 @@ class HistApplication(tk.Toplevel):
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
+
+        # create the new histogram
         self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, linetogg, linewidth, offset)
+        
+        # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
+
+        # save annotations on histogram
         self.annotations = self.hist.getAnnotations()
 
     # type checks the designation of x/y mins and maxes
+    # - val: value input into x/y min or max entry boxes
     def checkMinMax(self, val):
         if val != 'None':
             val = float(val)
@@ -464,15 +468,18 @@ class HistApplication(tk.Toplevel):
         canvas.draw()
         canvas.get_tk_widget().grid(row=0, column=1)
 
+
+    # generates a new pop up window to set the file path to save the figure at
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
         
-        #input area for file name
         s = ""
         savepath = self.path.split(".")
         for path in savepath[:-1]:
             s+= path
+
+        #input area for file name, automatically sets to the filepath that was input originally
         self.path_label = tk.Label(self.win, text="Save File Path:")
         self.path_label.grid(row=0, column=0)
         self.ref_path = tk.StringVar(self.win)
@@ -502,16 +509,17 @@ class HistApplication(tk.Toplevel):
         self.combo9.config(width=5)
         self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
 
-
+        # save button
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
-        #self.win.mainloop()
     
+
+    # save histogram with matplotlib, close save window
     def save(self):
-        self.hist.save(self.ref_path.get(), self.ref_type.get())
+        self.hist.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
         self.win.destroy()
         
-
+    # alters the bin number/bin width input label based on whether bin number or width is toggled on
     def changeLabel(self):
             if self.bin1.get() == 1:
                 self.bin_label.destroy()
@@ -528,23 +536,30 @@ class HistApplication(tk.Toplevel):
                 self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
                 self.bin_label.grid(row=1, column=0)
 
+    # opens native color chooser dialog
     def choose_fillcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color.set(hexcode)
 
+    # opens native color chooser dialog
     def choose_edgecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_edgecolor.set(hexcode)
     
+    # opens native color chooser dialog
     def choose_linecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_linecolor.set(hexcode)
 
+    # removes the last line from the histogram, if line edits are toggled on
+    # - event: press of backspace key (optional)
     def undoLastLine(self, event=None):
-        if len(self.annotations) > 0:
-            self.annotations.pop()
-            self.his()
+        if self.linetoggle.get() == 1:
+            if len(self.annotations) > 0:
+                self.annotations.pop()
+                self.his()
 
+    # toggles bin number off and changes the label
     def togglebins(self):
         self.bin1.set(0)
         self.changeLabel()

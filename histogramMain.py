@@ -4,11 +4,9 @@ from histogramWindow import *
 from stackedHistogramWindow import *
 import os
 
-#file name to look for results in, should probably be able to change this
-eFRET_FILE_NAME = "FRETresult.dat"
 
-#example MacOS filepath
-path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
+# example MacOS filepath:
+# /Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy
 
 
 # opens a small window. takes a file path and decides whether to open a histogram or stacked histogram window based on the number of eFRET_FILE_NAMEs found. 
@@ -67,18 +65,11 @@ class HistogramMainApplication(tk.Toplevel):
                     keys.append(file)
         if len(keys) == 1:
             histapp = HistApplication(self.path, self.ref_file.get(), self.getTitle())
-            #histapp.mainloop()
         elif len(keys) > 1:
             stackedhistapp = StackedHistApplication(self.path, self.ref_file.get(), self.getTitle())
-            #stackedhistapp.mainloop()
 
     #returns the name of the final folder in the file path, to set as the window title
     def getTitle(self):
         path = self.path.split("/")
         title = path[-1]
         return title
-
-
-        
-#if __name__ == "__main__":
- #   main()

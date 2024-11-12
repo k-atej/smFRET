@@ -9,23 +9,38 @@ from matplotlib.figure import Figure
 class HistMaker():
 
 #   - data: pandas dataframe column to input into a histogram
+#   - savepath:
 #   - master: which frame of the gui to add the histogram to
 #   - row: which row to add canvas to
 #   - col: which column to add canvas to
 #   - bins: number of bins for histogram to recognize
+#   - bin1: 
 #   - title: graph title
+#   - titlefontsize: 
 #   - x: x-axis label
 #   - y: y-axis label
 #   - color: color of bins in histogram
 #   - edgecolor: color of bin edges in histogram
-#   - edgecolor: linewidth of bin edges in histogram
+#   - edgewidth: linewidth of bin edges in histogram
 #   - xmax: upper limit of x-axis
 #   - xmin: lower limit of x-axis
 #   - ymax: upper limit of y-axis
 #   - ymin: lower limit of y-axis
+#   - xfontsize:
+#   - yfontsize:
+#   - width:
+#   - height:
+#   - annotations:
+#   - linecolor:
+#   - linestyle:
+#   - linetogg:
+#   - linewidth:
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
-    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, annotations, linecolor, linestyle, linetogg, linewidth, shift=None):
+
+    def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, 
+                 x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, 
+                 width, height, annotations, linecolor, linestyle, linetogg, linewidth, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -58,17 +73,19 @@ class HistMaker():
         self.fig = self.makeHistogram()
 
 
-# makes a single histogram from a given data frame column
+    # makes a single histogram from a given data frame column
     def makeHistogram(self):
+
         self.zero_data()
 
+        # create a new matplotlib figure
         fig = Figure(dpi=100)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
         f = fig.gca() #gca = get current axes
-        
         self.setBins()
-            
+
+        # create a new histogram, set parameters
         f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
         f.set_xlabel(self.x, fontsize=self.xfontsize)
@@ -86,17 +103,20 @@ class HistMaker():
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
+        # annotate figure with lines
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
         self.restoreAnnotations(f)
 
         return fig
     
+    # re-add lines from previous generation of histogram
     def restoreAnnotations(self, f):
         if len(self.annotations) != 0:
             for annotation in self.annotations:
                 x, color, style, lw = annotation
                 self.draw_annotations(f, x, color, style, lw)
     
+    # simple bin logic, not currently in use
     def simpleBins(self):
         if self.bintype == 0:
             # this is a bin number
@@ -110,9 +130,10 @@ class HistMaker():
             self.bins = bins 
             self.return_bins = bin_width
 
-    
+    # sets the number/width of bins to use in the histogram based on input in the customization menu
+    # sets the number/width of bins to display in the customization menu
     def setBins(self):
-        # set number of bins, there must be a better way to do this!
+        
         if self.bins != 'Auto':
             if 'Auto' in str(self.bins):
                 self.bins = 'Auto'
@@ -145,10 +166,12 @@ class HistMaker():
     def getBins(self):
         return self.return_bins
     
+    # return list of line annotations on histogram
     def getAnnotations(self):
         return self.annotations
 
     # zeroes the data in the dataframe; can shift by a designated value or do it automatically
+    # authored by Kate Sanders
     def zero_data(self):
         # Make a histogram with two bins
         # so one bin in actual fret and the other is photobleaching
@@ -162,7 +185,7 @@ class HistMaker():
         self.data = self.data.astype(float)
         self.data_shifted = self.data - float(self.offset)
 
-    # returns the count of the highest bin
+    # returns the count of the highest bin, not currently in use
     #   - data: pandas dataframe column 
     def getHighestCount(data):
         hist = np.histogram(data)
@@ -175,11 +198,16 @@ class HistMaker():
         logn = math.ceil(math.log2(n))
         return str(5*(logn + 1))
 
+    # calculates the bin width based on matplotlibs automatic functions
     def auto_bin_width(self):
         hist, bin_edges = np.histogram(self.data_shifted)
         binwidths = bin_edges[1] - bin_edges[0]
         return binwidths
 
+    # saves the figure using matlotlibs savefig functions, based on parameters set in save window
+    #   - refpath: filepath to save the file to
+    #   - reftype: what kind of file to save as
+    #   - refqual: quality of image to save
     def save(self, refpath, reftype, refqual):
         if refqual == "Low":
             dpi=200
@@ -192,9 +220,12 @@ class HistMaker():
         self.annotate(refpath)
         print("SAVED!")
 
+    # removes canvas
     def destroy(self):
         self.hist_canvas.get_tk_widget().destroy()
 
+    # creates .txt file to save parameters, saves at same filepath
+    #   - refpath: filepath input in save window; matches figure save filepath
     def annotate(self, refpath):
         text = self.getText()
         refpath = refpath.split(".")[:-1]
@@ -205,6 +236,7 @@ class HistMaker():
         f = open(path, "w")
         f.write(text)
 
+    # gathers input parameters and formats it into text to save as a .txt file
     def getText(self):
         # if bintype = 1, bin width; otherwise bin number
         if self.bintype == 1:
@@ -215,6 +247,7 @@ class HistMaker():
         xmin, xmax = self.xlim
         ymin, ymax = self.ylim
 
+        # format text to insert into .txt file
         text = f"""
         data: {self.data}
         savepath: {self.savepath}
@@ -241,18 +274,27 @@ class HistMaker():
         """
         return text
     
-    # 'clear' button removes annotations
-    def onclick(self, event, canvas):
+    # clicking adds vertical line to figure if toggled on
+    #   - event: left mouse button press
+    def onclick(self, event):
         if self.linetogg == 1:
             if event.inaxes:
                 x = event.xdata
                 self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle, self.linewidth)
                 self.annotations.append((x, self.linecolor, self.linestyle, self.linewidth))
     
+    # draws lines on the matplotlib figure, parameters set in customization menu
+    #   - axis: where to draw the annotations (on the plot)
+    #   - x: x-coordinate (based on the x-axis data) to draw the line at
+    #   - color: color of the line to paste onto the canvas
+    #   - linestyle: style of line to paste onto the canvas
+    #   - linewidth: size of line to paste onto the canvas
     def draw_annotations(self, axis, x, color, linestyle, linewidth):
         canvas = self.hist_canvas
         ymin, ymax = self.ylim
-        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', arrowprops=dict(arrowstyle='-', color=color, linestyle=linestyle, linewidth=linewidth))
+        axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', 
+                      arrowprops=dict(arrowstyle='-', color=color, 
+                                      linestyle=linestyle, linewidth=linewidth))
         canvas.draw()
         
 
