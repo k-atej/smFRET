@@ -19,6 +19,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.paths = files # full file path
         self.numfiles = len(self.paths)
         self.index = 0
+        self.trajectory = None
 
         self.savepath = path.rstrip("/")
         print(self.savepath)
@@ -85,6 +86,32 @@ class TrajectoryWindow(tk.Toplevel):
         self.tabControl.add(self.tabText, text="Text")
 
     def makeOptions(self):
+        # tab 1: format
+
+        # input area for figure width
+        self.width_label = tk.Label(self.tabFormat, text="Width:")
+        self.width_label.grid(row=3, column=0)
+        self.ref_width = tk.StringVar(self)
+        self.ref_width.set('6')
+
+        self.combowidth = tk.Entry(self.tabFormat, textvariable=self.ref_width)
+        self.combowidth.config(width=5)
+        self.combowidth.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+         # input area for figure height
+        self.height_label = tk.Label(self.tabFormat, text="Height:")
+        self.height_label.grid(row=3, column=2)
+        self.ref_height = tk.StringVar(self)
+        self.ref_height.set('4.5')
+
+        self.comboheight = tk.Entry(self.tabFormat, textvariable=self.ref_height)
+        self.comboheight.config(width=5)
+        self.comboheight.grid(row=3, column=3, sticky="ew", padx=(0, 10), pady="10")
+
+
+
+        # tab2 : style
+
          # input area for designation of plot1 color
         self.color_label = tk.Label(self.tabStyle, text="Color A:")
         self.color_label.grid(row=0, column=0)
@@ -197,12 +224,15 @@ class TrajectoryWindow(tk.Toplevel):
         self.df['efret'] = self.df['acceptor'] / (self.df['acceptor'] + (gamma * self.df['donor']))
 
     def maketrajectory(self, event=None):
+        if self.trajectory is not None:
+            self.trajectory.destroy()
         self.get_data()
         self.calculateEfret()
         title = self.paths[self.index]
         self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(),
-                                          self.ref_x.get(), self.ref_x2.get(), self.ref_y.get(), self.ref_y2.get())
+                                          self.ref_x.get(), self.ref_x2.get(), self.ref_y.get(), self.ref_y2.get(),
+                                          float(self.ref_height.get()), float(self.ref_width.get()))
         self.makeLabel()
 
     def back(self, event=None):

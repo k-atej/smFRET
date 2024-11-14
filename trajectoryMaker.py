@@ -8,7 +8,7 @@ class TrajectoryMaker():
     # title is the full file path
     # title set is the window title aka the parent folder that was inputted
     # data should come in as a dataframe
-    def __init__(self, title, titleset, data, master, refcolor1, refcolor2, refcolor3, graphtitle, x, x2, y, y2):
+    def __init__(self, title, titleset, data, master, refcolor1, refcolor2, refcolor3, graphtitle, x, x2, y, y2, height, width):
         self.data = data
         self.master = master
         self.color1 = refcolor1
@@ -19,6 +19,8 @@ class TrajectoryMaker():
         self.x2label = x2
         self.ylabel = y
         self.y2label = y2
+        self.width = width
+        self.height = height
 
         keys = title.split("/")
         self.title = ""
@@ -33,8 +35,10 @@ class TrajectoryMaker():
         self.title = self.title.strip("/")
 
         self.fig = Figure()
-        self.fig.set_figwidth(6)
-        self.fig.set_figheight(4.5)
+
+        self.fig.set_figwidth(self.width)
+        self.fig.set_figheight(self.height)
+
         self.axes = []
         for i in range(2):
             ax = self.fig.add_subplot(2, 1, i+1)
@@ -47,9 +51,9 @@ class TrajectoryMaker():
         self.fig.subplots_adjust(wspace=0, hspace=0.5, left=0.1, right=0.9)
         self.fig.suptitle(self.graphtitle)
 
-        trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
-        trajectorycanvas.draw()
-        trajectorycanvas.get_tk_widget().grid(row=0, column=0)
+        self.trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
+        self.trajectorycanvas.draw()
+        self.trajectorycanvas.get_tk_widget().grid(row=0, column=0)
 
 
 
@@ -101,3 +105,7 @@ class TrajectoryMaker():
         self.fig.savefig(refpath, dpi=dpi)
        #self.annotate(refpath)
         print("SAVED!")
+
+    # removes canvas
+    def destroy(self):
+        self.trajectorycanvas.get_tk_widget().destroy()
