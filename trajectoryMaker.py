@@ -8,10 +8,17 @@ class TrajectoryMaker():
     # title is the full file path
     # title set is the window title aka the parent folder that was inputted
     # data should come in as a dataframe
-    def __init__(self, title, titleset, data, master):
+    def __init__(self, title, titleset, data, master, refcolor1, refcolor2, refcolor3, graphtitle, x, x2, y, y2):
         self.data = data
         self.master = master
-
+        self.color1 = refcolor1
+        self.color2 = refcolor2
+        self.color3 = refcolor3
+        self.graphtitle = graphtitle
+        self.xlabel = x
+        self.x2label = x2
+        self.ylabel = y
+        self.y2label = y2
 
         keys = title.split("/")
         self.title = ""
@@ -38,6 +45,7 @@ class TrajectoryMaker():
         self.makeEfficiency()
 
         self.fig.subplots_adjust(wspace=0, hspace=0.5, left=0.1, right=0.9)
+        self.fig.suptitle(self.graphtitle)
 
         trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
         trajectorycanvas.draw()
@@ -53,11 +61,13 @@ class TrajectoryMaker():
         donor = self.data["donor"]
         acceptor = self.data["acceptor"]
 
-        fig.plot(time, donor, color="lime", label="Donor")
-        fig.plot(time, acceptor, color="red", label="Acceptor")
+        fig.plot(time, donor, color=self.color1, label="Donor")
+        fig.plot(time, acceptor, color=self.color2, label="Acceptor")
         fig.set_ylim([0, None]) #should be able to standardize this across a set?
         fig.legend()
         fig.set_title("Intensity")
+        fig.set_xlabel(self.xlabel)
+        fig.set_ylabel(self.ylabel)
         fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
         #fig.tight_layout()
 
@@ -70,8 +80,10 @@ class TrajectoryMaker():
         time = self.data["time"]
         efret = self.data["efret"]
 
-        fig.plot(time, efret, color="black")
+        fig.plot(time, efret, color=self.color3)
         fig.set_ylim([0, 1]) 
+        fig.set_ylabel(self.y2label)
+        fig.set_xlabel(self.x2label)
         fig.set_title("FRET Efficiency")
         fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
         #fig.tight_layout()

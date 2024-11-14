@@ -37,7 +37,7 @@ class TrajectoryWindow(tk.Toplevel):
 
         # left half (contains intensities and efret figures)
         self.subframeleft = tk.Frame(self.frame, background='white')
-        self.subframeleft.grid(row=1, column=0)
+        self.subframeleft.grid(row=1, column=0, padx=(20, 0))
 
         # right half (contains menu)
         self.subframeright = tk.Frame(self.frame, background='white')
@@ -46,19 +46,24 @@ class TrajectoryWindow(tk.Toplevel):
         self.start()
 
     def start(self):
-        #self.makeFormat() not visible, for now
+        self.makeFormat() #not visible, for now
         self.makeButtons()
+        self.makeOptions()
         self.maketrajectory()
+        self.bind('<Return>', self.maketrajectory)
         self.bind('<Left>', self.back)
         self.bind('<Right>', self.next1)
     
     def makeButtons(self):
-
         # generate button, bound to the generation of a histogram
+        makeTraj = tk.Button(self.subframetop, text="Generate", command=self.maketrajectory)
+        makeTraj.grid(row=4, column=0, padx="10")
+
+        # back button
         self.backbutton = tk.Button(self.subframetop, text="Back", command=self.back)
         self.backbutton.grid(row=0, column=1, padx="10")
 
-        # clear button, bound to the generation of an empty histogram
+        # next button
         self.nextbutton = tk.Button(self.subframetop, text="Next", command=self.next1)
         self.nextbutton.grid(row=0, column=2, padx="10", pady="10")
     
@@ -79,6 +84,106 @@ class TrajectoryWindow(tk.Toplevel):
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
 
+    def makeOptions(self):
+         # input area for designation of plot1 color
+        self.color_label = tk.Label(self.tabStyle, text="Color A:")
+        self.color_label.grid(row=0, column=0)
+        self.ref_color1 = tk.StringVar(self)
+        self.ref_color1.set("lime")
+
+        self.combo2 = tk.Entry(self.tabStyle, textvariable=self.ref_color1)
+        self.combo2.config(width=5)
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        # color wheel for designation of plot1 color
+        self.color1button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotAcolor)
+        self.color1button.grid(row=0, column=3)
+
+        
+        
+        # input area for designation of plot2 color
+        self.color_label = tk.Label(self.tabStyle, text="Color B:")
+        self.color_label.grid(row=1, column=0)
+        self.ref_color2 = tk.StringVar(self)
+        self.ref_color2.set("red")
+
+        self.combo3 = tk.Entry(self.tabStyle, textvariable=self.ref_color2)
+        self.combo3.config(width=5)
+        self.combo3.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        # color wheel for designation of plot2 color
+        self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotBcolor)
+        self.color2button.grid(row=1, column=3)
+
+
+
+        # input area for designation of plot3 color
+        self.color_label = tk.Label(self.tabStyle, text="Color C:")
+        self.color_label.grid(row=2, column=0)
+        self.ref_color3 = tk.StringVar(self)
+        self.ref_color3.set("black")
+
+        self.combo4 = tk.Entry(self.tabStyle, textvariable=self.ref_color3)
+        self.combo4.config(width=5)
+        self.combo4.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        # color wheel for designation of plot3 color
+        self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotCcolor)
+        self.color2button.grid(row=2, column=3)
+
+
+        # third tab: text
+        # all of these should be toggled on & off with each subplot, should toggle overall title individually
+
+        # input area for designation of graph title
+        self.title_label = tk.Label(self.tabText, text="Title:")
+        self.title_label.grid(row=0, column=0)
+        self.ref_title = tk.StringVar(self)
+        self.ref_title.set("Title")
+
+        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="5")
+
+        # input area for designation of intensity x-axis label
+        self.x_label = tk.Label(self.tabText, text="X-Axis Label 1:")
+        self.x_label.grid(row=1, column=0)
+        self.ref_x = tk.StringVar(self)
+        self.ref_x.set("X-Axis")
+
+        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="5")
+
+        # input area for designation of efficiency x-axis label
+        self.x2_label = tk.Label(self.tabText, text="X-Axis Label 2:")
+        self.x2_label.grid(row=2, column=0)
+        self.ref_x2 = tk.StringVar(self)
+        self.ref_x2.set("X-Axis")
+
+        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x2)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
+
+        # input area for designation of intensity y-axis label
+        self.y_label = tk.Label(self.tabText, text="Y-Axis Label 1:")
+        self.y_label.grid(row=3, column=0)
+        self.ref_y = tk.StringVar(self)
+        self.ref_y.set("Y-Axis")
+
+        self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y)
+        self.combo3.config(width=10)
+        self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
+
+        # input area for designation of efficiency y-axis label
+        self.y2_label = tk.Label(self.tabText, text="Y-Axis Label 2:")
+        self.y2_label.grid(row=4, column=0)
+        self.ref_y2 = tk.StringVar(self)
+        self.ref_y2.set("Y-Axis")
+
+        self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y2)
+        self.combo3.config(width=10)
+        self.combo3.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
 
     # parses the data file into a pandas dataframe
     def get_data(self):
@@ -91,11 +196,13 @@ class TrajectoryWindow(tk.Toplevel):
         gamma = 1
         self.df['efret'] = self.df['acceptor'] / (self.df['acceptor'] + (gamma * self.df['donor']))
 
-    def maketrajectory(self):
+    def maketrajectory(self, event=None):
         self.get_data()
         self.calculateEfret()
         title = self.paths[self.index]
-        self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft)
+        self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft, self.ref_color1.get(), 
+                                          self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(),
+                                          self.ref_x.get(), self.ref_x2.get(), self.ref_y.get(), self.ref_y2.get())
         self.makeLabel()
 
     def back(self, event=None):
@@ -157,3 +264,18 @@ class TrajectoryWindow(tk.Toplevel):
     def save(self):
         self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
         self.win.destroy()
+
+    # opens native color chooser dialog
+    def choose_plotAcolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_color1.set(hexcode)
+
+    # opens native color chooser dialog
+    def choose_plotBcolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_color2.set(hexcode)
+
+     # opens native color chooser dialog
+    def choose_plotCcolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_color3.set(hexcode)
