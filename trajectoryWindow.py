@@ -87,6 +87,66 @@ class TrajectoryWindow(tk.Toplevel):
 
     def makeOptions(self):
         # tab 1: format
+         # input area to designate maximum value on x axis
+        self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
+        self.xmax_label.grid(row=0, column=2)
+        self.ref_xmax = tk.StringVar(self)
+        self.ref_xmax.set("None")
+
+        self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
+        self.comboxmax.config(width=5)
+        self.comboxmax.grid(row=0, column=3, sticky="ew", padx=(0, 0), pady="10")
+
+        # input area to designate minimum value on x axis
+        self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
+        self.xmin_label.grid(row=0, column=0)
+        self.ref_xmin = tk.StringVar(self)
+        self.ref_xmin.set("None")
+
+        self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
+        self.comboxmin.config(width=5)
+        self.comboxmin.grid(row=0, column=1, sticky="ew", padx=(0, 0), pady="10")
+
+        # input area to designate maximum value on y axis
+        self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
+        self.ymax_label.grid(row=1, column=2)
+        self.ref_ymax = tk.StringVar(self)
+        self.ref_ymax.set("None")
+
+        self.comboymax = tk.Entry(self.tabFormat, textvariable=self.ref_ymax)
+        self.comboymax.config(width=5)
+        self.comboymax.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+
+        # input area to designate minimum value on y axis
+        self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
+        self.ymin_label.grid(row=1, column=0)
+        self.ref_ymin = tk.StringVar(self)
+        self.ref_ymin.set("None")
+
+        self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
+        self.comboymin.config(width=5)
+        self.comboymin.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        # input area to designate maximum value on y2 axis
+        self.y2max_label = tk.Label(self.tabFormat, text="Y Max 2:")
+        self.y2max_label.grid(row=2, column=2)
+        self.ref_y2max = tk.StringVar(self)
+        self.ref_y2max.set("None")
+
+        self.comboy2max = tk.Entry(self.tabFormat, textvariable=self.ref_y2max)
+        self.comboy2max.config(width=5)
+        self.comboy2max.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
+
+        # input area to designate minimum value on y2 axis
+        self.y2min_label = tk.Label(self.tabFormat, text="Y Min 2:")
+        self.y2min_label.grid(row=2, column=0)
+        self.ref_y2min = tk.StringVar(self)
+        self.ref_y2min.set("None")
+
+        self.comboy2min = tk.Entry(self.tabFormat, textvariable=self.ref_y2min)
+        self.comboy2min.config(width=5)
+        self.comboy2min.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+
 
         # input area for figure width
         self.width_label = tk.Label(self.tabFormat, text="Width:")
@@ -172,6 +232,17 @@ class TrajectoryWindow(tk.Toplevel):
         self.combo2.config(width=10)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="5")
 
+        # dropdown for title font size
+        self.titlef_label = tk.Label(self.tabText, text="Size:")
+        self.titlef_label.grid(row=0, column=2)
+        titlef = [8, 9, 10, 11, 12, 15, 20, 24]
+        self.ref_titlefontsize = tk.IntVar(self)
+        self.ref_titlefontsize.set(12)
+
+        self.combo = tk.OptionMenu(self.tabText, self.ref_titlefontsize, *titlef)
+        self.combo.config(width=3)
+        self.combo.grid(row=0, column=3)
+
         # input area for designation of intensity x-axis label
         self.x_label = tk.Label(self.tabText, text="X-Axis Label 1:")
         self.x_label.grid(row=1, column=0)
@@ -212,6 +283,50 @@ class TrajectoryWindow(tk.Toplevel):
         self.combo3.config(width=10)
         self.combo3.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
 
+        # dropdown for x font size
+        self.titlex_label = tk.Label(self.tabText, text="Size:")
+        self.titlex_label.grid(row=1, column=2)
+        titlex = [8, 9, 10, 11, 12, 15, 20, 24]
+        self.ref_xfontsize = tk.StringVar(self)
+        self.ref_xfontsize.set("12")
+
+        self.combo4 = tk.OptionMenu(self.tabText, self.ref_xfontsize, *titlex)
+        self.combo4.config(width=3)
+        self.combo4.grid(row=1, column=3)
+
+        # dropdown for y font size
+        self.titley_label = tk.Label(self.tabText, text="Size:")
+        self.titley_label.grid(row=3, column=2)
+        titley = [8, 9, 10, 11, 12, 15, 20, 24]
+        self.ref_yfontsize = tk.StringVar(self)
+        self.ref_yfontsize.set("12")
+
+        self.combo = tk.OptionMenu(self.tabText, self.ref_yfontsize, *titley)
+        self.combo.config(width=3)
+        self.combo.grid(row=3, column=3)
+
+        # dropdown for x2 font size
+        self.titlex2_label = tk.Label(self.tabText, text="Size:")
+        self.titlex2_label.grid(row=2, column=2)
+        titlex2 = [8, 9, 10, 11, 12, 15, 20, 24]
+        self.ref_x2fontsize = tk.StringVar(self)
+        self.ref_x2fontsize.set("12")
+
+        self.combo4 = tk.OptionMenu(self.tabText, self.ref_x2fontsize, *titlex2)
+        self.combo4.config(width=3)
+        self.combo4.grid(row=2, column=3)
+
+        # dropdown for y2 font size
+        self.titley2_label = tk.Label(self.tabText, text="Size:")
+        self.titley2_label.grid(row=4, column=2)
+        titley2 = [8, 9, 10, 11, 12, 15, 20, 24]
+        self.ref_y2fontsize = tk.StringVar(self)
+        self.ref_y2fontsize.set("12")
+
+        self.combo = tk.OptionMenu(self.tabText, self.ref_y2fontsize, *titley2)
+        self.combo.config(width=3)
+        self.combo.grid(row=4, column=3)
+
     # parses the data file into a pandas dataframe
     def get_data(self):
         trajectories = open(self.paths[self.index], "r") 
@@ -229,11 +344,35 @@ class TrajectoryWindow(tk.Toplevel):
         self.get_data()
         self.calculateEfret()
         title = self.paths[self.index]
+        xmax = self.checkMinMax(self.ref_xmax.get())
+        xmin = self.checkMinMax(self.ref_xmin.get())
+        ymax = self.checkMinMax(self.ref_ymax.get())
+        ymin = self.checkMinMax(self.ref_ymin.get())
+        y2max = self.checkMinMax(self.ref_y2max.get())
+        y2min = self.checkMinMax(self.ref_y2min.get())
+
+        xfontsize = float(self.ref_xfontsize.get())
+        yfontsize = float(self.ref_yfontsize.get())
+        x2fontsize = float(self.ref_x2fontsize.get())
+        y2fontsize = float(self.ref_y2fontsize.get())
+        titlefontsize = float(self.ref_titlefontsize.get())
+
+
         self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft, self.ref_color1.get(), 
-                                          self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(),
-                                          self.ref_x.get(), self.ref_x2.get(), self.ref_y.get(), self.ref_y2.get(),
-                                          float(self.ref_height.get()), float(self.ref_width.get()))
+                                          self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), self.ref_titlefontsize.get(),
+                                          self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
+                                          self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
+                                          ymin, y2max, y2min)
         self.makeLabel()
+
+    # type checks the designation of x/y mins and maxes
+    # - val: value input into x/y min or max entry boxes
+    def checkMinMax(self, val):
+        if val != 'None':
+            val = float(val)
+        else:
+            val = None
+        return val
 
     def back(self, event=None):
         self.index -= 1
