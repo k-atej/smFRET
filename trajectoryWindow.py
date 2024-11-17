@@ -44,6 +44,14 @@ class TrajectoryWindow(tk.Toplevel):
         self.subframeright = tk.Frame(self.frame, background='white')
         self.subframeright.grid(row=1, column=1)
 
+        # right half, top (contains i menu)
+        self.subframerighttop = tk.Frame(self.subframeright, background='white')
+        self.subframerighttop.grid(row=0, column=0)
+
+        # right half, bottom (contains e menu)
+        self.subframerightbottom = tk.Frame(self.subframeright, background='white')
+        self.subframerightbottom.grid(row=1, column=0)
+
         self.start()
 
     def start(self):
@@ -73,7 +81,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
     def makeFormat(self):
-        self.tabControl = ttk.Notebook(master=self.subframeright)
+        self.tabControl = ttk.Notebook(master=self.subframerighttop)
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabControl.grid(row=0, column=0, rowspan=2, padx=10, sticky='n')
 
@@ -84,6 +92,21 @@ class TrajectoryWindow(tk.Toplevel):
         self.tabControl.add(self.tabFormat, text="Format")
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
+
+        self.tabControl2 = ttk.Notebook(master=self.subframerightbottom)
+        self.tabFormat2 = tk.Frame(self.tabControl2)
+        self.tabControl2.grid(row=0, column=0, rowspan=2, padx=10, sticky='n')
+
+        self.tabFormat2 = tk.Frame(self.tabControl2)
+        self.tabStyle2 = tk.Frame(self.tabControl2)
+        self.tabText2 = tk.Frame(self.tabControl2)
+
+        self.tabControl2.add(self.tabFormat2, text="Format")
+        self.tabControl2.add(self.tabStyle2, text="Style")
+        self.tabControl2.add(self.tabText2, text="Text")
+
+
+
 
     def makeOptions(self):
         # tab 1: format
@@ -101,7 +124,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
         self.xmin_label.grid(row=0, column=0)
         self.ref_xmin = tk.StringVar(self)
-        self.ref_xmin.set("None")
+        self.ref_xmin.set("0")
 
         self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
         self.comboxmin.config(width=5)
@@ -121,29 +144,29 @@ class TrajectoryWindow(tk.Toplevel):
         self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
         self.ymin_label.grid(row=1, column=0)
         self.ref_ymin = tk.StringVar(self)
-        self.ref_ymin.set("None")
+        self.ref_ymin.set("0")
 
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
         self.comboymin.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # input area to designate maximum value on y2 axis
-        self.y2max_label = tk.Label(self.tabFormat, text="Y Max 2:")
+        self.y2max_label = tk.Label(self.tabFormat2, text="Y Max 2:")
         self.y2max_label.grid(row=2, column=2)
         self.ref_y2max = tk.StringVar(self)
-        self.ref_y2max.set("None")
+        self.ref_y2max.set("1.2")
 
-        self.comboy2max = tk.Entry(self.tabFormat, textvariable=self.ref_y2max)
+        self.comboy2max = tk.Entry(self.tabFormat2, textvariable=self.ref_y2max)
         self.comboy2max.config(width=5)
         self.comboy2max.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
 
         # input area to designate minimum value on y2 axis
-        self.y2min_label = tk.Label(self.tabFormat, text="Y Min 2:")
+        self.y2min_label = tk.Label(self.tabFormat2, text="Y Min 2:")
         self.y2min_label.grid(row=2, column=0)
         self.ref_y2min = tk.StringVar(self)
-        self.ref_y2min.set("None")
+        self.ref_y2min.set("0")
 
-        self.comboy2min = tk.Entry(self.tabFormat, textvariable=self.ref_y2min)
+        self.comboy2min = tk.Entry(self.tabFormat2, textvariable=self.ref_y2min)
         self.comboy2min.config(width=5)
         self.comboy2min.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
@@ -205,17 +228,17 @@ class TrajectoryWindow(tk.Toplevel):
 
 
         # input area for designation of plot3 color
-        self.color_label = tk.Label(self.tabStyle, text="Color C:")
+        self.color_label = tk.Label(self.tabStyle2, text="Color C:")
         self.color_label.grid(row=2, column=0)
         self.ref_color3 = tk.StringVar(self)
         self.ref_color3.set("black")
 
-        self.combo4 = tk.Entry(self.tabStyle, textvariable=self.ref_color3)
+        self.combo4 = tk.Entry(self.tabStyle2, textvariable=self.ref_color3)
         self.combo4.config(width=5)
         self.combo4.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # color wheel for designation of plot3 color
-        self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotCcolor)
+        self.color2button = tk.Button(self.tabStyle2, text="Select Color", command=self.choose_plotCcolor)
         self.color2button.grid(row=2, column=3)
 
 
@@ -254,12 +277,12 @@ class TrajectoryWindow(tk.Toplevel):
         self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area for designation of efficiency x-axis label
-        self.x2_label = tk.Label(self.tabText, text="X-Axis Label 2:")
+        self.x2_label = tk.Label(self.tabText2, text="X-Axis Label 2:")
         self.x2_label.grid(row=2, column=0)
         self.ref_x2 = tk.StringVar(self)
         self.ref_x2.set("X-Axis")
 
-        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x2)
+        self.combo2 = tk.Entry(self.tabText2, textvariable=self.ref_x2)
         self.combo2.config(width=10)
         self.combo2.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
 
@@ -274,12 +297,12 @@ class TrajectoryWindow(tk.Toplevel):
         self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area for designation of efficiency y-axis label
-        self.y2_label = tk.Label(self.tabText, text="Y-Axis Label 2:")
+        self.y2_label = tk.Label(self.tabText2, text="Y-Axis Label 2:")
         self.y2_label.grid(row=4, column=0)
         self.ref_y2 = tk.StringVar(self)
         self.ref_y2.set("Y-Axis")
 
-        self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y2)
+        self.combo3 = tk.Entry(self.tabText2, textvariable=self.ref_y2)
         self.combo3.config(width=10)
         self.combo3.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
 
@@ -306,24 +329,24 @@ class TrajectoryWindow(tk.Toplevel):
         self.combo.grid(row=3, column=3)
 
         # dropdown for x2 font size
-        self.titlex2_label = tk.Label(self.tabText, text="Size:")
+        self.titlex2_label = tk.Label(self.tabText2, text="Size:")
         self.titlex2_label.grid(row=2, column=2)
         titlex2 = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_x2fontsize = tk.StringVar(self)
         self.ref_x2fontsize.set("12")
 
-        self.combo4 = tk.OptionMenu(self.tabText, self.ref_x2fontsize, *titlex2)
+        self.combo4 = tk.OptionMenu(self.tabText2, self.ref_x2fontsize, *titlex2)
         self.combo4.config(width=3)
         self.combo4.grid(row=2, column=3)
 
         # dropdown for y2 font size
-        self.titley2_label = tk.Label(self.tabText, text="Size:")
+        self.titley2_label = tk.Label(self.tabText2, text="Size:")
         self.titley2_label.grid(row=4, column=2)
         titley2 = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_y2fontsize = tk.StringVar(self)
         self.ref_y2fontsize.set("12")
 
-        self.combo = tk.OptionMenu(self.tabText, self.ref_y2fontsize, *titley2)
+        self.combo = tk.OptionMenu(self.tabText2, self.ref_y2fontsize, *titley2)
         self.combo.config(width=3)
         self.combo.grid(row=4, column=3)
 

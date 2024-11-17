@@ -35,6 +35,8 @@ class TrajectoryMaker():
         self.y2max = y2max
         self.y2min = y2min
 
+
+
         keys = title.split("/")
         self.title = ""
         count = False
@@ -80,9 +82,9 @@ class TrajectoryMaker():
 
         fig.plot(time, donor, color=self.color1, label="Donor")
         fig.plot(time, acceptor, color=self.color2, label="Acceptor")
-        fig.set_ylim([0, None]) #should be able to standardize this across a set?
+        
         fig.legend()
-        fig.set_title("Intensity")
+        #fig.set_title("Intensity")
         fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
         fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
         fig.set_xlim([self.xmin, self.xmax])
@@ -105,7 +107,7 @@ class TrajectoryMaker():
         fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.y2min, self.y2max])
-        fig.set_title("FRET Efficiency")
+        #fig.set_title("FRET Efficiency")
         fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
         #fig.tight_layout()
         

@@ -40,7 +40,9 @@ class StackedTrajectoryMaker():
         self.fig.set_figwidth(width)
         self.fig.set_figheight(height)
             
-
+        self.processData()
+        if self.xmax == None:
+            self.xmax = self.maxtime
         self.makeIntensity()
         self.makeEfficiency()
 
@@ -53,14 +55,12 @@ class StackedTrajectoryMaker():
     
 
     def makeIntensity(self):
-        self.processData()
 
         self.axes = []
         for i in reversed(range(len(self.all_data))):
             time = self.all_data[i]["time"]
             donor = self.all_data[i]["donor"]
             acceptor = self.all_data[i]["acceptor"]
-
             ax = self.fig.add_subplot(len(self.all_data), 2, 2*i+1)
             ax.plot(time, donor, color=self.color1, label="Donor")
             ax.plot(time, acceptor, color=self.color2, label="Acceptor")
@@ -117,12 +117,16 @@ class StackedTrajectoryMaker():
     def processData(self):
         max_donor_data = 0
         max_acceptor_data = 0
+        max_time = 0
         for data in self.all_data:
             if data["donor"].max() > max_donor_data:
                 max__donor_data = data["donor"].max()
             if data["acceptor"].max() > max_acceptor_data:
                 max_acceptor_data = data["acceptor"].max()
+            if data["time"].max() > max_time:
+                max_time = data["time"].max()
         self.max_data = max(max_donor_data, max_acceptor_data)
+        self.maxtime = max_time
 
     def save(self, refpath, reftype, refqual):
         if refqual == "Low":
