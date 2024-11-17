@@ -359,7 +359,7 @@ class TrajectoryWindow(tk.Toplevel):
 
 
         self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft, self.ref_color1.get(), 
-                                          self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), self.ref_titlefontsize.get(),
+                                          self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min)
