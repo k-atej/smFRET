@@ -8,8 +8,10 @@ class TrajectoryMaker():
     # title is the full file path
     # title set is the window title aka the parent folder that was inputted
     # data should come in as a dataframe
-    def __init__(self, title, titleset, data, master, refcolor1, refcolor2, refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
-                 x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, xmax, xmin, ymax, ymin, y2max, y2min):
+    def __init__(self, title, titleset, data, master, refcolor1, refcolor2, 
+                 refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
+                 x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
+                 xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle):
         self.data = data
         self.master = master
         self.color1 = refcolor1
@@ -27,6 +29,8 @@ class TrajectoryMaker():
         self.y2fontsize = y2fontsize
         self.width = width
         self.height = height
+        self.intensitytoggle = intensitytoggle
+        self.efficiencytoggle = efficiencytoggle
 
         self.xmax = xmax
         self.xmin = xmin
@@ -54,14 +58,16 @@ class TrajectoryMaker():
         self.fig.set_figwidth(self.width)
         self.fig.set_figheight(self.height)
 
+        axesnum = self.efficiencytoggle + self.intensitytoggle
         self.axes = []
-        for i in range(2):
-            ax = self.fig.add_subplot(2, 1, i+1)
+        for i in range(axesnum):
+            ax = self.fig.add_subplot(axesnum, 1, i+1)
             self.axes.append(ax)
-            
 
-        self.makeIntensity()
-        self.makeEfficiency()
+        if self.intensitytoggle == 1:
+            self.makeIntensity()
+        if self.efficiencytoggle == 1:
+            self.makeEfficiency()
 
         self.fig.subplots_adjust(wspace=0, hspace=0.5, left=0.1, right=0.9)
         self.fig.suptitle(self.graphtitle, fontsize=self.titlefontsize)
@@ -95,7 +101,10 @@ class TrajectoryMaker():
         return fig
     
     def makeEfficiency(self):
-        fig = self.axes[1]
+        if self.intensitytoggle == 1:
+            fig = self.axes[1]
+        elif self.intensitytoggle == 0:
+            fig = self.axes[0]
         #f = fig.gca()
         
         time = self.data["time"]

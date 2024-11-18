@@ -11,7 +11,7 @@ class StackedTrajectoryMaker():
     # data should come in as a dataframe
     def __init__(self, all_data, master, title, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
-                 height, width, xmax, xmin, ymax, ymin, y2max, y2min):
+                 height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle):
         self.all_data = all_data
         self.master = master
         self.title = title
@@ -28,6 +28,8 @@ class StackedTrajectoryMaker():
         self.y2fontsize = y2fontsize
         self.title = graphtitle
         self.titlefontsize = graphtitlesize
+        self.intensitytoggle = intensitytoggle
+        self.efficiencytoggle = efficiencytoggle
 
         self.xmax = xmax
         self.xmin = xmin
@@ -43,8 +45,17 @@ class StackedTrajectoryMaker():
         self.processData()
         if self.xmax == None:
             self.xmax = self.maxtime
-        self.makeIntensity()
-        self.makeEfficiency()
+        self.numdata = 0
+        if self.intensitytoggle == 1:
+            self.numdata += 1
+        if self.efficiencytoggle == 1:
+            self.numdata += 1
+        
+        if self.intensitytoggle == 1:
+            self.makeIntensity()
+        if self.efficiencytoggle == 1:
+            self.makeEfficiency()
+        
 
         self.fig.subplots_adjust(wspace=0.4, hspace=0, left=0.2, right=0.9)
         self.fig.suptitle(self.title, y = 0.93, x=0.55, fontsize=self.titlefontsize)
@@ -61,7 +72,7 @@ class StackedTrajectoryMaker():
             time = self.all_data[i]["time"]
             donor = self.all_data[i]["donor"]
             acceptor = self.all_data[i]["acceptor"]
-            ax = self.fig.add_subplot(len(self.all_data), 2, 2*i+1)
+            ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*i+1)
             ax.plot(time, donor, color=self.color1, label="Donor")
             ax.plot(time, acceptor, color=self.color2, label="Acceptor")
             ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
@@ -81,7 +92,8 @@ class StackedTrajectoryMaker():
 
         self.axes[0].set_xlabel(self.xlabel, fontsize=self.xfontsize)
         #self.fig.supylabel("Intensity (AU)", fontsize=12, x=0.1)
-        self.fig.text(0.1, 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
+        if self.intensitytoggle == 1:
+            self.fig.text(0.1, 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
 
     
@@ -90,8 +102,7 @@ class StackedTrajectoryMaker():
         for i in reversed(range(len(self.all_data))):
             time = self.all_data[i]["time"]
             efret = self.all_data[i]["efret"]
-
-            ax = self.fig.add_subplot(len(self.all_data), 2, 2*(i+1))
+            ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*(i+1))
             ax.plot(time, efret, color=self.color3)
             ax.set_ylim([self.y2min, self.y2max]) 
             #ax.set_title(self.title)
@@ -110,8 +121,10 @@ class StackedTrajectoryMaker():
 
         self.Eaxes[0].set_xlabel(self.x2label, fontsize=self.x2fontsize)
         #self.fig.supylabel("FRET Efficiency", fontsize=12, x=0.5)
-        self.fig.text(0.525, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
-
+        if self.numdata == 2:
+            self.fig.text(0.525, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
+        else:
+            self.fig.text(0.1, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         
     
     def processData(self):

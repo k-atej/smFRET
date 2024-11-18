@@ -84,6 +84,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.tabControl = ttk.Notebook(master=self.subframerighttop)
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabControl.grid(row=0, column=0, rowspan=2, padx=10, sticky='n')
+        
 
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
@@ -111,44 +112,55 @@ class TrajectoryWindow(tk.Toplevel):
     def makeOptions(self):
         # tab 1: format
          # input area to designate maximum value on x axis
+        #check box for toggling to bin width input
+        self.intensitytogg = tk.IntVar()
+        self.toggle1 = tk.Checkbutton(self.tabFormat, text="Intensity Plot", variable=self.intensitytogg, onvalue=1, offvalue=0)
+        self.toggle1.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.intensitytogg.set(1)
+
+        self.efficiencytogg = tk.IntVar()
+        self.toggle2 = tk.Checkbutton(self.tabFormat2, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
+        self.toggle2.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.efficiencytogg.set(1)
+
         self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
-        self.xmax_label.grid(row=0, column=2)
+        self.xmax_label.grid(row=1, column=2)
         self.ref_xmax = tk.StringVar(self)
         self.ref_xmax.set("None")
 
         self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
         self.comboxmax.config(width=5)
-        self.comboxmax.grid(row=0, column=3, sticky="ew", padx=(0, 0), pady="10")
+        self.comboxmax.grid(row=1, column=3, sticky="ew", padx=(0, 0), pady="10")
 
         # input area to designate minimum value on x axis
         self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
-        self.xmin_label.grid(row=0, column=0)
+        self.xmin_label.grid(row=1, column=0)
         self.ref_xmin = tk.StringVar(self)
         self.ref_xmin.set("0")
 
         self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
         self.comboxmin.config(width=5)
-        self.comboxmin.grid(row=0, column=1, sticky="ew", padx=(0, 0), pady="10")
+        self.comboxmin.grid(row=1, column=1, sticky="ew", padx=(0, 0), pady="10")
 
         # input area to designate maximum value on y axis
         self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
-        self.ymax_label.grid(row=1, column=2)
+        self.ymax_label.grid(row=2, column=2)
         self.ref_ymax = tk.StringVar(self)
         self.ref_ymax.set("None")
 
         self.comboymax = tk.Entry(self.tabFormat, textvariable=self.ref_ymax)
         self.comboymax.config(width=5)
-        self.comboymax.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymax.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
 
         # input area to designate minimum value on y axis
         self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
-        self.ymin_label.grid(row=1, column=0)
+        self.ymin_label.grid(row=2, column=0)
         self.ref_ymin = tk.StringVar(self)
         self.ref_ymin.set("0")
 
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
-        self.comboymin.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymin.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # input area to designate maximum value on y2 axis
         self.y2max_label = tk.Label(self.tabFormat2, text="Y Max 2:")
@@ -385,7 +397,7 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
-                                          ymin, y2max, y2min)
+                                          ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get())
         self.makeLabel()
 
     # type checks the designation of x/y mins and maxes
