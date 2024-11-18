@@ -184,35 +184,41 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
         # tab2 : style
 
+        # legend toggle
+        self.legendtogg = tk.IntVar()
+        self.togglelegend = tk.Checkbutton(self.tabStyle, text="Legend", variable=self.legendtogg, onvalue=1, offvalue=0)
+        self.togglelegend.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.legendtogg.set(1)
+
          # input area for designation of plot1 color
         self.color_label = tk.Label(self.tabStyle, text="Color A:")
-        self.color_label.grid(row=0, column=0)
+        self.color_label.grid(row=1, column=0)
         self.ref_color1 = tk.StringVar(self)
         self.ref_color1.set("lime")
 
         self.combo2 = tk.Entry(self.tabStyle, textvariable=self.ref_color1)
         self.combo2.config(width=5)
-        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # color wheel for designation of plot1 color
         self.color1button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotAcolor)
-        self.color1button.grid(row=0, column=3)
+        self.color1button.grid(row=1, column=3)
 
         
         
         # input area for designation of plot2 color
         self.color_label = tk.Label(self.tabStyle, text="Color B:")
-        self.color_label.grid(row=1, column=0)
+        self.color_label.grid(row=2, column=0)
         self.ref_color2 = tk.StringVar(self)
         self.ref_color2.set("red")
 
         self.combo3 = tk.Entry(self.tabStyle, textvariable=self.ref_color2)
         self.combo3.config(width=5)
-        self.combo3.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo3.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # color wheel for designation of plot2 color
         self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotBcolor)
-        self.color2button.grid(row=1, column=3)
+        self.color2button.grid(row=2, column=3)
 
 
 
@@ -339,6 +345,18 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.combo.config(width=3)
         self.combo.grid(row=4, column=3)
 
+         # subtitle toggle: intensity
+        self.subtogg = tk.IntVar()
+        self.togglesub = tk.Checkbutton(self.tabText, text="Subtitle", variable=self.subtogg, onvalue=1, offvalue=0)
+        self.togglesub.grid(row=4, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.subtogg.set(1)
+
+        # subtitle toggle: efficiency
+        self.sub2togg = tk.IntVar()
+        self.togglesub2 = tk.Checkbutton(self.tabText2, text="Subtitle", variable=self.sub2togg, onvalue=1, offvalue=0)
+        self.togglesub2.grid(row=5, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.sub2togg.set(1)
+
     # HOW DO I NEED TO RESTRUCTURE THIS?
 
     # parses the files into a series of pandas dataframes
@@ -372,11 +390,12 @@ class stackedTrajectoryWindow(tk.Toplevel):
         x2fontsize = float(self.ref_x2fontsize.get())
         y2fontsize = float(self.ref_y2fontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.ref_color1.get(), 
+        self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
                                           y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
-                                          ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get())
+                                          ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
+                                          self.subtogg.get(), self.sub2togg.get())
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes

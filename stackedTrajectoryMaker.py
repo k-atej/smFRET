@@ -9,12 +9,14 @@ class StackedTrajectoryMaker():
     # title is the full file path
     # title set is the window title aka the parent folder that was inputted
     # data should come in as a dataframe
-    def __init__(self, all_data, master, title, refcolor1, refcolor2, refcolor3, 
+    def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
-                 height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle):
+                 height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
+                 legendtoggle, subtitletoggle, subtitletoggle2):
         self.all_data = all_data
         self.master = master
         self.title = title
+        self.files = files
         self.color1 = refcolor1
         self.color2 = refcolor2
         self.color3 = refcolor3
@@ -30,6 +32,9 @@ class StackedTrajectoryMaker():
         self.titlefontsize = graphtitlesize
         self.intensitytoggle = intensitytoggle
         self.efficiencytoggle = efficiencytoggle
+        self.legend = legendtoggle
+        self.subtitle = subtitletoggle
+        self.subtitle2 = subtitletoggle2
 
         self.xmax = xmax
         self.xmin = xmin
@@ -78,12 +83,15 @@ class StackedTrajectoryMaker():
             ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_xticks([])
-            #ax.set_title(self.title)
+            if self.subtitle == 1:
+                key = self.files[i].split("/")[-1]
+                ax.annotate(text=key.split(".")[0], xy=(0.03, 0.05), xycoords='axes fraction')
             self.axes.append(ax)
         
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
-
-        #f.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
+        if self.legend ==1:
+            self.axes[len(self.all_data) - 1].legend()
+ #toggle on and off
         #self.fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
         # remove x-tick labels on subplots, except for last one
         for i in range(1, len(self.all_data)):
@@ -108,6 +116,9 @@ class StackedTrajectoryMaker():
             #ax.set_title(self.title)
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_xticks([])
+            if self.subtitle2 == 1:
+                key = self.files[i].split("/")[-1]
+                ax.annotate(text=key.split(".")[0], xy=(0.03, 0.05), xycoords='axes fraction')
             self.Eaxes.append(ax)
         
         self.Eaxes[0].xaxis.set_major_locator(plt.AutoLocator())

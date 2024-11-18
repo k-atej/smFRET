@@ -11,7 +11,8 @@ class TrajectoryMaker():
     def __init__(self, title, titleset, data, master, refcolor1, refcolor2, 
                  refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
-                 xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle):
+                 xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
+                 legendtoggle, subtitletoggle, subtitletoggle2):
         self.data = data
         self.master = master
         self.color1 = refcolor1
@@ -31,6 +32,9 @@ class TrajectoryMaker():
         self.height = height
         self.intensitytoggle = intensitytoggle
         self.efficiencytoggle = efficiencytoggle
+        self.legend = legendtoggle
+        self.subtitle = subtitletoggle
+        self.subtitle2 = subtitletoggle2
 
         self.xmax = xmax
         self.xmin = xmin
@@ -89,13 +93,15 @@ class TrajectoryMaker():
         fig.plot(time, donor, color=self.color1, label="Donor")
         fig.plot(time, acceptor, color=self.color2, label="Acceptor")
         
-        fig.legend()
+        if self.legend == 1:
+            fig.legend()
         #fig.set_title("Intensity")
         fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
         fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.ymin, self.ymax])
-        fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
+        if self.subtitle == 1:
+            fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
         #fig.tight_layout()
 
         return fig
@@ -117,8 +123,9 @@ class TrajectoryMaker():
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.y2min, self.y2max])
         #fig.set_title("FRET Efficiency")
-        fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
-        #fig.tight_layout()
+        if self.subtitle2 == 1:
+            fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
+
         
         return fig
     
