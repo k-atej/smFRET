@@ -75,166 +75,161 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
 
-        self.tabControl2 = ttk.Notebook(master=self.subframerightbottom)
-        self.tabFormat2 = tk.Frame(self.tabControl2)
-        self.tabControl2.grid(row=0, column=0, rowspan=2, padx=10, sticky='n')
-
-        self.tabFormat2 = tk.Frame(self.tabControl2)
-        self.tabStyle2 = tk.Frame(self.tabControl2)
-        self.tabText2 = tk.Frame(self.tabControl2)
-
-        self.tabControl2.add(self.tabFormat2, text="Format")
-        self.tabControl2.add(self.tabStyle2, text="Style")
-        self.tabControl2.add(self.tabText2, text="Text")
-
     def makeOptions(self):
         # tab 1: format
-
+         # input area to designate maximum value on x axis
         #check box for toggling to bin width input
         self.intensitytogg = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.tabFormat, text="Intensity Plot", variable=self.intensitytogg, onvalue=1, offvalue=0)
-        self.toggle1.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.toggle1.grid(row=3, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.intensitytogg.set(1)
 
         self.efficiencytogg = tk.IntVar()
-        self.toggle2 = tk.Checkbutton(self.tabFormat2, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
-        self.toggle2.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.toggle2 = tk.Checkbutton(self.tabFormat, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
+        self.toggle2.grid(row=6, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.efficiencytogg.set(1)
 
         self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
-        self.xmax_label.grid(row=1, column=2)
+        self.xmax_label.grid(row=4, column=2, pady="5")
         self.ref_xmax = tk.StringVar(self)
         self.ref_xmax.set("None")
 
         self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
         self.comboxmax.config(width=5)
-        self.comboxmax.grid(row=1, column=3, sticky="ew", padx=(0, 0), pady="10")
+        self.comboxmax.grid(row=4, column=3, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate minimum value on x axis
         self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
-        self.xmin_label.grid(row=1, column=0)
+        self.xmin_label.grid(row=4, column=0, padx=(20,0), pady="5")
         self.ref_xmin = tk.StringVar(self)
         self.ref_xmin.set("0")
 
         self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
         self.comboxmin.config(width=5)
-        self.comboxmin.grid(row=1, column=1, sticky="ew", padx=(0, 0), pady="10")
+        self.comboxmin.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate maximum value on y axis
         self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
-        self.ymax_label.grid(row=2, column=2)
+        self.ymax_label.grid(row=5, column=2, pady="5")
         self.ref_ymax = tk.StringVar(self)
         self.ref_ymax.set("None")
 
         self.comboymax = tk.Entry(self.tabFormat, textvariable=self.ref_ymax)
         self.comboymax.config(width=5)
-        self.comboymax.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymax.grid(row=5, column=3, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate minimum value on y axis
         self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
-        self.ymin_label.grid(row=2, column=0)
+        self.ymin_label.grid(row=5, column=0, padx=(20,0), pady="5")
         self.ref_ymin = tk.StringVar(self)
         self.ref_ymin.set("0")
 
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
-        self.comboymin.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymin.grid(row=5, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate maximum value on y2 axis
-        self.y2max_label = tk.Label(self.tabFormat2, text="Y Max 2:")
-        self.y2max_label.grid(row=2, column=2)
+        self.y2max_label = tk.Label(self.tabFormat, text="Y Max:")
+        self.y2max_label.grid(row=7, column=2, pady="5")
         self.ref_y2max = tk.StringVar(self)
         self.ref_y2max.set("1.2")
 
-        self.comboy2max = tk.Entry(self.tabFormat2, textvariable=self.ref_y2max)
+        self.comboy2max = tk.Entry(self.tabFormat, textvariable=self.ref_y2max)
         self.comboy2max.config(width=5)
-        self.comboy2max.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.comboy2max.grid(row=7, column=3, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate minimum value on y2 axis
-        self.y2min_label = tk.Label(self.tabFormat2, text="Y Min 2:")
-        self.y2min_label.grid(row=2, column=0)
+        self.y2min_label = tk.Label(self.tabFormat, text="Y Min:")
+        self.y2min_label.grid(row=7, column=0, padx=(20,0), pady="5")
         self.ref_y2min = tk.StringVar(self)
         self.ref_y2min.set("0")
 
-        self.comboy2min = tk.Entry(self.tabFormat2, textvariable=self.ref_y2min)
+        self.comboy2min = tk.Entry(self.tabFormat, textvariable=self.ref_y2min)
         self.comboy2min.config(width=5)
-        self.comboy2min.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.comboy2min.grid(row=7, column=1, sticky="ew", padx=(0, 10), pady="5")
+
+        self.fig_label = tk.Label(self.tabFormat, text="Figure Dimensions")
+        self.fig_label.grid(row=0, column=0, columnspan=2, pady=(10,5))
+
 
         # input area for figure width
         self.width_label = tk.Label(self.tabFormat, text="Width:")
-        self.width_label.grid(row=3, column=0)
+        self.width_label.grid(row=1, column=0, padx=(20,0), pady="5")
         self.ref_width = tk.StringVar(self)
-        self.ref_width.set('7')
+        self.ref_width.set('6')
 
         self.combowidth = tk.Entry(self.tabFormat, textvariable=self.ref_width)
         self.combowidth.config(width=5)
-        self.combowidth.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combowidth.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="5")
 
          # input area for figure height
         self.height_label = tk.Label(self.tabFormat, text="Height:")
-        self.height_label.grid(row=3, column=2)
+        self.height_label.grid(row=2, column=0, padx=(20,0), pady="5")
         self.ref_height = tk.StringVar(self)
-        self.ref_height.set('5.5')
+        self.ref_height.set('4.5')
 
         self.comboheight = tk.Entry(self.tabFormat, textvariable=self.ref_height)
         self.comboheight.config(width=5)
-        self.comboheight.grid(row=3, column=3, sticky="ew", padx=(0, 10), pady="10")
-
+        self.comboheight.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
 
 
         # tab2 : style
 
+        self.i_label = tk.Label(self.tabStyle, text="Intensity Plot:")
+        self.i_label.grid(row=0, column=0, columnspan=2, pady=(10,5), sticky="w")
+
         # legend toggle
         self.legendtogg = tk.IntVar()
         self.togglelegend = tk.Checkbutton(self.tabStyle, text="Legend", variable=self.legendtogg, onvalue=1, offvalue=0)
-        self.togglelegend.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.togglelegend.grid(row=1, column=0, sticky="ew", padx=(20, 0), pady="5")
         self.legendtogg.set(1)
 
          # input area for designation of plot1 color
-        self.color_label = tk.Label(self.tabStyle, text="Color A:")
-        self.color_label.grid(row=1, column=0)
+        self.color_label = tk.Label(self.tabStyle, text="Donor:")
+        self.color_label.grid(row=2, column=0)
         self.ref_color1 = tk.StringVar(self)
         self.ref_color1.set("lime")
 
         self.combo2 = tk.Entry(self.tabStyle, textvariable=self.ref_color1)
         self.combo2.config(width=5)
-        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # color wheel for designation of plot1 color
         self.color1button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotAcolor)
-        self.color1button.grid(row=1, column=3)
+        self.color1button.grid(row=2, column=3)
 
         
         
         # input area for designation of plot2 color
-        self.color_label = tk.Label(self.tabStyle, text="Color B:")
-        self.color_label.grid(row=2, column=0)
+        self.color_label = tk.Label(self.tabStyle, text="Acceptor:")
+        self.color_label.grid(row=3, column=0, padx=(15,0))
         self.ref_color2 = tk.StringVar(self)
         self.ref_color2.set("red")
 
         self.combo3 = tk.Entry(self.tabStyle, textvariable=self.ref_color2)
         self.combo3.config(width=5)
-        self.combo3.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # color wheel for designation of plot2 color
         self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotBcolor)
-        self.color2button.grid(row=2, column=3)
+        self.color2button.grid(row=3, column=3)
 
-
+        self.e_label = tk.Label(self.tabStyle, text="Efficiency Plot:")
+        self.e_label.grid(row=4, column=0, columnspan=2, pady=(10,5), sticky="w")
 
         # input area for designation of plot3 color
-        self.color_label = tk.Label(self.tabStyle2, text="Color C:")
-        self.color_label.grid(row=2, column=0)
+        self.color_label = tk.Label(self.tabStyle, text="Efficiency:")
+        self.color_label.grid(row=5, column=0, padx=(20,0))
         self.ref_color3 = tk.StringVar(self)
         self.ref_color3.set("black")
 
-        self.combo4 = tk.Entry(self.tabStyle2, textvariable=self.ref_color3)
+        self.combo4 = tk.Entry(self.tabStyle, textvariable=self.ref_color3)
         self.combo4.config(width=5)
-        self.combo4.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo4.grid(row=5, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # color wheel for designation of plot3 color
-        self.color2button = tk.Button(self.tabStyle2, text="Select Color", command=self.choose_plotCcolor)
-        self.color2button.grid(row=2, column=3)
+        self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotCcolor)
+        self.color2button.grid(row=5, column=3)
 
 
         # third tab: text
@@ -258,59 +253,65 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.ref_titlefontsize.set(12)
 
         self.combo = tk.OptionMenu(self.tabText, self.ref_titlefontsize, *titlef)
-        self.combo.config(width=3)
+        self.combo.config(width=1)
         self.combo.grid(row=0, column=3)
 
+        self.istyle_label = tk.Label(self.tabText, text="Intensity Plot:")
+        self.istyle_label.grid(row=1, column=0, columnspan=2, pady=(10,5), sticky="w")
+
+        self.estyle_label = tk.Label(self.tabText, text="Efficiency Plot:")
+        self.estyle_label.grid(row=5, column=0, columnspan=2, pady=(10,5), sticky="w")
+
         # input area for designation of intensity x-axis label
-        self.x_label = tk.Label(self.tabText, text="X-Axis Label 1:")
-        self.x_label.grid(row=1, column=0)
+        self.x_label = tk.Label(self.tabText, text="X-Axis:")
+        self.x_label.grid(row=2, column=0, padx=(15,0))
         self.ref_x = tk.StringVar(self)
-        self.ref_x.set("X-Axis")
+        self.ref_x.set("Time (s)")
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x)
         self.combo2.config(width=10)
-        self.combo2.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="5")
-
-        # input area for designation of efficiency x-axis label
-        self.x2_label = tk.Label(self.tabText2, text="X-Axis Label 2:")
-        self.x2_label.grid(row=2, column=0)
-        self.ref_x2 = tk.StringVar(self)
-        self.ref_x2.set("X-Axis")
-
-        self.combo2 = tk.Entry(self.tabText2, textvariable=self.ref_x2)
-        self.combo2.config(width=10)
         self.combo2.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
 
+        # input area for designation of efficiency x-axis label
+        self.x2_label = tk.Label(self.tabText, text="X-Axis:")
+        self.x2_label.grid(row=6, column=0, padx=(15,0))
+        self.ref_x2 = tk.StringVar(self)
+        self.ref_x2.set("Time (s)")
+
+        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x2)
+        self.combo2.config(width=10)
+        self.combo2.grid(row=6, column=1, sticky="ew", padx=(0, 10), pady="5")
+
         # input area for designation of intensity y-axis label
-        self.y_label = tk.Label(self.tabText, text="Y-Axis Label 1:")
-        self.y_label.grid(row=3, column=0)
+        self.y_label = tk.Label(self.tabText, text="Y-Axis:")
+        self.y_label.grid(row=3, column=0, padx=(15,0))
         self.ref_y = tk.StringVar(self)
-        self.ref_y.set("Y-Axis")
+        self.ref_y.set("I (A.U.)")
 
         self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y)
         self.combo3.config(width=10)
         self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area for designation of efficiency y-axis label
-        self.y2_label = tk.Label(self.tabText2, text="Y-Axis Label 2:")
-        self.y2_label.grid(row=4, column=0)
+        self.y2_label = tk.Label(self.tabText, text="Y-Axis:")
+        self.y2_label.grid(row=7, column=0, padx=(15,0))
         self.ref_y2 = tk.StringVar(self)
-        self.ref_y2.set("Y-Axis")
+        self.ref_y2.set("E_FRET")
 
-        self.combo3 = tk.Entry(self.tabText2, textvariable=self.ref_y2)
+        self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y2)
         self.combo3.config(width=10)
-        self.combo3.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
+        self.combo3.grid(row=7, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for x font size
         self.titlex_label = tk.Label(self.tabText, text="Size:")
-        self.titlex_label.grid(row=1, column=2)
+        self.titlex_label.grid(row=2, column=2)
         titlex = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
         self.combo4 = tk.OptionMenu(self.tabText, self.ref_xfontsize, *titlex)
-        self.combo4.config(width=3)
-        self.combo4.grid(row=1, column=3)
+        self.combo4.config(width=1)
+        self.combo4.grid(row=2, column=3)
 
         # dropdown for y font size
         self.titley_label = tk.Label(self.tabText, text="Size:")
@@ -320,43 +321,42 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.ref_yfontsize.set("12")
 
         self.combo = tk.OptionMenu(self.tabText, self.ref_yfontsize, *titley)
-        self.combo.config(width=3)
+        self.combo.config(width=1)
         self.combo.grid(row=3, column=3)
 
         # dropdown for x2 font size
-        self.titlex2_label = tk.Label(self.tabText2, text="Size:")
-        self.titlex2_label.grid(row=2, column=2)
+        self.titlex2_label = tk.Label(self.tabText, text="Size:")
+        self.titlex2_label.grid(row=6, column=2)
         titlex2 = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_x2fontsize = tk.StringVar(self)
         self.ref_x2fontsize.set("12")
 
-        self.combo4 = tk.OptionMenu(self.tabText2, self.ref_x2fontsize, *titlex2)
-        self.combo4.config(width=3)
-        self.combo4.grid(row=2, column=3)
+        self.combo4 = tk.OptionMenu(self.tabText, self.ref_x2fontsize, *titlex2)
+        self.combo4.config(width=1)
+        self.combo4.grid(row=6, column=3)
 
         # dropdown for y2 font size
-        self.titley2_label = tk.Label(self.tabText2, text="Size:")
-        self.titley2_label.grid(row=4, column=2)
+        self.titley2_label = tk.Label(self.tabText, text="Size:")
+        self.titley2_label.grid(row=7, column=2)
         titley2 = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_y2fontsize = tk.StringVar(self)
         self.ref_y2fontsize.set("12")
 
-        self.combo = tk.OptionMenu(self.tabText2, self.ref_y2fontsize, *titley2)
-        self.combo.config(width=3)
-        self.combo.grid(row=4, column=3)
+        self.combo = tk.OptionMenu(self.tabText, self.ref_y2fontsize, *titley2)
+        self.combo.config(width=1)
+        self.combo.grid(row=7, column=3)
 
-         # subtitle toggle: intensity
+        # subtitle toggle: intensity
         self.subtogg = tk.IntVar()
-        self.togglesub = tk.Checkbutton(self.tabText, text="Subtitle", variable=self.subtogg, onvalue=1, offvalue=0)
-        self.togglesub.grid(row=4, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.togglesub = tk.Checkbutton(self.tabText, text="Subtitles", variable=self.subtogg, onvalue=1, offvalue=0)
+        self.togglesub.grid(row=4, column=0, sticky="ew", padx=(15,10), pady="5", columnspan=2)
         self.subtogg.set(1)
 
         # subtitle toggle: efficiency
         self.sub2togg = tk.IntVar()
-        self.togglesub2 = tk.Checkbutton(self.tabText2, text="Subtitle", variable=self.sub2togg, onvalue=1, offvalue=0)
-        self.togglesub2.grid(row=5, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.togglesub2 = tk.Checkbutton(self.tabText, text="Subtitles", variable=self.sub2togg, onvalue=1, offvalue=0)
+        self.togglesub2.grid(row=8, column=0, sticky="ew", padx=(15,10), pady="5", columnspan=2)
         self.sub2togg.set(1)
-
     # HOW DO I NEED TO RESTRUCTURE THIS?
 
     # parses the files into a series of pandas dataframes
