@@ -12,7 +12,7 @@ class StackedTrajectoryMaker():
     def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2):
+                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2):
         self.all_data = all_data
         self.master = master
         self.title = title
@@ -35,6 +35,8 @@ class StackedTrajectoryMaker():
         self.legend = legendtoggle
         self.subtitle = subtitletoggle
         self.subtitle2 = subtitletoggle2
+        self.zero = zerotoggle
+        self.zero2 = zerotoggle2
 
         self.xmax = xmax
         self.xmin = xmin
@@ -86,6 +88,9 @@ class StackedTrajectoryMaker():
             if self.subtitle == 1:
                 key = self.files[i].split("/")[-1]
                 ax.annotate(text=key.split(".")[0], xy=(0.03, 0.05), xycoords='axes fraction')
+            yticks = ax.get_yticklabels()
+            if self.zero == 0:
+                yticks[0].set_visible(False)
             self.axes.append(ax)
         
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
@@ -119,6 +124,9 @@ class StackedTrajectoryMaker():
             if self.subtitle2 == 1:
                 key = self.files[i].split("/")[-1]
                 ax.annotate(text=key.split(".")[0], xy=(0.03, 0.05), xycoords='axes fraction')
+            yticks = ax.get_yticklabels()
+            if self.zero2 == 0:
+                yticks[0].set_visible(False)
             self.Eaxes.append(ax)
         
         self.Eaxes[0].xaxis.set_major_locator(plt.AutoLocator())

@@ -215,21 +215,33 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.color2button.grid(row=3, column=3)
 
         self.e_label = tk.Label(self.tabStyle, text="Efficiency Plot:")
-        self.e_label.grid(row=4, column=0, columnspan=2, pady=(10,5), sticky="w")
+        self.e_label.grid(row=5, column=0, columnspan=2, pady=(10,5), sticky="w")
+
+        #check box for toggling zero on y axis
+        self.toggle = tk.IntVar()
+        self.toggle1 = tk.Checkbutton(self.tabStyle, text="Zero Tick Visible", variable=self.toggle, onvalue=1, offvalue=0)
+        self.toggle1.grid(row=4, column=0, pady='5', padx=(20,0), columnspan=2, sticky='ew')
+        self.toggle.set(1)
 
         # input area for designation of plot3 color
         self.color_label = tk.Label(self.tabStyle, text="Efficiency:")
-        self.color_label.grid(row=5, column=0, padx=(20,0))
+        self.color_label.grid(row=6, column=0, padx=(20,0))
         self.ref_color3 = tk.StringVar(self)
         self.ref_color3.set("black")
 
         self.combo4 = tk.Entry(self.tabStyle, textvariable=self.ref_color3)
         self.combo4.config(width=5)
-        self.combo4.grid(row=5, column=1, sticky="ew", padx=(0, 10), pady="5")
+        self.combo4.grid(row=6, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # color wheel for designation of plot3 color
         self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotCcolor)
-        self.color2button.grid(row=5, column=3)
+        self.color2button.grid(row=6, column=3)
+
+        #check box for toggling zero on y axis
+        self.togglevar2 = tk.IntVar()
+        self.toggle2 = tk.Checkbutton(self.tabStyle, text="Zero Tick Visible", variable=self.togglevar2, onvalue=1, offvalue=0)
+        self.toggle2.grid(row=7, column=0, padx=(20,0), pady="5", columnspan=2, sticky="ew")
+        self.togglevar2.set(1)
 
 
         # third tab: text
@@ -395,7 +407,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
                                           y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get())
+                                          self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get())
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes
