@@ -26,6 +26,8 @@ class TrajectoryWindow(tk.Toplevel):
         
         self.titleset = path.split("/")[-1] # final folder in the input path
         self.title(self.titleset)
+        self.yshift = 0
+        self.generation = 0
 
 
         #full window 
@@ -60,6 +62,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.makeOptions()
         self.maketrajectory()
         self.bind('<Return>', self.maketrajectory)
+        self.bind('<BackSpace>', self.undo)
         self.bind('<Left>', self.back)
         self.bind('<Right>', self.next1)
     
@@ -392,6 +395,10 @@ class TrajectoryWindow(tk.Toplevel):
         self.df['efret'] = self.df['acceptor'] / (self.df['acceptor'] + (gamma * self.df['donor']))
 
     def maketrajectory(self, event=None):
+        if self.generation != 0:
+            self.updateZero()
+        self.generation += 1
+        
         if self.trajectory is not None:
             self.trajectory.destroy()
         self.get_data()
@@ -416,7 +423,9 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get())
+                                          self.subtogg.get(), self.sub2togg.get(), self.yshift)
+        #self.yshift = self.trajectory.getShift()
+        #print(self.yshift)
         self.makeLabel()
 
     # type checks the designation of x/y mins and maxes
@@ -502,3 +511,10 @@ class TrajectoryWindow(tk.Toplevel):
     def choose_plotCcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color3.set(hexcode)
+
+    def updateZero(self, event=None):
+        self.yshift = self.trajectory.getShift()
+
+    def undo(self, event=None):
+        self.trajectory.setShift(0.0)
+        self.maketrajectory()

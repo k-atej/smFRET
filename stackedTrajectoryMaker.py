@@ -70,6 +70,8 @@ class StackedTrajectoryMaker():
         self.trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.trajectorycanvas.draw()
         self.trajectorycanvas.get_tk_widget().grid(row=0, column=0, padx=(5, 5))
+
+        self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
     
 
     def makeIntensity(self):

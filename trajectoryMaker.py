@@ -1,6 +1,7 @@
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
+import pandas
 
 
 class TrajectoryMaker():
@@ -12,8 +13,9 @@ class TrajectoryMaker():
                  refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2):
+                 legendtoggle, subtitletoggle, subtitletoggle2, yshift):
         self.data = data
+        self.datacopy = data.copy()
         self.master = master
         self.color1 = refcolor1
         self.color2 = refcolor2
@@ -35,6 +37,7 @@ class TrajectoryMaker():
         self.legend = legendtoggle
         self.subtitle = subtitletoggle
         self.subtitle2 = subtitletoggle2
+        self.yshift = yshift
 
         self.xmax = xmax
         self.xmin = xmin
@@ -42,18 +45,33 @@ class TrajectoryMaker():
         self.ymin = ymin
         self.y2max = y2max
         self.y2min = y2min
+        self.title = title
+        self.titleset = titleset
+        self.clicked = False
+
+        self.datacopy['donor'] = self.data['donor'] - self.yshift
+        self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
+        
+        self.start()
 
 
+    def getShift(self):
+        print(f"get: {self.yshift}")
+        return self.yshift
+    
+    def setShift(self, yshift):
+        self.yshift = yshift
 
-        keys = title.split("/")
+    def start(self):
+        keys = self.title.split("/")
         self.title = ""
         count = False
         for i in range(len(keys)):
             if count:
                 self.title += "/" + keys[i]
-            if keys[i] == titleset:
+            if keys[i] == self.titleset:
                 count = True
-
+    
         self.title = self.title.split(".")[0]
         self.title = self.title.strip("/")
 
@@ -80,18 +98,21 @@ class TrajectoryMaker():
         self.trajectorycanvas.draw()
         self.trajectorycanvas.get_tk_widget().grid(row=0, column=0)
 
+        self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
+
+
 
 
     def makeIntensity(self):
         fig = self.axes[0]
         #f = fig.gca()
         
-        time = self.data["time"]
-        donor = self.data["donor"]
-        acceptor = self.data["acceptor"]
+        time = self.datacopy["time"]
+        donor = self.datacopy["donor"]
+        acceptor = self.datacopy["acceptor"]
 
-        fig.plot(time, donor, color=self.color1, label="Donor")
-        fig.plot(time, acceptor, color=self.color2, label="Acceptor")
+        fig.plot(time, donor, color=self.color1, label="Donor", zorder=1)
+        fig.plot(time, acceptor, color=self.color2, label="Acceptor", zorder=2)
         
         if self.legend == 1:
             fig.legend()
@@ -101,10 +122,10 @@ class TrajectoryMaker():
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.ymin, self.ymax])
         if self.subtitle == 1:
-            fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
-        #fig.tight_layout()
-
+            fig.annotate(text=self.title, xy=(10, 10), xycoords='axes pixels', zorder=3)
+        
         return fig
+        
     
     def makeEfficiency(self):
         if self.intensitytoggle == 1:
@@ -116,7 +137,7 @@ class TrajectoryMaker():
         time = self.data["time"]
         efret = self.data["efret"]
 
-        fig.plot(time, efret, color=self.color3)
+        fig.plot(time, efret, color=self.color3, zorder=1)
         fig.set_ylim([0, 1]) 
         fig.set_ylabel(self.y2label, fontsize=self.y2fontsize)
         fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
@@ -124,9 +145,8 @@ class TrajectoryMaker():
         fig.set_ylim([self.y2min, self.y2max])
         #fig.set_title("FRET Efficiency")
         if self.subtitle2 == 1:
-            fig.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
+            fig.annotate(text=self.title, xy=(10, 10), xycoords='axes pixels', zorder=2) #toggle on and off
 
-        
         return fig
     
     def save(self, refpath, reftype, refqual):
@@ -144,3 +164,14 @@ class TrajectoryMaker():
     # removes canvas
     def destroy(self):
         self.trajectorycanvas.get_tk_widget().destroy()
+
+    def onclick(self, event):
+        if event.inaxes: # will need to make this specific to each graph
+            self.yshift += event.ydata
+            print(f"event: {event.ydata}")
+            self.datacopy['donor'] = self.data['donor'] - self.yshift
+            self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
+            self.start()
+            print(f"total: {self.yshift}")
+
+
