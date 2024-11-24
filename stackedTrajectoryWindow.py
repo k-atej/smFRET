@@ -17,6 +17,10 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.figtitle = self.path.split("/")[-1]
         self.title(self.figtitle)
         self.trajectory = None
+        self.generation = 0
+        self.yshift = []
+        for file in files:
+            self.yshift.append(0.0)
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -49,6 +53,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.makeButtons()
         self.makeOptions() 
         self.maketrajectory()
+        self.bind('<BackSpace>', self.undo)
         self.bind('<Return>', self.maketrajectory)
 
 
@@ -386,10 +391,15 @@ class stackedTrajectoryWindow(tk.Toplevel):
             data['efret'] = data['acceptor'] / (data['acceptor'] + (gamma * data['donor']))
 
     def maketrajectory(self, event=None):
+        if self.generation != 0:
+            self.updateZero()
+        self.generation += 1
+
         if self.trajectory is not None:
             self.trajectory.destroy()
+
         self.get_data()
-        self.calculateEfret()
+        #self.calculateEfret()
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
         ymax = self.checkMinMax(self.ref_ymax.get())
@@ -407,7 +417,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
                                           y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get())
+                                          self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift)
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes
@@ -477,3 +487,10 @@ class stackedTrajectoryWindow(tk.Toplevel):
     def choose_plotCcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color3.set(hexcode)
+    
+    def updateZero(self, event=None):
+        self.yshift = self.trajectory.getShift()
+    
+    def undo(self, event=None):
+        self.trajectory.setShift(0.0)
+        self.maketrajectory()

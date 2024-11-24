@@ -12,8 +12,18 @@ class StackedTrajectoryMaker():
     def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2):
+                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift):
         self.all_data = all_data
+        self.yshift = yshift
+        self.datacopy = []
+        for i in range(len(self.all_data)):
+            datum = self.all_data[i]
+            datumcopy = datum.copy()
+            self.datacopy.append(datumcopy)
+            datumcopy['donor'] = datumcopy['donor'] - self.yshift[i]
+            datumcopy['acceptor'] = datumcopy['acceptor'] - self.yshift[i]
+
+
         self.master = master
         self.title = title
         self.files = files
@@ -37,6 +47,7 @@ class StackedTrajectoryMaker():
         self.subtitle2 = subtitletoggle2
         self.zero = zerotoggle
         self.zero2 = zerotoggle2
+        
 
         self.xmax = xmax
         self.xmin = xmin
@@ -44,12 +55,23 @@ class StackedTrajectoryMaker():
         self.ymin = ymin
         self.y2max = y2max
         self.y2min = y2min
+        self.iaxes = None
+        self.eaxes = None
+
+        self.width = width
+        self.height = height
+
+        self.start()
+ 
+    def start(self):
 
         self.fig = Figure()
-        self.fig.set_figwidth(width)
-        self.fig.set_figheight(height)
+        self.fig.set_figwidth(self.width)
+        self.fig.set_figheight(self.height)
+
             
         self.processData()
+        self.calculateEfret()
         if self.xmax == None:
             self.xmax = self.maxtime
         self.numdata = 0
@@ -71,16 +93,16 @@ class StackedTrajectoryMaker():
         self.trajectorycanvas.draw()
         self.trajectorycanvas.get_tk_widget().grid(row=0, column=0, padx=(5, 5))
 
-        self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
+        self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
     
 
     def makeIntensity(self):
 
         self.axes = []
         for i in reversed(range(len(self.all_data))):
-            time = self.all_data[i]["time"]
-            donor = self.all_data[i]["donor"]
-            acceptor = self.all_data[i]["acceptor"]
+            time = self.datacopy[i]["time"]
+            donor = self.datacopy[i]["donor"]
+            acceptor = self.datacopy[i]["acceptor"]
             ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*i+1)
             ax.plot(time, donor, color=self.color1, label="Donor")
             ax.plot(time, acceptor, color=self.color2, label="Acceptor")
@@ -110,13 +132,14 @@ class StackedTrajectoryMaker():
         if self.intensitytoggle == 1:
             self.fig.text(0.1, 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
+        self.axes.reverse()
 
     
     def makeEfficiency(self):
         self.Eaxes = []
         for i in reversed(range(len(self.all_data))):
-            time = self.all_data[i]["time"]
-            efret = self.all_data[i]["efret"]
+            time = self.datacopy[i]["time"]
+            efret = self.datacopy[i]["efret"]
             ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*(i+1))
             ax.plot(time, efret, color=self.color3)
             ax.set_ylim([self.y2min, self.y2max]) 
@@ -176,3 +199,27 @@ class StackedTrajectoryMaker():
 
     def destroy(self):
         self.trajectorycanvas.get_tk_widget().destroy()
+
+    # not being used yet
+    def calculateEfret(self):
+        for data in self.datacopy:
+            gamma = 1
+            data['efret'] = data['acceptor'] / (data['acceptor'] + (gamma * data['donor']))
+    
+    def getShift(self):
+        #print(f"get: {self.yshift}")
+        return self.yshift
+    
+    def setShift(self, yshift):
+        for i in range(len(self.yshift)):
+            self.yshift[i] = yshift
+ 
+
+    def onclick(self, event):
+        if event.inaxes:
+            for i in range(len(self.axes)):
+                if event.inaxes == self.axes[i]: # will need to make this specific to each intensity subgraph
+                    self.yshift[i] += event.ydata
+                    self.datacopy[i]['donor'] = self.datacopy[i]['donor'] - event.ydata
+                    self.datacopy[i]['acceptor'] = self.datacopy[i]['acceptor'] - event.ydata
+                    self.start()
