@@ -48,6 +48,8 @@ class TrajectoryMaker():
         self.title = title
         self.titleset = titleset
         self.clicked = False
+        self.iaxis = None
+        self.eaxis = None
 
         self.datacopy['donor'] = self.data['donor'] - self.yshift
         self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
@@ -63,6 +65,7 @@ class TrajectoryMaker():
         self.yshift = yshift
 
     def start(self):
+        self.calculateEfret()
         keys = self.title.split("/")
         self.title = ""
         count = False
@@ -104,6 +107,7 @@ class TrajectoryMaker():
 
 
     def makeIntensity(self):
+        self.iaxis = self.axes[0]
         fig = self.axes[0]
         #f = fig.gca()
         
@@ -130,12 +134,14 @@ class TrajectoryMaker():
     def makeEfficiency(self):
         if self.intensitytoggle == 1:
             fig = self.axes[1]
+            self.eaxis = self.axes[1]
         elif self.intensitytoggle == 0:
             fig = self.axes[0]
+            self.eaxis = self.axes[0]
         #f = fig.gca()
         
-        time = self.data["time"]
-        efret = self.data["efret"]
+        time = self.datacopy["time"]
+        efret = self.datacopy["efret"]
 
         fig.plot(time, efret, color=self.color3, zorder=1)
         fig.set_ylim([0, 1]) 
@@ -166,7 +172,7 @@ class TrajectoryMaker():
         self.trajectorycanvas.get_tk_widget().destroy()
 
     def onclick(self, event):
-        if event.inaxes: # will need to make this specific to each graph
+        if event.inaxes == self.iaxis: # will need to make this specific to each graph
             self.yshift += event.ydata
             print(f"event: {event.ydata}")
             self.datacopy['donor'] = self.data['donor'] - self.yshift
@@ -174,4 +180,6 @@ class TrajectoryMaker():
             self.start()
             print(f"total: {self.yshift}")
 
-
+    def calculateEfret(self):
+        gamma = 1
+        self.datacopy['efret'] = self.datacopy['acceptor'] / (self.datacopy['acceptor'] + (gamma * self.datacopy['donor']))

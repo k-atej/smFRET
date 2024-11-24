@@ -146,7 +146,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
         self.ymin_label.grid(row=5, column=0, padx=(20,0), pady="5")
         self.ref_ymin = tk.StringVar(self)
-        self.ref_ymin.set("0")
+        self.ref_ymin.set("None")
 
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
@@ -166,7 +166,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.y2min_label = tk.Label(self.tabFormat, text="Y Min:")
         self.y2min_label.grid(row=7, column=0, padx=(20,0), pady="5")
         self.ref_y2min = tk.StringVar(self)
-        self.ref_y2min.set("0")
+        self.ref_y2min.set("None")
 
         self.comboy2min = tk.Entry(self.tabFormat, textvariable=self.ref_y2min)
         self.comboy2min.config(width=5)
@@ -390,9 +390,6 @@ class TrajectoryWindow(tk.Toplevel):
         data.columns = ["time", "donor", "acceptor"]
         self.df = data
 
-    def calculateEfret(self):
-        gamma = 1
-        self.df['efret'] = self.df['acceptor'] / (self.df['acceptor'] + (gamma * self.df['donor']))
 
     def maketrajectory(self, event=None):
         if self.generation != 0:
@@ -402,7 +399,7 @@ class TrajectoryWindow(tk.Toplevel):
         if self.trajectory is not None:
             self.trajectory.destroy()
         self.get_data()
-        self.calculateEfret()
+
         title = self.paths[self.index]
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
@@ -441,6 +438,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.index -= 1
         if self.index < 0:
             self.index = self.numfiles - 1
+        self.trajectory.setShift(0.0)
         self.maketrajectory()
 
 
@@ -448,6 +446,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.index += 1
         if self.index >= self.numfiles:
             self.index = 0
+        self.trajectory.setShift(0.0)
         self.maketrajectory()
 
     def makeLabel(self):
