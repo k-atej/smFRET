@@ -16,6 +16,7 @@ class TrajectoryMaker():
                  legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg):
         self.data = data
         self.datacopy = data.copy()
+        #self.sub_title = sub_titles
         self.master = master
         self.color1 = refcolor1
         self.color2 = refcolor2
@@ -58,7 +59,7 @@ class TrajectoryMaker():
         self.start()
 
     def getMinMax(self):
-        print("setting lims")
+        #print("setting lims")
         return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
 
     def getShift(self):

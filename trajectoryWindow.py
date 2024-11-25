@@ -89,6 +89,12 @@ class TrajectoryWindow(tk.Toplevel):
         self.togglesub3.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
         self.sub3togg.set(0)
 
+        # lock toggle
+        self.sub4togg = tk.IntVar()
+        self.togglesub4 = tk.Checkbutton(self.subframetop, text="Lock", variable=self.sub4togg, onvalue=1, offvalue=0)
+        self.togglesub4.grid(row=0, column=5, sticky="ew", padx="10", pady="10")
+        self.sub4togg.set(0)
+
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.subframerighttop)
         self.tabFormat = tk.Frame(self.tabControl)
@@ -437,7 +443,6 @@ class TrajectoryWindow(tk.Toplevel):
         self.ref_ymax.set(ymax)
         self.ref_y2min.set(y2min)
         self.ref_y2max.set(y2max)
-
         self.makeLabel()
 
     # type checks the designation of x/y mins and maxes
@@ -450,19 +455,21 @@ class TrajectoryWindow(tk.Toplevel):
         return val
 
     def back(self, event=None):
-        self.index -= 1
-        if self.index < 0:
-            self.index = self.numfiles - 1
-        self.trajectory.setShift(0.0)
-        self.maketrajectory()
+        if self.sub4togg.get() == 0:
+            self.index -= 1
+            if self.index < 0:
+                self.index = self.numfiles - 1
+            self.trajectory.setShift(0.0)
+            self.maketrajectory()
 
 
     def next1(self, event=None):
-        self.index += 1
-        if self.index >= self.numfiles:
-            self.index = 0
-        self.trajectory.setShift(0.0)
-        self.maketrajectory()
+        if self.sub4togg.get() == 0:
+            self.index += 1
+            if self.index >= self.numfiles:
+                self.index = 0
+            self.trajectory.setShift(0.0)
+            self.maketrajectory()
 
     def makeLabel(self):
         self.label = tk.Label(self.subframetop, text=f"{self.index + 1} of {self.numfiles}")    
@@ -530,5 +537,6 @@ class TrajectoryWindow(tk.Toplevel):
         self.yshift = self.trajectory.getShift()
 
     def undo(self, event=None):
-        self.trajectory.setShift(0.0)
-        self.maketrajectory()
+        if self.sub3togg.get() == 1:
+            self.trajectory.setShift(0.0)
+            self.maketrajectory()
