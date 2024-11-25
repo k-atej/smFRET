@@ -12,7 +12,8 @@ class StackedTrajectoryMaker():
     def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift, clicktogg):
+                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift, clicktogg,
+                 subtitles, subtitlesizes):
         self.all_data = all_data
         self.yshift = yshift
         self.datacopy = []
@@ -23,6 +24,8 @@ class StackedTrajectoryMaker():
             datumcopy['donor'] = datumcopy['donor'] - self.yshift[i]
             datumcopy['acceptor'] = datumcopy['acceptor'] - self.yshift[i]
 
+        self.subtitles = subtitles
+        self.subtitlesizes = subtitlesizes
 
         self.master = master
         self.title = title
@@ -112,7 +115,11 @@ class StackedTrajectoryMaker():
             ax.set_xticks([])
             if self.subtitle == 1:
                 key = self.files[i].split("/")[-1]
-                ax.annotate(text=key.split(".")[0], xy=(0.03, 0.05), xycoords='axes fraction')
+                #ax.annotate(text=self.subtitles[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                if len(self.subtitles) != 0:
+                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                else:
+                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.05), xycoords='axes fraction')
             yticks = ax.get_yticklabels()
             if self.zero == 0:
                 yticks[0].set_visible(False)
@@ -151,7 +158,12 @@ class StackedTrajectoryMaker():
             ax.set_xticks([])
             if self.subtitle2 == 1:
                 key = self.files[i].split("/")[-1]
-                ax.annotate(text=key.split(".")[0], xy=(0.03, 0.05), xycoords='axes fraction')
+                #ax.annotate(text=self.subtitles[i], xy=(0.03, 0.05), xycoords='axes fraction')
+
+                if len(self.subtitles) != 0:
+                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                else:
+                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.05), xycoords='axes fraction')
             yticks = ax.get_yticklabels()
             if self.zero2 == 0:
                 yticks[0].set_visible(False)
@@ -206,7 +218,6 @@ class StackedTrajectoryMaker():
         self.trajectorycanvas.get_tk_widget().destroy()
 
     def getMinMax(self):
-        print("setting lims")
         return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
 
     def calculateEfret(self):
@@ -230,3 +241,19 @@ class StackedTrajectoryMaker():
                         self.datacopy[i]['donor'] = self.datacopy[i]['donor'] - event.ydata
                         self.datacopy[i]['acceptor'] = self.datacopy[i]['acceptor'] - event.ydata
                         self.start()
+
+    # return number of plots in stacked histogram
+    def get_height(self):
+        return len(self.all_data)
+    
+    # return list of subtitles on histogram
+    def get_subtitles(self):
+        return self.subtitles
+    
+    # return name of last folder in filepath
+    def get_lastfolder(self):
+        return self.lastFolder
+    
+    # return list of subtitle sizes on histogram
+    def get_subtitlesizes(self):
+        return self.subtitlesizes

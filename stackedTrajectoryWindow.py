@@ -19,6 +19,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.trajectory = None
         self.generation = 0
         self.yshift = []
+        self.subtitle_inputs = []
         for file in files:
             self.yshift.append(0.0)
 
@@ -81,10 +82,12 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
         self.tabText = tk.Frame(self.tabControl)
+        self.tabSub = tk.Frame(self.tabControl)
 
         self.tabControl.add(self.tabFormat, text="Format")
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
+        self.tabControl.add(self.tabSub, text="Subtitles")
 
     def makeOptions(self):
         # tab 1: format
@@ -262,7 +265,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.title_label = tk.Label(self.tabText, text="Title:")
         self.title_label.grid(row=0, column=0)
         self.ref_title = tk.StringVar(self)
-        self.ref_title.set("Title")
+        self.ref_title.set(self.figtitle)
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
         self.combo2.config(width=10)
@@ -418,13 +421,41 @@ class stackedTrajectoryWindow(tk.Toplevel):
         x2fontsize = float(self.ref_x2fontsize.get())
         y2fontsize = float(self.ref_y2fontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
+
+        subtitles = []
+        subtitlesizes = []
+        for subtitle in self.subtitle_inputs:
+            j, jtext, jfontsize = subtitle
+            subtitles.append(j.get())
+            subtitlesizes.append(jfontsize.get())
+
         self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
                                           y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift,
-                                          self.sub3togg.get())
+                                          self.sub3togg.get(), subtitles, subtitlesizes)
+        
+        self.subtitle_length = self.trajectory.get_height()
+        self.subtitles = self.trajectory.get_subtitles()
+        self.subtitlesizes = self.trajectory.get_subtitlesizes()
+
+        # make input areas for subtitles based on hist size
+        if self.generation == 1:
+            self.makeSubtitleInputs()
+            for i in range(len(self.subtitle_inputs)):
+                j, jtext, jfontsize = self.subtitle_inputs[i]
+                f = self.files[i].split("/")[-1]
+                jtext.set(f.split(".")[0])
+
+        # reset subtitle input sizes
+        if len(self.subtitle_inputs) == len(self.subtitles):
+            for i in range(len(self.subtitle_inputs)):
+                j, jtext, jfontsize = self.subtitle_inputs[i]
+                jtext.set(self.subtitles[i])
+                jfontsize.set(self.subtitlesizes[i])
+
         xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
         self.ref_xmin.set(xmin)
         self.ref_xmax.set(xmax)
@@ -432,6 +463,29 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.ref_ymax.set(ymax)
         self.ref_y2min.set(y2min)
         self.ref_y2max.set(y2max)
+
+    # creates input areas and fontsize dropdowns based on length of data provided to histogram
+    def makeSubtitleInputs(self):
+        self.subtitle_inputs = []
+        k = tk.Label(self.tabSub,text="Plot Subtitles: ")
+        k.grid(row=0, column=0, columnspan=2)
+        for i in range(self.subtitle_length):
+            l = tk.Label(self.tabSub, text=f"{i+1}: ")
+            l.grid(row=i + 1, column=0, padx=(10,5))
+
+            jtext = tk.StringVar(self)
+            j = tk.Entry(self.tabSub, textvariable=jtext)
+            j.config(width=20)
+            j.grid(row=i+1, column=1, sticky="ew", padx=(0, 10))
+
+            jfont = [6, 7, 8, 9, 10, 11, 12]
+            jvar = tk.IntVar(self)
+            jvar.set(9)
+            jfontwidget = tk.OptionMenu(self.tabSub, jvar, *jfont)
+            jfontwidget.grid(row=i+1, column=2)
+            jfontwidget.config(width=2)
+
+            self.subtitle_inputs.append((j, jtext, jvar))
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes
