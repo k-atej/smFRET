@@ -425,6 +425,13 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift,
                                           self.sub3togg.get())
+        xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
+        self.ref_xmin.set(xmin)
+        self.ref_xmax.set(xmax)
+        self.ref_ymin.set(ymin)
+        self.ref_ymax.set(ymax)
+        self.ref_y2min.set(y2min)
+        self.ref_y2max.set(y2max)
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes

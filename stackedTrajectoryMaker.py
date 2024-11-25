@@ -108,6 +108,7 @@ class StackedTrajectoryMaker():
             ax.plot(time, acceptor, color=self.color2, label="Acceptor")
             ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
             ax.set_xlim([self.xmin, self.xmax])
+            self.ymin, self.ymax = ax.get_ylim()
             ax.set_xticks([])
             if self.subtitle == 1:
                 key = self.files[i].split("/")[-1]
@@ -118,6 +119,8 @@ class StackedTrajectoryMaker():
             self.axes.append(ax)
         
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
+        self.xmin, self.xmax = self.axes[0].get_xlim()
+        self.ymin, self.ymax = self.axes[0].get_ylim()
         if self.legend ==1:
             self.axes[len(self.all_data) - 1].legend()
  #toggle on and off
@@ -154,6 +157,8 @@ class StackedTrajectoryMaker():
                 yticks[0].set_visible(False)
             self.Eaxes.append(ax)
         
+        self.y2min, self.y2max = self.Eaxes[0].get_ylim()
+
         self.Eaxes[0].xaxis.set_major_locator(plt.AutoLocator())
 
         #f.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
@@ -166,7 +171,7 @@ class StackedTrajectoryMaker():
         self.Eaxes[0].set_xlabel(self.x2label, fontsize=self.x2fontsize)
         #self.fig.supylabel("FRET Efficiency", fontsize=12, x=0.5)
         if self.numdata == 2:
-            self.fig.text(0.525, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
+            self.fig.text(0.515, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         else:
             self.fig.text(0.1, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         
@@ -200,7 +205,10 @@ class StackedTrajectoryMaker():
     def destroy(self):
         self.trajectorycanvas.get_tk_widget().destroy()
 
-    # not being used yet
+    def getMinMax(self):
+        print("setting lims")
+        return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
+
     def calculateEfret(self):
         for data in self.datacopy:
             gamma = 1

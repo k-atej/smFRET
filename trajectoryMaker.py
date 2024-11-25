@@ -57,9 +57,12 @@ class TrajectoryMaker():
         
         self.start()
 
+    def getMinMax(self):
+        print("setting lims")
+        return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
 
     def getShift(self):
-        print(f"get: {self.yshift}")
+        #print(f"get: {self.yshift}")
         return self.yshift
     
     def setShift(self, yshift):
@@ -96,7 +99,7 @@ class TrajectoryMaker():
             self.makeEfficiency()
 
         self.fig.subplots_adjust(wspace=0, hspace=0.5, left=0.1, right=0.9)
-        self.fig.suptitle(self.graphtitle, fontsize=self.titlefontsize)
+        self.fig.suptitle(self.graphtitle, fontsize=self.titlefontsize, y=0.93)
 
         self.trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.trajectorycanvas.draw()
@@ -126,6 +129,10 @@ class TrajectoryMaker():
         fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.ymin, self.ymax])
+
+        self.xmin, self.xmax = fig.get_xlim()
+        self.ymin, self.ymax = fig.get_ylim()
+
         if self.subtitle == 1:
             fig.annotate(text=self.title, xy=(10, 10), xycoords='axes pixels', zorder=3)
         
@@ -150,6 +157,9 @@ class TrajectoryMaker():
         fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.y2min, self.y2max])
+
+        self.y2min, self.y2max = fig.get_ylim()
+
         #fig.set_title("FRET Efficiency")
         if self.subtitle2 == 1:
             fig.annotate(text=self.title, xy=(10, 10), xycoords='axes pixels', zorder=2) #toggle on and off

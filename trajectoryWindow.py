@@ -270,7 +270,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.title_label = tk.Label(self.tabText, text="Title:")
         self.title_label.grid(row=0, column=0)
         self.ref_title = tk.StringVar(self)
-        self.ref_title.set("Title")
+        self.ref_title.set(self.titleset)
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
         self.combo2.config(width=10)
@@ -429,6 +429,15 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get())
         #self.yshift = self.trajectory.getShift()
         #print(self.yshift)
+
+        xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
+        self.ref_xmin.set(xmin)
+        self.ref_xmax.set(xmax)
+        self.ref_ymin.set(ymin)
+        self.ref_ymax.set(ymax)
+        self.ref_y2min.set(y2min)
+        self.ref_y2max.set(y2max)
+
         self.makeLabel()
 
     # type checks the designation of x/y mins and maxes
