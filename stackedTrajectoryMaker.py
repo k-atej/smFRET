@@ -12,7 +12,7 @@ class StackedTrajectoryMaker():
     def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift):
+                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift, clicktogg):
         self.all_data = all_data
         self.yshift = yshift
         self.datacopy = []
@@ -47,7 +47,7 @@ class StackedTrajectoryMaker():
         self.subtitle2 = subtitletoggle2
         self.zero = zerotoggle
         self.zero2 = zerotoggle2
-        
+        self.clicktoggle = clicktogg
 
         self.xmax = xmax
         self.xmin = xmin
@@ -207,19 +207,18 @@ class StackedTrajectoryMaker():
             data['efret'] = data['acceptor'] / (data['acceptor'] + (gamma * data['donor']))
     
     def getShift(self):
-        #print(f"get: {self.yshift}")
         return self.yshift
     
     def setShift(self, yshift):
         for i in range(len(self.yshift)):
             self.yshift[i] = yshift
  
-
     def onclick(self, event):
-        if event.inaxes:
-            for i in range(len(self.axes)):
-                if event.inaxes == self.axes[i]: # will need to make this specific to each intensity subgraph
-                    self.yshift[i] += event.ydata
-                    self.datacopy[i]['donor'] = self.datacopy[i]['donor'] - event.ydata
-                    self.datacopy[i]['acceptor'] = self.datacopy[i]['acceptor'] - event.ydata
-                    self.start()
+        if self.clicktoggle == 1:
+            if event.inaxes:
+                for i in range(len(self.axes)):
+                    if event.inaxes == self.axes[i]: # will need to make this specific to each intensity subgraph
+                        self.yshift[i] += event.ydata
+                        self.datacopy[i]['donor'] = self.datacopy[i]['donor'] - event.ydata
+                        self.datacopy[i]['acceptor'] = self.datacopy[i]['acceptor'] - event.ydata
+                        self.start()

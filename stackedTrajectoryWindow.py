@@ -65,6 +65,12 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # save button
         self.saveButton = tk.Button(self.subframetop, text="Save", command=self.savewindow)
         self.saveButton.grid(row=0, column=1, sticky="ew", padx="10", pady="10")
+
+        # click-to-zero toggle
+        self.sub3togg = tk.IntVar()
+        self.togglesub3 = tk.Checkbutton(self.subframetop, text="Click to Zero", variable=self.sub3togg, onvalue=1, offvalue=0)
+        self.togglesub3.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+        self.sub3togg.set(0)
     
     
     def makeFormat(self):
@@ -417,7 +423,8 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
                                           y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift)
+                                          self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift,
+                                          self.sub3togg.get())
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes

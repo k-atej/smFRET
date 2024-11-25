@@ -13,7 +13,7 @@ class TrajectoryMaker():
                  refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, yshift):
+                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg):
         self.data = data
         self.datacopy = data.copy()
         self.master = master
@@ -38,6 +38,7 @@ class TrajectoryMaker():
         self.subtitle = subtitletoggle
         self.subtitle2 = subtitletoggle2
         self.yshift = yshift
+        self.clicktoggle = clicktogg
 
         self.xmax = xmax
         self.xmin = xmin
@@ -172,13 +173,12 @@ class TrajectoryMaker():
         self.trajectorycanvas.get_tk_widget().destroy()
 
     def onclick(self, event):
-        if event.inaxes == self.iaxis: # will need to make this specific to each graph
-            self.yshift += event.ydata
-            print(f"event: {event.ydata}")
-            self.datacopy['donor'] = self.data['donor'] - self.yshift
-            self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
-            self.start()
-            print(f"total: {self.yshift}")
+        if self.clicktoggle == 1:
+            if event.inaxes == self.iaxis: # will need to make this specific to each graph
+                self.yshift += event.ydata
+                self.datacopy['donor'] = self.data['donor'] - self.yshift
+                self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
+                self.start()
 
     def calculateEfret(self):
         gamma = 1
