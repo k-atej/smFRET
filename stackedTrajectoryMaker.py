@@ -211,7 +211,7 @@ class StackedTrajectoryMaker():
             dpi=600
         refpath += reftype
         self.fig.savefig(refpath, dpi=dpi)
-       #self.annotate(refpath)
+        self.annotate(refpath)
         print("SAVED!")
 
     def destroy(self):
@@ -257,3 +257,60 @@ class StackedTrajectoryMaker():
     # return list of subtitle sizes on histogram
     def get_subtitlesizes(self):
         return self.subtitlesizes
+    
+    # creates .txt file to save parameters, saves at same filepath
+    #   - refpath: filepath input in save window; matches figure save filepath
+    def annotate(self, refpath):
+        text = self.getText()
+        refpath = refpath.split(".")[:-1]
+        pathway = ""
+        for path in refpath:
+            pathway += path
+        path = str(pathway) + ".txt"
+        f = open(path, "w")
+        f.write(text)
+        f.close()
+
+    # gathers input parameters and formats it into text to save as a .txt file
+    def getText(self):
+    
+        # format text to insert into .txt file
+        #path: {self.title} full file path ?
+        text = f"""
+        data: {self.all_data}
+        
+        files: {self.files}
+        title: {self.title}
+        title fontsize: {self.titlefontsize}
+        x-axis label: {self.xlabel}
+        y-axis label: {self.ylabel}
+        x-axis label fontsize: {self.xfontsize}
+        y-axis label fontsize: {self.yfontsize}
+        x-axis label: {self.x2label}
+        y-axis label: {self.y2label}
+        x-axis label fontsize: {self.x2fontsize}
+        y-axis label fontsize: {self.y2fontsize}
+        color 1: {self.color1}
+        color 2: {self.color2}
+        color 3: {self.color3}
+        x-axis max: {self.xmax}
+        x-axis min: {self.xmin}
+        y-axis max: {self.ymax}
+        y-axis min: {self.ymin}
+        y-axis 2 max: {self.y2max}
+        y-axis 2 min: {self.y2min}
+        
+        offset: {self.yshift}
+        legend: {self.legend}
+        figure width: {self.width}
+        figure height: {self.height} 
+
+        intensity plot: {self.intensitytoggle}
+        efficiency plot: {self.efficiencytoggle}
+        intensity zero tick: {self.zero}
+        efficiency zero tick: {self.zero2}
+        subtitles:{self.subtitles}
+        subtitle sizes: {self.subtitlesizes}
+
+        """
+        return text
