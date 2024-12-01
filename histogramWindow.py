@@ -142,255 +142,267 @@ class HistApplication(tk.Toplevel):
 
         # first tab = format
 
+        self.data_label = tk.Label(self.tabFormat, text="Data:")
+        self.data_label.grid(row=0, column=0, pady="5", padx=(5), sticky="w")
+
         # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
-        self.lbl_label = tk.Label(self.tabFormat_0, text="Data Column:")
-        self.lbl_label.grid(row=0, column=0)
+        self.lbl_label = tk.Label(self.tabFormat, text="Source:")
+        self.lbl_label.grid(row=1, column=0, padx=(20,0), pady="5")
         labels = self.df.columns
         self.ref_col = tk.StringVar(self)
         self.ref_col.set("eFRET")
 
-        self.combo = tk.OptionMenu(self.tabFormat_0, self.ref_col, *labels)
-        self.combo.config(width=10)
-        self.combo.grid(row=0, column=1)
+        self.combo = tk.OptionMenu(self.tabFormat, self.ref_col, *labels)
+        self.combo.config(width=5)
+        self.combo.grid(row=1, column=1, columnspan=1)
+
+        self.binning_label = tk.Label(self.tabFormat, text="Bins:")
+        self.binning_label.grid(row=3, column=0, pady="5", padx="5", sticky="w")
 
         # input area that allows entry of the preferred number of bins or bin width to use in the histogram (depends on bin1 and bin2)
-        self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
-        self.bin_label.grid(row=1, column=0)
+        self.bin_label = tk.Label(self.tabFormat, text="Bins:")
+        self.bin_label.grid(row=5, column=0, pady="5", padx=(20,0), sticky="w")
         self.ref_bins = tk.StringVar(self)
         self.ref_bins.set("10")
 
         #check box for toggling to bin number input
         self.bin2 = tk.IntVar()
-        self.toggle2 = tk.Checkbutton(self.tabFormat_1, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
-        self.toggle2.grid(row=0, column=1, sticky="ew", padx=(10,10), pady="10")
+        self.toggle2 = tk.Checkbutton(self.tabFormat, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
+        self.toggle2.grid(row=4, column=2, sticky="w", padx=(0,0), pady="5", columnspan=2)
         self.bin2.set(1)
 
         #check box for toggling to bin width input
         self.bin1 = tk.IntVar()
-        self.toggle1 = tk.Checkbutton(self.tabFormat_1, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
-        self.toggle1.grid(row=0, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.toggle1 = tk.Checkbutton(self.tabFormat, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
+        self.toggle1.grid(row=4, column=0, sticky="w", padx=(20,0), pady="5", columnspan=2)
        
-        self.combo1 = tk.Entry(self.tabFormat_1, textvariable=self.ref_bins)
-        self.combo1.config(width=10)
-        self.combo1.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo1 = tk.Entry(self.tabFormat, textvariable=self.ref_bins)
+        self.combo1.config(width=5)
+        self.combo1.grid(row=5, column=1, padx=(0, 10), pady="5", sticky="w")
 
         # input area that allows entry of the distance to shift data to the left (zeroing)
-        self.offset_label = tk.Label(self.tabFormat_2, text="Offset:")
-        self.offset_label.grid(row=0, column=0, columnspan=2)
+        self.offset_label = tk.Label(self.tabFormat, text="Offset:")
+        self.offset_label.grid(row=2, column=0, padx=(15,0), sticky="ew", pady="5")
         self.ref_offset = tk.StringVar(self)
         self.ref_offset.set('0.0')
 
-        self.combo3 = tk.Entry(self.tabFormat_2, textvariable=self.ref_offset)
-        self.combo3.config(width=10)
-        self.combo3.grid(row=0, column=2, sticky="ew", padx=(0, 0), pady="10", columnspan=2)
+        self.combo3 = tk.Entry(self.tabFormat, textvariable=self.ref_offset)
+        self.combo3.config(width=5)
+        self.combo3.grid(row=2, column=1, pady="5", sticky="w")
 
+        self.fig_label = tk.Label(self.tabFormat, text="Figure:")
+        self.fig_label.grid(row=6, column=0, pady="5", padx="5", sticky="w")
+        
         # input area to designate maximum value on x axis
-        self.xmax_label = tk.Label(self.tabFormat_2, text="X Max:")
-        self.xmax_label.grid(row=1, column=0)
+        self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
+        self.xmax_label.grid(row=8, column=2)
         self.ref_xmax = tk.StringVar(self)
         self.ref_xmax.set('None')
 
-        self.comboxmax = tk.Entry(self.tabFormat_2, textvariable=self.ref_xmax)
+        self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
         self.comboxmax.config(width=5)
-        self.comboxmax.grid(row=1, column=1, sticky="ew", padx=(0, 0), pady="10")
+        self.comboxmax.grid(row=8, column=3, sticky="w", padx=(0, 0), pady="5")
 
         # input area to designate minimum value on x axis
-        self.xmin_label = tk.Label(self.tabFormat_2, text="X Min:")
-        self.xmin_label.grid(row=2, column=0)
+        self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
+        self.xmin_label.grid(row=8, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_xmin = tk.StringVar(self)
         self.ref_xmin.set('None')
 
-        self.comboxmin = tk.Entry(self.tabFormat_2, textvariable=self.ref_xmin)
+        self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
         self.comboxmin.config(width=5)
-        self.comboxmin.grid(row=2, column=1, sticky="ew", padx=(0, 0), pady="10")
+        self.comboxmin.grid(row=8, column=1, sticky="w", padx=(0, 0), pady="5")
 
         # input area to designate maximum value on y axis
-        self.ymax_label = tk.Label(self.tabFormat_2, text="Y Max:")
-        self.ymax_label.grid(row=1, column=2)
+        self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
+        self.ymax_label.grid(row=9, column=2)
         self.ref_ymax = tk.StringVar(self)
         self.ref_ymax.set('None')
 
-        self.comboymax = tk.Entry(self.tabFormat_2, textvariable=self.ref_ymax)
+        self.comboymax = tk.Entry(self.tabFormat, textvariable=self.ref_ymax)
         self.comboymax.config(width=5)
-        self.comboymax.grid(row=1, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymax.grid(row=9, column=3, sticky="w", padx=(0, 0), pady="5")
 
         # input area to designate minimum value on y axis
-        self.ymin_label = tk.Label(self.tabFormat_2, text="Y Min:")
-        self.ymin_label.grid(row=2, column=2)
+        self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
+        self.ymin_label.grid(row=9, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_ymin = tk.StringVar(self)
         self.ref_ymin.set('None')
 
-        self.comboymin = tk.Entry(self.tabFormat_2, textvariable=self.ref_ymin)
+        self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
-        self.comboymin.grid(row=2, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.comboymin.grid(row=9, column=1, sticky="w", padx=(0, 10), pady="5")
 
         # input area for figure width
-        self.width_label = tk.Label(self.tabFormat_2, text="Width:")
-        self.width_label.grid(row=3, column=0)
+        self.width_label = tk.Label(self.tabFormat, text="Width:")
+        self.width_label.grid(row=7, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_width = tk.StringVar(self)
         self.ref_width.set('5')
 
-        self.combowidth = tk.Entry(self.tabFormat_2, textvariable=self.ref_width)
+        self.combowidth = tk.Entry(self.tabFormat, textvariable=self.ref_width)
         self.combowidth.config(width=5)
-        self.combowidth.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combowidth.grid(row=7, column=1, sticky="w", padx=(0, 10), pady="5")
 
          # input area for figure height
-        self.height_label = tk.Label(self.tabFormat_2, text="Height:")
-        self.height_label.grid(row=3, column=2)
+        self.height_label = tk.Label(self.tabFormat, text="Height:")
+        self.height_label.grid(row=7, column=2)
         self.ref_height = tk.StringVar(self)
         self.ref_height.set('5')
 
-        self.comboheight = tk.Entry(self.tabFormat_2, textvariable=self.ref_height)
+        self.comboheight = tk.Entry(self.tabFormat, textvariable=self.ref_height)
         self.comboheight.config(width=5)
-        self.comboheight.grid(row=3, column=3, sticky="ew", padx=(0, 10), pady="10")
+        self.comboheight.grid(row=7, column=3, sticky="w", padx=(0, 5), pady="5")
 
 
 
         # second tab = style
 
+        self.fig_label = tk.Label(self.tabStyle, text="Histogram:")
+        self.fig_label.grid(row=0, column=0, pady="5", padx="5", sticky="w")
+
         # input area for designation of histogram fill color
-        self.color_label = tk.Label(self.tabStyle_0, text="Color:")
-        self.color_label.grid(row=0, column=0)
+        self.color_label = tk.Label(self.tabStyle, text="Fill Color:")
+        self.color_label.grid(row=1, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_color = tk.StringVar(self)
         self.ref_color.set("0")
 
-        self.combo2 = tk.Entry(self.tabStyle_0, textvariable=self.ref_color)
-        self.combo2.config(width=5)
-        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2 = tk.Entry(self.tabStyle, textvariable=self.ref_color)
+        self.combo2.config(width=8)
+        self.combo2.grid(row=1, column=1, padx=(0, 10), pady="5", sticky="w")
 
         # color wheel for designation of histogram fill color
-        self.colorbutton = tk.Button(self.tabStyle_0, text="Select Color", command=self.choose_fillcolor)
-        self.colorbutton.grid(row=0, column=3)
+        self.colorbutton = tk.Button(self.tabStyle, text="Select", command=self.choose_fillcolor)
+        self.colorbutton.grid(row=1, column=2)
 
         # input area for designation of column edge color
-        self.edgecolor_label = tk.Label(self.tabStyle_1, text="Edge Color:")
-        self.edgecolor_label.grid(row=1, column=0)
+        self.edgecolor_label = tk.Label(self.tabStyle, text="Edge Color:")
+        self.edgecolor_label.grid(row=2, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_edgecolor = tk.StringVar(self)
         self.ref_edgecolor.set("0")
 
-        self.combo5 = tk.Entry(self.tabStyle_1, textvariable=self.ref_edgecolor)
-        self.combo5.config(width=5)
-        self.combo5.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo5 = tk.Entry(self.tabStyle, textvariable=self.ref_edgecolor)
+        self.combo5.config(width=8)
+        self.combo5.grid(row=2, column=1, padx=(0, 10), pady="5", sticky="w")
 
         # color wheel for designation of histogram edge color
-        self.edgecolorbutton = tk.Button(self.tabStyle_1, text='Select Color', command=self.choose_edgecolor)
-        self.edgecolorbutton.grid(row=1, column=2)
+        self.edgecolorbutton = tk.Button(self.tabStyle, text='Select', command=self.choose_edgecolor)
+        self.edgecolorbutton.grid(row=2, column=2)
 
         # dropdown for designation of column edge line width
-        self.edgewidth_label = tk.Label(self.tabStyle_1, text="Edge Width:")
-        self.edgewidth_label.grid(row=2, column=0)
+        self.edgewidth_label = tk.Label(self.tabStyle, text="Edge Width:")
+        self.edgewidth_label.grid(row=3, column=0, sticky="w", padx=(20,0), pady="5")
         refedge = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
         self.ref_edgewidth = tk.StringVar(self)
         self.ref_edgewidth.set(1.0)
 
-        self.combo6 = tk.OptionMenu(self.tabStyle_1, self.ref_edgewidth, *refedge)
-        self.combo6.config(width=5)
-        self.combo6.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo6 = tk.OptionMenu(self.tabStyle, self.ref_edgewidth, *refedge)
+        self.combo6.config(width=4)
+        self.combo6.grid(row=3, column=1, sticky="w", padx=(0, 10), pady="5")
 
+
+        self.hist_label = tk.Label(self.tabStyle, text="Line Annotations:")
+        self.hist_label.grid(row=5, column=0, pady=(10,5), padx="5", sticky="w", columnspan=2)
 
         # input area for designation of click-to-add vertical line color
-        self.linecolor_label = tk.Label(self.tabStyle_2, text="Line Color:")
-        self.linecolor_label.grid(row=0, column=0)
+        self.linecolor_label = tk.Label(self.tabStyle, text="Line Color:")
+        self.linecolor_label.grid(row=6, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_linecolor = tk.StringVar(self)
         self.ref_linecolor.set("red")
 
-        self.combol = tk.Entry(self.tabStyle_2, textvariable=self.ref_linecolor)
-        self.combol.config(width=5)
-        self.combol.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combol = tk.Entry(self.tabStyle, textvariable=self.ref_linecolor)
+        self.combol.config(width=8)
+        self.combol.grid(row=6, column=1, sticky="w", padx=(0, 10), pady="5")
 
         # color wheel for designation of click-to-add vertical line color
-        self.linecolorbutton = tk.Button(self.tabStyle_2, text='Select Color', command=self.choose_linecolor)
-        self.linecolorbutton.grid(row=0, column=2)
+        self.linecolorbutton = tk.Button(self.tabStyle, text='Select', command=self.choose_linecolor)
+        self.linecolorbutton.grid(row=6, column=2)
 
         # dropdown for designation of line style
-        self.linestyle_label = tk.Label(self.tabStyle_2, text="Line Style:")
-        self.linestyle_label.grid(row=1, column=0)
+        self.linestyle_label = tk.Label(self.tabStyle, text="Line Style:")
+        self.linestyle_label.grid(row=7, column=0, sticky="w", padx=(20,0), pady="5")
         refstyle = ["solid", "dashed", "dotted", "dashdot"]
         self.ref_linestyle = tk.StringVar(self)
         self.ref_linestyle.set("dashed")
 
-        self.combo9 = tk.OptionMenu(self.tabStyle_2, self.ref_linestyle, *refstyle)
-        self.combo9.config(width=5)
-        self.combo9.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo9 = tk.OptionMenu(self.tabStyle, self.ref_linestyle, *refstyle)
+        self.combo9.config(width=4)
+        self.combo9.grid(row=7, column=1, sticky="w", padx=(0, 10), pady="5")
 
         #dropdown for linewidth
-        self.lw_label = tk.Label(self.tabStyle_2, text="Line Width:")
-        self.lw_label.grid(row=2, column=0)
+        self.lw_label = tk.Label(self.tabStyle, text="Line Width:")
+        self.lw_label.grid(row=8, column=0, sticky="w", padx=(20,0), pady="5")
         lw = [1.0, 2.0, 3.0, 4.0]
         self.ref_lw = tk.IntVar(self)
         self.ref_lw.set(1.0)
 
-        self.combolw = tk.OptionMenu(self.tabStyle_2, self.ref_lw, *lw)
-        self.combolw.config(width=5)
-        self.combolw.grid(row=2, column=1)
+        self.combolw = tk.OptionMenu(self.tabStyle, self.ref_lw, *lw)
+        self.combolw.config(width=4)
+        self.combolw.grid(row=8, column=1, sticky="w", padx=(0, 10), pady="5")
 
 
 
         # third tab: text
 
         # input area for designation of graph title
-        self.title_label = tk.Label(self.tabText_0, text="Title:")
-        self.title_label.grid(row=0, column=0)
+        self.title_label = tk.Label(self.tabText, text="Title:")
+        self.title_label.grid(row=0, column=0, sticky="w", padx=(5,0), pady="5")
         self.ref_title = tk.StringVar(self)
         self.ref_title.set("Title")
 
-        self.combo2 = tk.Entry(self.tabText_0, textvariable=self.ref_title)
-        self.combo2.config(width=10)
-        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
+        self.combo2.config(width=15)
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for title font size
-        self.titlef_label = tk.Label(self.tabText_0, text="Size:")
-        self.titlef_label.grid(row=0, column=2)
         titlef = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
-        self.combo = tk.OptionMenu(self.tabText_0, self.ref_titlefontsize, *titlef)
-        self.combo.config(width=3)
-        self.combo.grid(row=0, column=3)
+        self.combo = tk.OptionMenu(self.tabText, self.ref_titlefontsize, *titlef)
+        self.combo.config(width=2)
+        self.combo.grid(row=0, column=2)
 
+   
+        self.hist_label = tk.Label(self.tabText, text="Axis Labels:")
+        self.hist_label.grid(row=1, column=0, pady=(10,5), padx="5", sticky="w", columnspan=2)
 
         # input area for designation of x-axis label
-        self.x_label = tk.Label(self.tabText_1, text="X-Axis Label:")
-        self.x_label.grid(row=0, column=0)
+        self.x_label = tk.Label(self.tabText, text="X:")
+        self.x_label.grid(row=2, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_x = tk.StringVar(self)
         self.ref_x.set("X-Axis")
 
-        self.combo2 = tk.Entry(self.tabText_1, textvariable=self.ref_x)
-        self.combo2.config(width=10)
-        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x)
+        self.combo2.config(width=15)
+        self.combo2.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area for designation of y-axis label
-        self.y_label = tk.Label(self.tabText_2, text="Y-Axis Label:")
-        self.y_label.grid(row=0, column=0)
+        self.y_label = tk.Label(self.tabText, text="Y:")
+        self.y_label.grid(row=3, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_y = tk.StringVar(self)
         self.ref_y.set("Y-Axis")
 
-        self.combo3 = tk.Entry(self.tabText_2, textvariable=self.ref_y)
-        self.combo3.config(width=10)
-        self.combo3.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="10")
+        self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y)
+        self.combo3.config(width=15)
+        self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for x font size
-        self.titlex_label = tk.Label(self.tabText_1, text="Size:")
-        self.titlex_label.grid(row=0, column=2)
         titlex = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
-        self.combo4 = tk.OptionMenu(self.tabText_1, self.ref_xfontsize, *titlex)
-        self.combo4.config(width=3)
-        self.combo4.grid(row=0, column=3)
+        self.combo4 = tk.OptionMenu(self.tabText, self.ref_xfontsize, *titlex)
+        self.combo4.config(width=2)
+        self.combo4.grid(row=2, column=2)
 
         # dropdown for y font size
-        self.titley_label = tk.Label(self.tabText_2, text="Size:")
-        self.titley_label.grid(row=0, column=2)
         titley = [8, 9, 10, 11, 12, 15, 20, 24]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
-        self.combo = tk.OptionMenu(self.tabText_2, self.ref_yfontsize, *titley)
-        self.combo.config(width=3)
-        self.combo.grid(row=0, column=3)
+        self.combo = tk.OptionMenu(self.tabText, self.ref_yfontsize, *titley)
+        self.combo.config(width=2)
+        self.combo.grid(row=3, column=2)
 
     # generates histogram without data, not currently in use
     def emptyHis(self):
@@ -523,18 +535,18 @@ class HistApplication(tk.Toplevel):
     def changeLabel(self):
             if self.bin1.get() == 1:
                 self.bin_label.destroy()
-                self.bin_label = tk.Label(self.tabFormat_1, text="Bin Width:")
-                self.bin_label.grid(row=1, column=0)
+                self.bin_label = tk.Label(self.tabFormat, text="Bins:")
+                self.bin_label.grid(row=5, column=0, pady="5", padx=(20,0), sticky="w")
                 self.bin2.set(0)
 
             elif self.bin1.get() == 0:
                 self.bin_label.destroy()
-                self.bin_label = tk.Label(self.tabFormat_1, text="Bin Number:")
-                self.bin_label.grid(row=1, column=0)
+                self.bin_label = tk.Label(self.tabFormat, text="Bins:")
+                self.bin_label.grid(row=5, column=0, pady="5", padx=(20,0), sticky="w")
             else:
                 self.bin_label.destroy()
-                self.bin_label = tk.Label(self.tabFormat_1, text="Error! ")
-                self.bin_label.grid(row=1, column=0)
+                self.bin_label = tk.Label(self.tabFormat, text="Error! ")
+                self.bin_label.grid(row=5, column=0, pady="5", padx=(20,0), sticky="w")
 
     # opens native color chooser dialog
     def choose_fillcolor(self):

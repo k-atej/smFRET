@@ -104,7 +104,7 @@ class HistMaker():
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
         # annotate figure with lines
-        fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event, self.hist_canvas))
+        fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
         self.restoreAnnotations(f)
 
         return fig
