@@ -392,7 +392,7 @@ class StackedHistApplication(tk.Toplevel):
         self.x_label = tk.Label(self.tabText, text="X:")
         self.x_label.grid(row=2, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_x = tk.StringVar(self)
-        self.ref_x.set("X-Axis")
+        self.ref_x.set("FRET Efficiency")
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x)
         self.combo2.config(width=15)
@@ -402,7 +402,7 @@ class StackedHistApplication(tk.Toplevel):
         self.y_label = tk.Label(self.tabText, text="Y:")
         self.y_label.grid(row=3, column=0, sticky="w", padx=(20,0), pady="5")
         self.ref_y = tk.StringVar(self)
-        self.ref_y.set("Y-Axis")
+        self.ref_y.set("Count")
 
         self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y)
         self.combo3.config(width=15)
