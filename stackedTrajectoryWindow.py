@@ -560,5 +560,6 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.yshift = self.trajectory.getShift()
     
     def undo(self, event=None):
-        self.trajectory.setShift(0.0)
-        self.maketrajectory()
+        if self.sub3togg.get() == 1:
+            self.trajectory.setShift(0.0)
+            self.maketrajectory()
