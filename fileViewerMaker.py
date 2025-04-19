@@ -250,12 +250,15 @@ class FileViewerMaker():
         #f.close()
 
     def save(self, path, ending): # doesn't save the zeroed data yet, only original raw data
-        filename = path + self.title + ending
+        print(f"path: {path}")
+        path = path.rstrip("/")
+        self.title = self.title.split("/")[-1]
+        filename = path + "/" + self.title + ending
         lowerbound, upperbound  = self.iaxis.get_xlim()
         column_name = 'time' # Replace with the name of your column
         zoomed_df = self.data[(self.data[column_name] >= lowerbound) & (self.data[column_name] <= upperbound)]
         zoomed_df.to_csv(filename, index=False) # saves data between x values in a zoomed-in view
-        print("file saved!")
+        #print("file saved!")
 
 
     def getDwellData(self):

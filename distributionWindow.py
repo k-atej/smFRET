@@ -3,7 +3,7 @@ import tkinter as tk
 from distributionMaker import *
 
 class DistributionWindow(tk.Toplevel):
-    def __init__(self, path, files):
+    def __init__(self, path, files, filetype):
         super().__init__()
         self.minsize(200, 200)
         self.df = []
@@ -11,6 +11,10 @@ class DistributionWindow(tk.Toplevel):
         self.files = files # full file path
         self.distribution = None
         self.distribution2 = None
+        self.filetype = filetype # 0 = csv, 1 = dat/fwf
+
+        self.upper_limit = None
+        self.lower_limit = None
 
         self.savepath = path.rstrip("/")
         #print(self.savepath)
@@ -51,6 +55,10 @@ class DistributionWindow(tk.Toplevel):
         self.saveButton = tk.Button(self.subframetop, text="Save", command=self.savewindow)
         self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
+        # set intensities button
+        self.intensityButton = tk.Button(self.subframetop, text="Set Intensity Cutoff", command=self.setIntensity)
+        self.intensityButton.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
+
 
     # parses the data files into a pandas dataframe
     # needs to take frames 3 - 12 and average the FRET and intensity values for each (will need to calc E_FRET)
@@ -59,14 +67,19 @@ class DistributionWindow(tk.Toplevel):
         all_data = pd.DataFrame(columns=["efret", "intensity"])
 
         for file in self.files:
+            
             # open file
             filename = self.savepath + "/" + file
             newdata = open(filename, "r") 
 
             #get data into df
-            data = pd.read_csv(newdata, header=None)
+            if self.filetype == 0:
+                data = pd.read_csv(newdata, header=None)
+            elif self.filetype == 1:
+                data = pd.read_fwf(newdata, header=None)
+            
             data.columns = ["time", "donor", "acceptor"]
-            data = data.iloc[3:13]
+            data = data.iloc[3:13] #WANT TO CHANGE WHAT FRAMES ARE INCLUDED? CHANGE HERE!
 
             #calculate efret & intensity averages
             data["acceptor"] = data["acceptor"].astype(float)
@@ -76,14 +89,13 @@ class DistributionWindow(tk.Toplevel):
             average_e = data['efret'].mean()
             average_i = data['intensity'].mean()
 
-
             #transfer data to all_data
             newdat = {"efret": [average_e], "intensity": [average_i]}
             newdat_df = pd.DataFrame(newdat)
             all_data = pd.concat([newdat_df, all_data])
 
         self.df = all_data
-
+        print(self.df)
 
 
     def makehist(self, event=None):        
@@ -94,13 +106,42 @@ class DistributionWindow(tk.Toplevel):
         self.get_data()
 
 
-        self.distribution = DistributionMaker(self.df, "efret", self.path, self.subframeleft, 0, 0)
-        self.distribution2 = DistributionMaker(self.df, "intensity", self.path, self.subframeleft, 1, 0)
+        self.distribution = DistributionMaker(self.df, "efret", self.path, self.subframeleft, 0, 0, self.upper_limit, self.lower_limit)
+        self.distribution2 = DistributionMaker(self.df, "intensity", self.path, self.subframeleft, 1, 0, self.upper_limit, self.lower_limit)
 
-    
+    def setIntensity(self):
+        self.win = tk.Toplevel()
+        self.win.title("Set Cutoff Intensities:")
+
+        self.upper_label = tk.Label(self.win, text="Set Upper Limit:")
+        self.upper_label.grid(row=0, column=0, sticky="ew", padx="10", pady="10")
+
+        self.ref_upper = tk.StringVar(self.win)
+        #self.ref_upper.set() # set this to whatever the maximum intensity in the data is?
+        self.upper = tk.Entry(self.win, textvariable=self.ref_upper)
+        self.upper.config(width=25)
+        self.upper.grid(row=0, column=1, sticky="ew", padx=(10, 20), pady="10")
 
 
+        self.lower_label = tk.Label(self.win, text="Set Lower Limit:")
+        self.lower_label.grid(row=1, column=0, sticky="ew", padx="10", pady="10")
 
+        self.ref_lower = tk.StringVar(self.win)
+        #self.ref_lower.set() # set this to whatever the maximum intensity in the data is?
+        self.lower = tk.Entry(self.win, textvariable=self.ref_lower)
+        self.lower.config(width=25)
+        self.lower.grid(row=1, column=1, sticky="ew", padx=(10, 20), pady="10")
+
+        self.setButton = tk.Button(self.win, text="SET CUTOFFS", command=self.setcutoff)
+        self.setButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+
+    def setcutoff(self):
+        # get parameters
+        self.upper_limit = self.ref_upper.get()
+        self.lower_limit = self.ref_lower.get()
+
+        self.makehist() # regenerate graph
+        self.win.destroy() # close
 
 
     # this needs to be changed to suit however i am going to save this stuff
@@ -112,32 +153,11 @@ class DistributionWindow(tk.Toplevel):
         self.path_label = tk.Label(self.win, text="Save File Path:")
         self.path_label.grid(row=0, column=0)
         self.ref_path = tk.StringVar(self.win)
-        self.ref_path.set(self.savepath)
+        self.ref_path.set(self.savepath) # points to a folder
 
         self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
         self.combo6.config(width=50)
         self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady="10")
-
-        # dropdown for designation of filetype
-        reftype = ['.pdf', '.png', '.svg', '.ps', '.eps']
-        self.ref_type = tk.StringVar(self)
-        self.ref_type.set('.png')
-
-        self.combo8 = tk.OptionMenu(self.win, self.ref_type, *reftype)
-        self.combo8.config(width=5)
-        self.combo8.grid(row=0, column=2, sticky="ew", padx=(0, 10), pady="10")
-
-        # dropdown for designation of file quality
-        self.qual_label = tk.Label(self.win, text="Quality:")
-        self.qual_label.grid(row= 1, column=0)
-        refqual = ["Low", "Medium", "High"]
-        self.ref_qual = tk.StringVar(self)
-        self.ref_qual.set('Medium')
-
-        self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
-        self.combo9.config(width=5)
-        self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
-
 
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
@@ -146,6 +166,6 @@ class DistributionWindow(tk.Toplevel):
 
 # this needs to be updated to save a .dat file that can be used for the graphing software
     def save(self):
-        self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
+        self.distribution.save(self.ref_path.get())
         self.win.destroy()
 

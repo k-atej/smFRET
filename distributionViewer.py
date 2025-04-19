@@ -6,9 +6,7 @@ import os
 #  ex file:   /Users/katejackson/Desktop/testdata
 
 # TO DO:
-    # make small pop up window to set high and low cutoff intensities?
-    # save file to FRETResult.dat
-    # generalize file opener to also work with regular trace file types (specify when entering file path?)
+    # (optional) make it kind of clear how to change how many frames to average together (default is 10, 3:12)
 
 # initializes and runs the application
 def main():
@@ -52,11 +50,28 @@ class Application(tk.Tk):
         self.combo4.config(width=30)
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
+        # dropdown for designation of filetype
+        self.type_label = tk.Label(self.subframe1, text="File Types:")
+        self.type_label.grid(row=2, column=0)
+
+        reftype = ['.csv', '.dat']
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.csv')
+
+        self.combo8 = tk.OptionMenu(self.subframe1, self.ref_type, *reftype)
+        self.combo8.config(width=5)
+        self.combo8.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady="10")
+
 
     def onclick(self):
-        keys = self.processPath()
-        print(f"csv files found: {keys}")
-        distribution_window = DistributionWindow(self.ref_input.get(), keys)
+        if (self.ref_type.get() == ".csv"):
+            keys = self.processPath()
+            filetype = 0
+        elif (self.ref_type.get() == ".dat"):
+            keys = self.processPath2()
+            filetype = 1
+        #print(f"csv files found: {keys}")
+        distribution_window = DistributionWindow(self.ref_input.get(), keys, filetype)
 
 
     def processPath(self):
@@ -66,9 +81,20 @@ class Application(tk.Tk):
         keys = glob.glob('*.{}'.format(extension))
 
         return keys
-
-
-
+    
+    def processPath2(self):
+        filepath = self.ref_input.get()
+        #print(filepath)
+        filetype = '* tr*.dat'
+        keys = []
+        for root, dirs, files in os.walk(filepath):
+            dirs.sort()
+            files.sort()
+            for file in files:
+                if glob.fnmatch.fnmatch(file, filetype):
+                    keys.append(file)
+                    #keys.append(os.path.join(root, file))
+        return keys
 
 
 main()
