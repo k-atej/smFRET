@@ -1,27 +1,38 @@
+from tkinter import colorchooser, ttk
 import pandas as pd
 import tkinter as tk
-from histogramMaker import *
-from histogramWindow import *
-from stackedHistogramWindow import *
-from trajectoryMaker import *
-from stackedTrajectoryMaker import *
+from fileviewer.fileViewerMaker import *
+
+#TO DO: remove plot customizability options and side window
 
 
-
-class stackedTrajectoryWindow(tk.Toplevel):
+class FileViewerWindow(tk.Toplevel):
     def __init__(self, path, files):
         super().__init__()
         self.minsize(200, 200)
-        self.path = path  # what the user input into the box in the menu
-        self.files = files  # list of filepaths for every trace file found within the folder
-        self.figtitle = self.path.split("/")[-1]
-        self.title(self.figtitle)
-        self.trajectory = None
-        self.generation = 0
-        self.yshift = []
-        self.subtitle_inputs = []
+        self.df = []
+        self.files = [] # name of final file
         for file in files:
-            self.yshift.append(0.0)
+            self.files.append(file.split("/")[-1])
+        self.paths = files # full file path
+        self.numfiles = len(self.paths)
+        self.index = 0
+        self.trajectory = None
+
+        self.savepath = path.rstrip("/")
+        print(self.savepath)
+        
+        self.titleset = path.split("/")[-1] # final folder in the input path
+        self.title(self.titleset)
+        self.yshift = 0
+        self.generation = 0
+
+        self.dwellActive = False
+        self.dwelltimedf = pd.DataFrame(columns=['Series', 'deltaT'])
+        self.dwellseries = 0
+
+        self.filepath = self.savepath
+        self.type = '.csv'
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -33,7 +44,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
         # left half (contains intensities and efret figures)
         self.subframeleft = tk.Frame(self.frame, background='white')
-        self.subframeleft.grid(row=1, column=0)
+        self.subframeleft.grid(row=1, column=0, padx=(20, 0))
 
         # right half (contains menu)
         self.subframeright = tk.Frame(self.frame, background='white')
@@ -50,30 +61,100 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.start()
 
     def start(self):
-        self.makeFormat()
+        #self.makeFormat() #not visible, for now
         self.makeButtons()
-        self.makeOptions() 
+        #self.makeOptions()
         self.maketrajectory()
+        #self.bind('<Return>', self.maketrajectory)
         self.bind('<BackSpace>', self.undo)
-        self.bind('<Return>', self.maketrajectory)
+        self.bind('<Left>', self.back)
+        self.bind('<Right>', self.next1)
+        self.bind('<Return>', self.save)
 
-
+        
+    
     def makeButtons(self):
         # generate button, bound to the generation of a histogram
-        makeTraj = tk.Button(self.subframetop, text="Generate", command=self.maketrajectory)
-        makeTraj.grid(row=0, column=0, padx="10")
+        makeTraj = tk.Button(self.subframetop, text="Regenerate", command=self.maketrajectory)
+        makeTraj.grid(row=0, column=7, padx="10")
 
+        # back button
+        self.backbutton = tk.Button(self.subframetop, text="Back", command=self.back)
+        self.backbutton.grid(row=0, column=1, padx="10")
+
+        # next button
+        self.nextbutton = tk.Button(self.subframetop, text="Next", command=self.next1)
+        self.nextbutton.grid(row=0, column=2, padx="10", pady="10")
+    
         # save button
-        self.saveButton = tk.Button(self.subframetop, text="Save", command=self.savewindow)
-        self.saveButton.grid(row=0, column=1, sticky="ew", padx="10", pady="10")
+        self.saveButton = tk.Button(self.subframetop, text="Set Filepath", command=self.savewindow)
+        self.saveButton.grid(row=0, column=3, sticky="ew", padx="10", pady="10")
 
         # click-to-zero toggle
         self.sub3togg = tk.IntVar()
         self.togglesub3 = tk.Checkbutton(self.subframetop, text="Click to Zero", variable=self.sub3togg, onvalue=1, offvalue=0)
-        self.togglesub3.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
+        self.togglesub3.grid(row=0, column=4, sticky="ew", padx="10", pady="10")
         self.sub3togg.set(0)
-    
-    
+
+        # sum toggle
+        self.sumtogg = tk.IntVar()
+        self.togglesum = tk.Checkbutton(self.subframetop, text="Show Sum", variable=self.sumtogg, onvalue=1, offvalue=0)
+        self.togglesum.grid(row=0, column=6, sticky="ew", padx="10", pady="10")
+        self.sumtogg.set(0)
+
+        # dwell time analysis button
+        self.dwellButton = tk.Button(self.subframetop, text="Show Dwell Time Analysis", command=self.dwellClicks)
+        self.dwellButton.grid(row=0, column=8, sticky="ew", padx="10", pady="10")
+        self.dwelltogg = tk.IntVar()
+        self.dwelltogg.set(0)
+
+
+    def dwellClicks(self):
+        if self.dwellActive == False:
+            self.updateDwellTable()
+        else:
+            self.tree = None
+            for widget in self.subframeright.winfo_children():
+                widget.destroy()
+            self.dwellActive = False
+            self.maketrajectory()
+
+    def updateDwellTable(self, event=None):
+        self.sub3togg.set(0)
+        self.original_size = (self.winfo_width(), self.winfo_height())
+        self.tree = ttk.Treeview(self.subframeright, show="headings")
+
+        self.tree["columns"] = list(self.dwelltimedf.columns)
+        self.tree.column("Series", anchor="center", width=50, stretch=False)
+        self.tree.heading("Series", text="Series")
+        self.tree.column("deltaT", anchor="center", width=250, stretch=False)
+        self.tree.heading("deltaT", text="deltaT")
+
+        for index, row in self.dwelltimedf.iterrows():
+            self.tree.insert("", "end", values=list(row))
+
+        # dwell time selection toggle
+        self.toggledwell = tk.Checkbutton(self.subframeright, text="Click to Select Dwell Times", variable=self.dwelltogg, onvalue=1, offvalue=0)
+        self.toggledwell.grid(row=0, column=0, padx=(10, 20), pady="10", columnspan=3)
+
+        self.tree.grid(row=1, column=0, sticky="ew", padx=(10, 20), pady="10", columnspan=3)
+        self.refreshButton = tk.Button(self.subframeright, text="Refresh", command=self.updateDwellTable)
+        self.refreshButton.grid(row=2, column=0, sticky="ew", padx=(10,20), pady="10")
+
+        self.seriesButton = tk.Button(self.subframeright, text="+ Series", command=self.addSeries)
+        self.seriesButton.grid(row=2, column=1, sticky="ew", padx=(10,20), pady="10")
+
+        self.seriesSaveButton = tk.Button(self.subframeright, text="Save", command=self.saveSeries)
+        self.seriesSaveButton.grid(row=2, column=2, sticky="ew", padx=(10,20), pady="10")
+
+        self.dwellActive = True
+        self.dwellseries = self.trajectory.getDwellSeries()
+        self.maketrajectory()
+
+    def addSeries(self):
+        self.trajectory.incrementDwellSeries()
+
+
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.subframerighttop)
         self.tabFormat = tk.Frame(self.tabControl)
@@ -82,12 +163,12 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
         self.tabText = tk.Frame(self.tabControl)
-        self.tabSub = tk.Frame(self.tabControl)
 
         self.tabControl.add(self.tabFormat, text="Format")
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
-        self.tabControl.add(self.tabSub, text="Subtitles")
+
+
 
     def makeOptions(self):
         # tab 1: format
@@ -136,7 +217,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.ymin_label = tk.Label(self.tabFormat, text="Y Min:")
         self.ymin_label.grid(row=5, column=0, padx=(20,0), pady="5")
         self.ref_ymin = tk.StringVar(self)
-        self.ref_ymin.set("0")
+        self.ref_ymin.set("None")
 
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
@@ -156,7 +237,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.y2min_label = tk.Label(self.tabFormat, text="Y Min:")
         self.y2min_label.grid(row=7, column=0, padx=(20,0), pady="5")
         self.ref_y2min = tk.StringVar(self)
-        self.ref_y2min.set("0")
+        self.ref_y2min.set("None")
 
         self.comboy2min = tk.Entry(self.tabFormat, textvariable=self.ref_y2min)
         self.comboy2min.config(width=5)
@@ -185,6 +266,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.comboheight = tk.Entry(self.tabFormat, textvariable=self.ref_height)
         self.comboheight.config(width=5)
         self.comboheight.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
+
 
 
         # tab2 : style
@@ -229,33 +311,21 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.color2button.grid(row=3, column=3)
 
         self.e_label = tk.Label(self.tabStyle, text="Efficiency Plot:")
-        self.e_label.grid(row=5, column=0, columnspan=2, pady=(10,5), sticky="w")
-
-        #check box for toggling zero on y axis
-        self.toggle = tk.IntVar()
-        self.toggle1 = tk.Checkbutton(self.tabStyle, text="Zero Tick Visible", variable=self.toggle, onvalue=1, offvalue=0)
-        self.toggle1.grid(row=4, column=0, pady='5', padx=(20,0), columnspan=2, sticky='ew')
-        self.toggle.set(1)
+        self.e_label.grid(row=4, column=0, columnspan=2, pady=(10,5), sticky="w")
 
         # input area for designation of plot3 color
         self.color_label = tk.Label(self.tabStyle, text="Efficiency:")
-        self.color_label.grid(row=6, column=0, padx=(20,0))
+        self.color_label.grid(row=5, column=0, padx=(20,0))
         self.ref_color3 = tk.StringVar(self)
         self.ref_color3.set("black")
 
         self.combo4 = tk.Entry(self.tabStyle, textvariable=self.ref_color3)
         self.combo4.config(width=5)
-        self.combo4.grid(row=6, column=1, sticky="ew", padx=(0, 10), pady="5")
+        self.combo4.grid(row=5, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # color wheel for designation of plot3 color
         self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotCcolor)
-        self.color2button.grid(row=6, column=3)
-
-        #check box for toggling zero on y axis
-        self.togglevar2 = tk.IntVar()
-        self.toggle2 = tk.Checkbutton(self.tabStyle, text="Zero Tick Visible", variable=self.togglevar2, onvalue=1, offvalue=0)
-        self.toggle2.grid(row=7, column=0, padx=(20,0), pady="5", columnspan=2, sticky="ew")
-        self.togglevar2.set(1)
+        self.color2button.grid(row=5, column=3)
 
 
         # third tab: text
@@ -265,7 +335,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.title_label = tk.Label(self.tabText, text="Title:")
         self.title_label.grid(row=0, column=0)
         self.ref_title = tk.StringVar(self)
-        self.ref_title.set(self.figtitle)
+        self.ref_title.set(self.titleset)
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
         self.combo2.config(width=10)
@@ -322,7 +392,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.y2_label = tk.Label(self.tabText, text="Y-Axis:")
         self.y2_label.grid(row=7, column=0, padx=(15,0))
         self.ref_y2 = tk.StringVar(self)
-        self.ref_y2.set("E_FRET")
+        self.ref_y2.set("E")
 
         self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y2)
         self.combo3.config(width=10)
@@ -374,118 +444,54 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
         # subtitle toggle: intensity
         self.subtogg = tk.IntVar()
-        self.togglesub = tk.Checkbutton(self.tabText, text="Subtitles", variable=self.subtogg, onvalue=1, offvalue=0)
+        self.togglesub = tk.Checkbutton(self.tabText, text="Subtitle", variable=self.subtogg, onvalue=1, offvalue=0)
         self.togglesub.grid(row=4, column=0, sticky="ew", padx=(15,10), pady="5", columnspan=2)
         self.subtogg.set(1)
 
         # subtitle toggle: efficiency
         self.sub2togg = tk.IntVar()
-        self.togglesub2 = tk.Checkbutton(self.tabText, text="Subtitles", variable=self.sub2togg, onvalue=1, offvalue=0)
+        self.togglesub2 = tk.Checkbutton(self.tabText, text="Subtitle", variable=self.sub2togg, onvalue=1, offvalue=0)
         self.togglesub2.grid(row=8, column=0, sticky="ew", padx=(15,10), pady="5", columnspan=2)
         self.sub2togg.set(1)
-    # HOW DO I NEED TO RESTRUCTURE THIS?
 
-    # parses the files into a series of pandas dataframes
+    # parses the data file into a pandas dataframe
     def get_data(self):
-        self.all_data = []
-        for file in self.files:
-            trajectory = open(file, "r") 
-            data = pd.read_fwf(trajectory, header=None)
-            data.columns = ["time", "donor", "acceptor"]
-            self.all_data.append(data)
+        trajectories = open(self.paths[self.index], "r") 
+        data = pd.read_fwf(trajectories, header=None)
+        data.columns = ["time", "donor", "acceptor"]
+        self.df = data
 
-    def calculateEfret(self):
-        for data in self.all_data:
-            gamma = 1
-            data['efret'] = data['acceptor'] / (data['acceptor'] + (gamma * data['donor']))
 
     def maketrajectory(self, event=None):
         if self.generation != 0:
             self.updateZero()
         self.generation += 1
-
-        if self.trajectory is not None:
-            self.trajectory.destroy()
-
-        self.get_data()
-        #self.calculateEfret()
-        xmax = self.checkMinMax(self.ref_xmax.get())
-        xmin = self.checkMinMax(self.ref_xmin.get())
-        ymax = self.checkMinMax(self.ref_ymax.get())
-        ymin = self.checkMinMax(self.ref_ymin.get())
-        y2max = self.checkMinMax(self.ref_y2max.get())
-        y2min = self.checkMinMax(self.ref_y2min.get())
-
-        xfontsize = float(self.ref_xfontsize.get())
-        yfontsize = float(self.ref_yfontsize.get())
-        x2fontsize = float(self.ref_x2fontsize.get())
-        y2fontsize = float(self.ref_y2fontsize.get())
-        titlefontsize = float(self.ref_titlefontsize.get())
-
-        subtitles = []
-        subtitlesizes = []
-        for subtitle in self.subtitle_inputs:
-            j, jtext, jfontsize = subtitle
-            subtitles.append(j.get())
-            subtitlesizes.append(jfontsize.get())
-
-        self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
-                                          self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
-                                          self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
-                                          y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
-                                          ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift,
-                                          self.sub3togg.get(), subtitles, subtitlesizes)
         
-        self.subtitle_length = self.trajectory.get_height()
-        self.subtitles = self.trajectory.get_subtitles()
-        self.subtitlesizes = self.trajectory.get_subtitlesizes()
+        if self.trajectory is not None:
+            self.trajectory.destroyWidget()
+        self.get_data()
 
-        # make input areas for subtitles based on hist size
-        if self.generation == 1:
-            self.makeSubtitleInputs()
-            for i in range(len(self.subtitle_inputs)):
-                j, jtext, jfontsize = self.subtitle_inputs[i]
-                f = self.files[i].split("/")[-1]
-                jtext.set(f.split(".")[0])
+        title = self.paths[self.index]
+        xfontsize = 12.0
+        yfontsize = 12.0
+        x2fontsize = 12.0
+        y2fontsize = 12.0
+        titlefontsize = 12.0
 
-        # reset subtitle input sizes
-        if len(self.subtitle_inputs) == len(self.subtitles):
-            for i in range(len(self.subtitle_inputs)):
-                j, jtext, jfontsize = self.subtitle_inputs[i]
-                jtext.set(self.subtitles[i])
-                jfontsize.set(self.subtitlesizes[i])
+        summ = self.sumtogg.get() # on = 1
 
-        xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
-        self.ref_xmin.set(xmin)
-        self.ref_xmax.set(xmax)
-        self.ref_ymin.set(ymin)
-        self.ref_ymax.set(ymax)
-        self.ref_y2min.set(y2min)
-        self.ref_y2max.set(y2max)
 
-    # creates input areas and fontsize dropdowns based on length of data provided to histogram
-    def makeSubtitleInputs(self):
-        self.subtitle_inputs = []
-        k = tk.Label(self.tabSub,text="Plot Subtitles: ")
-        k.grid(row=0, column=0, columnspan=2)
-        for i in range(self.subtitle_length):
-            l = tk.Label(self.tabSub, text=f"{i+1}: ")
-            l.grid(row=i + 1, column=0, padx=(10,5))
+        self.trajectory = FileViewerMaker(title, self.titleset, self.df, self.subframeleft, "lime", 
+                                          "red", "black", self.titleset, titlefontsize,
+                                          "Time (s)", xfontsize, "Time (s)", x2fontsize, " ", yfontsize, 
+                                          " ", y2fontsize, 4.5, 6.0, None, None, None, 
+                                          None, None, None, 1, 1, 0,
+                                          1, 1, self.yshift, self.sub3togg.get(), summ, 
+                                          self.dwelltogg.get(), self.dwelltimedf, self.dwellseries)
 
-            jtext = tk.StringVar(self)
-            j = tk.Entry(self.tabSub, textvariable=jtext)
-            j.config(width=20)
-            j.grid(row=i+1, column=1, sticky="ew", padx=(0, 10))
-
-            jfont = [6, 7, 8, 9, 10, 11, 12]
-            jvar = tk.IntVar(self)
-            jvar.set(9)
-            jfontwidget = tk.OptionMenu(self.tabSub, jvar, *jfont)
-            jfontwidget.grid(row=i+1, column=2)
-            jfontwidget.config(width=2)
-
-            self.subtitle_inputs.append((j, jtext, jvar))
+        self.dwelltimedf = self.trajectory.getDwellData()
+        self.dwellseries = self.trajectory.getDwellSeries()
+        self.makeLabel()
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes
@@ -495,53 +501,85 @@ class stackedTrajectoryWindow(tk.Toplevel):
         else:
             val = None
         return val
-    
-    
+
+    def back(self, event=None):
+        self.index -= 1
+        if self.index < 0:
+            self.index = self.numfiles - 1
+        self.trajectory.setShift(0.0)
+        self.maketrajectory()
+
+
+    def next1(self, event=None):
+        self.index += 1
+        if self.index >= self.numfiles:
+            self.index = 0
+        self.trajectory.setShift(0.0)
+        self.maketrajectory()
+
+    def makeLabel(self):
+        self.label = tk.Label(self.subframetop, text=f"{self.index + 1} of {self.numfiles}")    
+        self.label.grid(row=0, column=0, padx="10")
+
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
+        self.unbind_all('<Return>')
+        self.win.bind('<Return>', self.setfilepath)
         
         #input area for file name
-        self.path_label = tk.Label(self.win, text="Save File Path:")
+        self.path_label = tk.Label(self.win, text="Save Filepath:")
         self.path_label.grid(row=0, column=0)
         self.ref_path = tk.StringVar(self.win)
-        self.ref_path.set(self.path)
+        self.ref_path.set(self.filepath)
 
         self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
         self.combo6.config(width=50)
         self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady="10")
 
         # dropdown for designation of filetype
-        reftype = ['.pdf', '.png', '.svg', '.ps', '.eps']
-        self.ref_type = tk.StringVar(self)
-        self.ref_type.set('.png')
 
+        self.type_label = tk.Label(self.win, text="Save Data Files As:")
+        self.type_label.grid(row=1, column=0)
+        reftype = ['.csv']
+
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.csv')
         self.combo8 = tk.OptionMenu(self.win, self.ref_type, *reftype)
         self.combo8.config(width=5)
-        self.combo8.grid(row=0, column=2, sticky="ew", padx=(0, 10), pady="10")
+        self.combo8.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
 
         # dropdown for designation of file quality
-        self.qual_label = tk.Label(self.win, text="Quality:")
-        self.qual_label.grid(row= 1, column=0)
-        refqual = ["Low", "Medium", "High"]
-        self.ref_qual = tk.StringVar(self)
-        self.ref_qual.set('Medium')
+        #self.qual_label = tk.Label(self.win, text="Quality:")
+        #self.qual_label.grid(row= 1, column=0)
+        #refqual = ["Low", "Medium", "High"]
+        
+        #self.ref_qual = tk.StringVar(self)
+        #self.ref_qual.set('Medium')
 
-        self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
-        self.combo9.config(width=5)
-        self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
+        #self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
+        #self.combo9.config(width=5)
+        #self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
 
 
-        self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
+        self.saveButton = tk.Button(self.win, text="SAVE", command=self.setfilepath)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        
         #self.win.mainloop()
     
-    def save(self):
-        self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
+    def setfilepath(self, event=None):
+        self.filepath = self.ref_path.get()
+        self.type = self.ref_type.get()
         self.win.destroy()
+        self.win.unbind_all('<Return>')
+        self.bind('<Return>', self.save)
+        
     
+    def save(self, event=None):
+        self.trajectory.save(self.filepath, self.type) # modify this to set filepath
+        self.next1()
 
-        # opens native color chooser dialog
+    # opens native color chooser dialog
     def choose_plotAcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color1.set(hexcode)
@@ -555,11 +593,52 @@ class stackedTrajectoryWindow(tk.Toplevel):
     def choose_plotCcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color3.set(hexcode)
-    
+
     def updateZero(self, event=None):
         self.yshift = self.trajectory.getShift()
-    
+
     def undo(self, event=None):
         if self.sub3togg.get() == 1:
             self.trajectory.setShift(0.0)
+            self.trajectory.destroyWidget()
             self.maketrajectory()
+
+    def saveSeries(self):
+        self.win = tk.Toplevel()
+        self.win.title("Save Dwell Time Data: ")
+        self.unbind_all('<Return>')
+        self.win.bind('<Return>', self.saveSeriesData)
+        
+        #input area for file name
+        self.path_label = tk.Label(self.win, text="Save Filepath:")
+        self.path_label.grid(row=0, column=0)
+        self.ref_path = tk.StringVar(self.win)
+        self.ref_path.set(self.filepath)
+
+        self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
+        self.combo6.config(width=50)
+        self.combo6.grid(row=0, column=1, sticky="ew", padx=(10, 0), pady="10")
+
+        # dropdown for designation of filetype
+
+        self.type_label = tk.Label(self.win, text="Save File As:")
+        self.type_label.grid(row=1, column=0)
+        reftype = ['.csv']
+
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.csv')
+        self.combo8 = tk.OptionMenu(self.win, self.ref_type, *reftype)
+        self.combo8.config(width=5)
+        self.combo8.grid(row=1, column=1, sticky="ew", padx=(0, 10), pady="10")
+
+        self.saveButton = tk.Button(self.win, text="SAVE", command=self.saveSeriesData)
+        self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+
+    
+    def saveSeriesData(self, event=None):
+        self.filepath = self.ref_path.get()
+        self.type = self.ref_type.get()
+        self.trajectory.saveDwellData(self.filepath, self.type)
+        self.win.destroy()
+        self.win.unbind_all('<Return>')
+        self.bind('<Return>', self.save)

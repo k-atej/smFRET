@@ -1,11 +1,11 @@
 import tkinter as tk
 import glob
-from histogramMaker import *
-from histogramWindow import *
-from stackedHistogramWindow import *
-from trajectoryMaker import *
-from trajectoryWindow import *
-from stackedTrajectoryWindow import *
+from histograms.histogramMaker import *
+from histograms.histogramWindow import *
+from histograms.stackedHistogramWindow import *
+from trajectories.trajectoryMaker import *
+from trajectories.trajectoryWindow import *
+from trajectories.stackedTrajectoryWindow import *
 import os
 
 

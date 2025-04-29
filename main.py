@@ -1,9 +1,9 @@
 import tkinter as tk
-from histogramMaker import *
-from histogramWindow import *
-from stackedHistogramWindow import *
-from histogramMain import *
-from trajectoryMain import *
+from histograms.histogramMaker import *
+from histograms.histogramWindow import *
+from histograms.stackedHistogramWindow import *
+from histograms.histogramMain import *
+from trajectories.trajectoryMain import *
 import os
 
 #   /Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11traces/(1) THROMBIN APTAMER, 0 mM KCl

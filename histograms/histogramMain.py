@@ -1,7 +1,7 @@
 import tkinter as tk
-from histogramMaker import *
-from histogramWindow import *
-from stackedHistogramWindow import *
+from histograms.histogramMaker import *
+from histograms.histogramWindow import *
+from histograms.stackedHistogramWindow import *
 import os
 
 

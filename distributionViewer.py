@@ -1,12 +1,9 @@
 import tkinter as tk
 import glob
-from distributionWindow import *
+from distribution.distributionWindow import *
 import os
 
 #  ex file:   /Users/katejackson/Desktop/testdata
-
-# TO DO:
-    # (optional) make it kind of clear how to change how many frames to average together (default is 10, 3:12)
 
 # initializes and runs the application
 def main():

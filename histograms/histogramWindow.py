@@ -1,15 +1,17 @@
+import pandas as pd
 import tkinter as tk
 from tkinter import ttk
 from tkinter import colorchooser
-from histogramMaker import *
-from stackedHistogramMaker import *
-import os
+from matplotlib.figure import Figure
+from histograms.histogramMaker import *
 
-# Example MacOS filepath:
-# /Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy
 
-#opens a window that displays a stacked histogram based on the files provided
-class StackedHistApplication(tk.Toplevel):
+#Example MacOS filepath for a single histogram
+# /Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11/(1) THROMBIN APTAMER, 0 mM KCl
+
+
+#opens a window that displays a single histogram based on the file provided
+class HistApplication(tk.Toplevel):
 
     # path - filepath provided in entry box in histogram main menu
     # filename - name of file that was being searched for, set in histogram main menu
@@ -18,15 +20,12 @@ class StackedHistApplication(tk.Toplevel):
         super().__init__()
         self.title(title)
         self.minsize(200, 200)
-        self.path = path
+        self.path = path + "/" + filename
         self.savepath = path
-        self.annotations = []
+        self.annotations =[]
         self.hist = None
-        self.filename = filename
-        self.subtitle_inputs = []
-        self.generation = 0
-
-        self.find_files()
+        
+        self.get_data()
 
         #setting up the layout of the window!
 
@@ -57,38 +56,28 @@ class StackedHistApplication(tk.Toplevel):
         # bottom of window0
         self.subframe4 = tk.Frame(self.window0, background='white')
         self.subframe4.grid(row=2, column=0)
-        
-        self.start()
 
-    # parses the folders into list of folders with the designated filename in them
-    def find_files(self):
-        keys = []
-        for root, dirs, files in os.walk(self.path):
-            dirs.sort()
-            for file in sorted(files):
-                if file.endswith(self.filename):
-                    key, value = os.path.split(root)
-                    keys.append(value)
-        
-        self.files = []
-        for key in keys:
-            self.files.append(self.path + "/" + key)
+        self.start()         
+           
+    # parses the data file into a pandas dataframe
+    def get_data(self):
+        FRETresult = open(self.path, "r") 
+        data = pd.read_fwf(FRETresult, header=None)
+        data.columns = ["eFRET", "other"]
+        self.df = data
 
-    # initializes and creates the customizability options in the side menu
+    # initializes an empty histogram and creates the customizability options in the side menu
     def start(self):
         self.makeFeatures()
-        
+        self.emptyHis()
 
-    # creates the dropdowns & buttons available in the customizability menu, 
-    # binds 'Enter' to the generation of a histogram
-    # bins 'Backspace' to line deletions
+    # creates the dropdowns & buttons available in the customizability menu, binds 'Enter' to the generation of a histogram
     def makeFeatures(self):
         self.makeFormat()
         self.makeOptions()
         self.makeButtons()
         self.bind('<Return>', self.his)
         self.bind('<BackSpace>', self.undoLastLine)
-        self.his()
 
     # sets up the layout of the customizability menu
     def makeFormat(self):
@@ -123,7 +112,7 @@ class StackedHistApplication(tk.Toplevel):
         self.tabText_2 = tk.Frame(self.tabText)
         self.tabText_2.grid(row=2, column = 0)
 
-    # sets up the generate and clear buttons beneath the histogram
+    # sets up the buttons beneath the histogram
     def makeButtons(self):
 
         # generate button, bound to the generation of a histogram
@@ -146,9 +135,7 @@ class StackedHistApplication(tk.Toplevel):
         self.linetoggle = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.subframe3, text="Click to Add Lines", variable=self.linetoggle, onvalue=1, offvalue=0)
         self.toggle1.grid(row=0, column=4, sticky="ew", padx=(10,10), pady="10", columnspan=2)
-
-        self.lbl_label = tk.Label(self.subframe3, text="Double Click to add full lines")
-        self.lbl_label.grid(row=1, column=3, columnspan=3)
+        
 
     # sets up options in the customizability window
     def makeOptions(self):
@@ -161,7 +148,7 @@ class StackedHistApplication(tk.Toplevel):
         # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
         self.lbl_label = tk.Label(self.tabFormat, text="Source:")
         self.lbl_label.grid(row=1, column=0, padx=(20,0), pady="5")
-        labels = ["eFRET", "other"]
+        labels = self.df.columns
         self.ref_col = tk.StringVar(self)
         self.ref_col.set("eFRET")
 
@@ -303,7 +290,7 @@ class StackedHistApplication(tk.Toplevel):
 
         # dropdown for designation of column edge line width
         self.edgewidth_label = tk.Label(self.tabStyle, text="Edge Width:")
-        self.edgewidth_label.grid(row=3, column=0, sticky="w", padx=(20, 10), pady="5")
+        self.edgewidth_label.grid(row=3, column=0, sticky="w", padx=(20,0), pady="5")
         refedge = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
         self.ref_edgewidth = tk.StringVar(self)
         self.ref_edgewidth.set(1.0)
@@ -353,16 +340,7 @@ class StackedHistApplication(tk.Toplevel):
         self.combolw.grid(row=8, column=1, sticky="w", padx=(0, 10), pady="5")
 
 
-        
-        #check box for toggling zero on y axis
-        self.toggle = tk.IntVar()
-        self.toggle1 = tk.Checkbutton(self.tabStyle, text="Toggle Zero on Y-Axis", variable=self.toggle, onvalue=1, offvalue=0)
-        self.toggle1.grid(row=4, column=0, sticky="w", padx=(20,0), pady=(5), columnspan=2)
 
-
-
-
-        
         # third tab: text
 
         # input area for designation of graph title
@@ -373,7 +351,7 @@ class StackedHistApplication(tk.Toplevel):
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
         self.combo2.config(width=15)
-        self.combo2.grid(row=0, column=1, sticky="w", padx=(0, 10), pady="5")
+        self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for title font size
         titlef = [8, 9, 10, 11, 12, 15, 20, 24]
@@ -396,7 +374,7 @@ class StackedHistApplication(tk.Toplevel):
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_x)
         self.combo2.config(width=15)
-        self.combo2.grid(row=2, column=1, sticky="w", padx=(0, 10), pady="5")
+        self.combo2.grid(row=2, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area for designation of y-axis label
         self.y_label = tk.Label(self.tabText, text="Y:")
@@ -406,7 +384,7 @@ class StackedHistApplication(tk.Toplevel):
 
         self.combo3 = tk.Entry(self.tabText, textvariable=self.ref_y)
         self.combo3.config(width=15)
-        self.combo3.grid(row=3, column=1, sticky="w", padx=(0, 10), pady="5")
+        self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for x font size
         titlex = [8, 9, 10, 11, 12, 15, 20, 24]
@@ -426,7 +404,6 @@ class StackedHistApplication(tk.Toplevel):
         self.combo.config(width=2)
         self.combo.grid(row=3, column=2)
 
-
     # generates histogram without data, not currently in use
     def emptyHis(self):
         self.annotations = []
@@ -439,15 +416,14 @@ class StackedHistApplication(tk.Toplevel):
         # clear any existing histogram
         if self.hist is not None:
             self.hist.destroy()
-        self.generation += 1
 
         # collect new parameters from customization menu
-        datacol = self.ref_col.get()
+        col = self.ref_col.get()
         bins = self.ref_bins.get()
         title = str(self.ref_title.get())
         x_ax = str(self.ref_x.get())
         y_ax = str(self.ref_y.get())
-
+        
         color = str(self.ref_color.get())
         if color == "None":
             color = 0
@@ -455,13 +431,13 @@ class StackedHistApplication(tk.Toplevel):
         edgecolor = str(self.ref_edgecolor.get())
         if edgecolor == "None":
             edgecolor = 0
-        
+
         linecolor = str(self.ref_linecolor.get())
         if linecolor == "None":
             linecolor = "red"
-        
-        linetogg = self.linetoggle.get()
+
         linestyle = self.ref_linestyle.get()
+        linetogg = self.linetoggle.get()
         linewidth = self.ref_lw.get()
         edgewidth = float(self.ref_edgewidth.get())
         offset = self.ref_offset.get()
@@ -473,69 +449,20 @@ class StackedHistApplication(tk.Toplevel):
         width = float(self.ref_width.get())
         height = float(self.ref_height.get())
 
-        toggle = self.toggle.get()
         bin1 = self.bin1.get()
 
         xfontsize = float(self.ref_xfontsize.get())
         yfontsize = float(self.ref_yfontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
-        subtitles = []
-        subtitlesizes = []
-        for subtitle in self.subtitle_inputs:
-            j, jtext, jfontsize = subtitle
-            subtitles.append(j.get())
-            subtitlesizes.append(jfontsize.get())
 
-         # create the new histogram
-        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, offset)
+        # create the new histogram
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, linetogg, linewidth, offset)
         
-        # save annotations & subtitles on histogram
-        self.annotations = self.hist.get_annotations()
-        self.subtitle_length = self.hist.get_height()
-        self.subtitles = self.hist.get_subtitles()
-        self.subtitlesizes = self.hist.get_subtitlesizes()
-        
-        # make input areas for subtitles based on hist size
-        if self.generation == 1:
-            self.makeSubtitleInputs()
-            folders = self.hist.get_lastfolder()
-            for i in range(len(self.subtitle_inputs)):
-                j, jtext, jfontsize = self.subtitle_inputs[i]
-                jtext.set(folders[i])
-
         # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
 
-        # reset subtitle input sizes
-        if len(self.subtitle_inputs) == len(self.subtitles):
-            for i in range(len(self.subtitle_inputs)):
-                j, jtext, jfontsize = self.subtitle_inputs[i]
-                jtext.set(self.subtitles[i])
-                jfontsize.set(self.subtitlesizes[i])
-
-
-    # creates input areas and fontsize dropdowns based on length of data provided to histogram
-    def makeSubtitleInputs(self):
-        self.subtitle_inputs = []
-        k = tk.Label(self.tabText,text="Plot Subtitles: ")
-        k.grid(row=4, column=0, sticky="w", padx=(5,0), pady="5", columnspan=2)
-        for i in range(self.subtitle_length):
-            l = tk.Label(self.tabText, text=f"{i+1}: ")
-            l.grid(row=i + 5, column=0, padx=(20,0), sticky="w")
-
-            jtext = tk.StringVar(self)
-            j = tk.Entry(self.tabText, textvariable=jtext)
-            j.config(width=15)
-            j.grid(row=i+5, column=1, sticky="w", padx=(0, 5), pady="5")
-
-            jfont = [6, 7, 8, 9, 10, 11, 12]
-            jvar = tk.IntVar(self)
-            jvar.set(9)
-            jfontwidget = tk.OptionMenu(self.tabText, jvar, *jfont)
-            jfontwidget.grid(row=i+5, column=2)
-            jfontwidget.config(width=2)
-
-            self.subtitle_inputs.append((j, jtext, jvar))
+        # save annotations on histogram
+        self.annotations = self.hist.getAnnotations()
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes
@@ -545,17 +472,25 @@ class StackedHistApplication(tk.Toplevel):
         else:
             val = None
         return val
+    
+    # currently unused, can create an empty figure to take up space
+    def emptyFig(self):
+        fig = Figure()
+        canvas = FigureCanvasTkAgg(fig, master=self.subframe2)
+        canvas.draw()
+        canvas.get_tk_widget().grid(row=0, column=1)
+
 
     # generates a new pop up window to set the file path to save the figure at
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
-
-        path = self.path + "/" + self.filename
+        
         s = ""
-        savepath = path.split(".")
+        savepath = self.path.split(".")
         for path in savepath[:-1]:
             s+= path
+
         #input area for file name, automatically sets to the filepath that was input originally
         self.path_label = tk.Label(self.win, text="Save File Path:")
         self.path_label.grid(row=0, column=0)
@@ -577,7 +512,7 @@ class StackedHistApplication(tk.Toplevel):
 
         # dropdown for designation of file quality
         self.qual_label = tk.Label(self.win, text="Quality:")
-        self.qual_label.grid(row=  1, column=0)
+        self.qual_label.grid(row= 1, column=0)
         refqual = ["Low", "Medium", "High"]
         self.ref_qual = tk.StringVar(self)
         self.ref_qual.set('Medium')
@@ -589,12 +524,13 @@ class StackedHistApplication(tk.Toplevel):
         # save button
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
- 
+    
+
     # save histogram with matplotlib, close save window
     def save(self):
         self.hist.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
         self.win.destroy()
-
+        
     # alters the bin number/bin width input label based on whether bin number or width is toggled on
     def changeLabel(self):
             if self.bin1.get() == 1:
@@ -621,23 +557,19 @@ class StackedHistApplication(tk.Toplevel):
     def choose_edgecolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_edgecolor.set(hexcode)
+    
+    # opens native color chooser dialog
+    def choose_linecolor(self):
+        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
+        self.ref_linecolor.set(hexcode)
 
     # removes the last line from the histogram, if line edits are toggled on
     # - event: press of backspace key (optional)
     def undoLastLine(self, event=None):
         if self.linetoggle.get() == 1:
             if len(self.annotations) > 0:
-                axis, x, y, dbl, color, style, lw = self.annotations.pop()
-                
-                # if dbl click line was added to entire figure, removes it as a single line
-                while dbl:
-                    axis, x, y, dbl, color, style, lw = self.annotations.pop()
+                self.annotations.pop()
                 self.his()
-
-    # opens native color chooser dialog
-    def choose_linecolor(self):
-        color_code, hexcode = colorchooser.askcolor(title="Choose Color")
-        self.ref_linecolor.set(hexcode)
 
     # toggles bin number off and changes the label
     def togglebins(self):

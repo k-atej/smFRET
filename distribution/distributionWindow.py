@@ -1,6 +1,6 @@
 import pandas as pd
 import tkinter as tk
-from distributionMaker import *
+from distribution.distributionMaker import *
 
 class DistributionWindow(tk.Toplevel):
     def __init__(self, path, files, filetype):

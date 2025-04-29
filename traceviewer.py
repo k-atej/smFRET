@@ -1,6 +1,6 @@
 import tkinter as tk
 import glob
-from fileViewerWindow import *
+from fileviewer.fileViewerWindow import *
 import os
 
 #/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11traces/(1) THROMBIN APTAMER, 0 mM KCl
