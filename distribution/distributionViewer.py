@@ -5,13 +5,9 @@ import os
 
 #  ex file:   /Users/katejackson/Desktop/testdata
 
-# initializes and runs the application
-def main():
-    app = Application()
-    app.mainloop()
 
 
-class Application(tk.Tk):
+class DistApplication(tk.Toplevel):
 
     def __init__(self):
         super().__init__()
@@ -92,6 +88,3 @@ class Application(tk.Tk):
                     keys.append(file)
                     #keys.append(os.path.join(root, file))
         return keys
-
-
-main()

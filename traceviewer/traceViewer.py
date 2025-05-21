@@ -6,13 +6,8 @@ import os
 #/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11traces/(1) THROMBIN APTAMER, 0 mM KCl
 # /Users/katejackson/Desktop/matlab_rec/
 
-# initializes and runs the application
-def main():
-    app = Application()
-    app.mainloop()
 
-
-class Application(tk.Tk):
+class TraceApplication(tk.Toplevel):
 
     def __init__(self):
         super().__init__()
@@ -68,6 +63,3 @@ class Application(tk.Tk):
                 if glob.fnmatch.fnmatch(file, filetype):
                     keys.append(os.path.join(root, file))
         return keys
-
-
-main()
