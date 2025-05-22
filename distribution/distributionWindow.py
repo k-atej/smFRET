@@ -1,14 +1,16 @@
 import pandas as pd
 import tkinter as tk
 from distribution.distributionMaker import *
+import os
 
 class DistributionWindow(tk.Toplevel):
-    def __init__(self, path, files, filetype):
+    def __init__(self, path, files, filetype): #path = user input, files = keys, filetype = csv or dat
         super().__init__()
         self.minsize(200, 200)
         self.df = []
-        self.path = path
-        self.files = files # full file path
+
+        self.files = files # individual file names, not full file paths
+
         self.distribution = None
         self.distribution2 = None
         self.filetype = filetype # 0 = csv, 1 = dat/fwf
@@ -16,10 +18,8 @@ class DistributionWindow(tk.Toplevel):
         self.upper_limit = None
         self.lower_limit = None
 
-        self.savepath = path.rstrip("/")
-        #print(self.savepath)
-        
-        self.titleset = path.split("/")[-1] # final folder in the input path
+        self.savepath = path.rstrip("\\/")
+        self.titleset = os.path.basename(self.savepath) # final folder in the input path
         self.title(self.titleset)
 
         #full window 
@@ -45,7 +45,6 @@ class DistributionWindow(tk.Toplevel):
         self.makehist()
         self.bind('<Return>', self.makehist)
 
-    
     def makeButtons(self):
         # generate button, bound to the generation of a histogram
         makeTraj = tk.Button(self.subframetop, text="Generate", command=self.makehist)
@@ -67,9 +66,8 @@ class DistributionWindow(tk.Toplevel):
         all_data = pd.DataFrame(columns=["efret", "intensity"])
 
         for file in self.files:
-            
             # open file
-            filename = self.savepath + "/" + file
+            filename = os.path.join(self.savepath, file)
             newdata = open(filename, "r") 
 
             #get data into df
@@ -95,8 +93,7 @@ class DistributionWindow(tk.Toplevel):
             all_data = pd.concat([newdat_df, all_data])
 
         self.df = all_data
-        print(self.df)
-
+        #print(self.df)
 
     def makehist(self, event=None):        
         if self.distribution is not None:
@@ -105,9 +102,10 @@ class DistributionWindow(tk.Toplevel):
             self.distribution2.destroy()
         self.get_data()
 
-
-        self.distribution = DistributionMaker(self.df, "efret", self.path, self.subframeleft, 0, 0, self.upper_limit, self.lower_limit)
-        self.distribution2 = DistributionMaker(self.df, "intensity", self.path, self.subframeleft, 1, 0, self.upper_limit, self.lower_limit)
+        self.distribution = DistributionMaker(self.df, "efret", self.savepath, self.subframeleft, 0, 
+                                              0, self.upper_limit, self.lower_limit)
+        self.distribution2 = DistributionMaker(self.df, "intensity", self.savepath, self.subframeleft, 1,
+                                               0, self.upper_limit, self.lower_limit)
 
     def setIntensity(self):
         self.win = tk.Toplevel()
@@ -117,17 +115,14 @@ class DistributionWindow(tk.Toplevel):
         self.upper_label.grid(row=0, column=0, sticky="ew", padx="10", pady="10")
 
         self.ref_upper = tk.StringVar(self.win)
-        #self.ref_upper.set() # set this to whatever the maximum intensity in the data is?
         self.upper = tk.Entry(self.win, textvariable=self.ref_upper)
         self.upper.config(width=25)
         self.upper.grid(row=0, column=1, sticky="ew", padx=(10, 20), pady="10")
-
 
         self.lower_label = tk.Label(self.win, text="Set Lower Limit:")
         self.lower_label.grid(row=1, column=0, sticky="ew", padx="10", pady="10")
 
         self.ref_lower = tk.StringVar(self.win)
-        #self.ref_lower.set() # set this to whatever the maximum intensity in the data is?
         self.lower = tk.Entry(self.win, textvariable=self.ref_lower)
         self.lower.config(width=25)
         self.lower.grid(row=1, column=1, sticky="ew", padx=(10, 20), pady="10")
@@ -143,8 +138,6 @@ class DistributionWindow(tk.Toplevel):
         self.makehist() # regenerate graph
         self.win.destroy() # close
 
-
-    # this needs to be changed to suit however i am going to save this stuff
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
@@ -162,9 +155,7 @@ class DistributionWindow(tk.Toplevel):
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
 
-
-
-# this needs to be updated to save a .dat file that can be used for the graphing software
+    # this needs to be updated to save a .dat file that can be used for the graphing software
     def save(self):
         self.distribution.save(self.ref_path.get())
         self.win.destroy()

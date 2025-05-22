@@ -63,7 +63,6 @@ class DistApplication(tk.Toplevel):
         elif (self.ref_type.get() == ".dat"):
             keys = self.processPath2()
             filetype = 1
-        #print(f"csv files found: {keys}")
         distribution_window = DistributionWindow(self.ref_input.get(), keys, filetype)
 
 
@@ -72,12 +71,10 @@ class DistApplication(tk.Toplevel):
         extension = 'csv'
         os.chdir(filepath)
         keys = glob.glob('*.{}'.format(extension))
-
-        return keys
+        return keys #individual file names, not full paths
     
     def processPath2(self):
         filepath = self.ref_input.get()
-        #print(filepath)
         filetype = '* tr*.dat'
         keys = []
         for root, dirs, files in os.walk(filepath):
@@ -86,5 +83,4 @@ class DistApplication(tk.Toplevel):
             for file in files:
                 if glob.fnmatch.fnmatch(file, filetype):
                     keys.append(file)
-                    #keys.append(os.path.join(root, file))
-        return keys
+        return keys #individual file names, not full filepaths

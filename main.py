@@ -23,7 +23,7 @@ class Application(tk.Tk):
         self.title("smFRET Toolkit: Menu")
         self.buildMenu()
 
-    # builds the start menu with options for the user to choose from: "Make Histograms" or "View Trajectories"
+    # builds the start menu with options for the user to choose from
     def buildMenu(self):
         text_var = tk.StringVar()
 

@@ -1,6 +1,7 @@
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
+import os
 
 
 
@@ -63,18 +64,15 @@ class DistributionMaker():
         return fig
     
     def save(self, path):
-        filepath = path + "/" + "FRETresult.dat"
+        filepath = os.path.join(path, "FRETresult.dat")
         col_widths = [20, 20]
         self.write_fwf(self.data, filepath, col_widths)
 
-
-        filepath2 = path + "/" + "csvtest.csv"
+        filepath2 = os.path.join(path, "FRETresult.csv") 
         self.data.to_csv(filepath2, index=False, header=False)
-        
     
     def destroy(self):
         self.hist_canvas.get_tk_widget().destroy()
-
 
     def write_fwf(self, df, filepath, col_widths, justify='left'):
         with open(filepath, 'w') as f:
