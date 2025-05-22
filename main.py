@@ -4,7 +4,7 @@ from histograms.histogramWindow import *
 from histograms.stackedHistogramWindow import *
 from histograms.histogramMain import *
 from trajectories.trajectoryMain import *
-from traceviewer.traceViewer import *
+from fileviewer.traceViewer import *
 from distribution.distributionViewer import *
 import os
 

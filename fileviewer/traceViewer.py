@@ -52,14 +52,13 @@ class TraceApplication(tk.Toplevel):
 
 
     def processPath(self):
-        filepath = self.ref_input.get()
-        #print(filepath)
-        filetype = '* tr*.dat'
-        keys = []
-        for root, dirs, files in os.walk(filepath):
-            dirs.sort()
-            files.sort()
-            for file in files:
-                if glob.fnmatch.fnmatch(file, filetype):
-                    keys.append(os.path.join(root, file))
-        return keys
+        filepath = self.ref_input.get() #creates variable from the file path set by the user
+        filetype = '* tr*.dat' #file type to look for
+        keys = [] #empty list
+        for root, dirs, files in os.walk(filepath): #for every file in the folder at the filepath
+            dirs.sort() #sorts folders alphabetically
+            files.sort() #sorts files alphabetically
+            for file in files: #for every file in the path
+                if glob.fnmatch.fnmatch(file, filetype): #if the file is of the correct filetype
+                    keys.append(os.path.join(root, file)) #add the full file path to the list of keys
+        return keys #return a list of filepaths, pointing to files of the correct file type

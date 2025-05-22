@@ -4,6 +4,7 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.figure import Figure
 import pandas as pd
 import tkinter as tk
+import os
 
 
 class FileViewerMaker():
@@ -91,9 +92,6 @@ class FileViewerMaker():
 
         self.fig = Figure()
 
-        #self.fig.set_figwidth(self.width)
-        #self.fig.set_figheight(self.height)
-
         axesnum = self.efficiencytoggle + self.intensitytoggle
         self.axes = []
         for i in range(axesnum):
@@ -114,7 +112,6 @@ class FileViewerMaker():
 
         if self.toolbar != None:
             self.toolbar.destroy()
-            #self.toolbar.grid_forget()
             self.toolbar = None
             self.master.update_idletasks()
 
@@ -125,15 +122,11 @@ class FileViewerMaker():
 
         self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
 
-        
-
-    
 
 
     def makeIntensity(self):
         self.iaxis = self.axes[0]
         fig = self.axes[0]
-        #f = fig.gca()
         
         time = self.datacopy["time"]
         donor = self.datacopy["donor"]
@@ -141,21 +134,15 @@ class FileViewerMaker():
         self.datacopy["sum"] = self.datacopy["donor"] + self.datacopy["acceptor"]
         summm = self.datacopy["sum"]
 
-
         fig.plot(time, donor, color=self.color1, label="Donor", zorder=2)
         fig.plot(time, acceptor, color=self.color2, label="Acceptor", zorder=3)
         if self.sumtogg == 1:
             fig.plot(time, summm, color='black', label="Sum", zorder=1)
         
-        
         if self.legend == 1:
             fig.legend()
-        #fig.set_title("Intensity")
-        #fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
-        #fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
-        fig.set_xlim([self.xmin, None])
-        #fig.set_ylim([self.ymin, self.ymax])
 
+        fig.set_xlim([self.xmin, None])
         fig.set_axisbelow(True)
         fig.grid(True, linestyle="--", linewidth=0.8, color='xkcd:light grey')
 
@@ -172,41 +159,23 @@ class FileViewerMaker():
         elif self.intensitytoggle == 0:
             fig = self.axes[0]
             self.eaxis = self.axes[0]
-        #f = fig.gca()
 
         self.eaxis.sharex(self.iaxis)
         
         time = self.datacopy["time"]
         efret = self.datacopy["efret"]
 
-        
-
         fig.plot(time, efret, color=self.color3, zorder=1)
         fig.set_ylim([0, 1]) 
-        #fig.set_ylabel(self.y2label, fontsize=self.y2fontsize)
-        #fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
         fig.set_xlim([self.xmin, None])
         
         fig.set_axisbelow(True)
         fig.grid(True, linestyle="--", linewidth=0.8, color='xkcd:light grey')
         
-        
         if self.subtitle2 == 1:
             fig.annotate(text=self.title, xy=(10, 10), xycoords='axes pixels', zorder=2) #toggle on and off
 
         return fig
-    
-    def save(self, refpath, reftype, refqual):
-        if refqual == "Low":
-            dpi=200
-        elif refqual == "Medium":
-            dpi=400
-        elif refqual == "High":
-            dpi=600
-        refpath += reftype
-        self.fig.savefig(refpath, dpi=dpi)
-        self.annotate(refpath)
-        print("SAVED!")
 
     # removes canvas
     def destroyWidget(self):
@@ -235,31 +204,18 @@ class FileViewerMaker():
         gamma = 1
         self.datacopy['efret'] = self.datacopy['acceptor'] / (self.datacopy['acceptor'] + (gamma * self.datacopy['donor']))
 
+    def save(self, path, ending):
+        path = path.rstrip("\\/")
+        self.title = os.path.basename(self.title)
+        filename = os.path.join(path, self.title)
+        filename = filename + ending
 
-    # creates .txt file to save parameters, saves at same filepath
-    #   - refpath: filepath input in save window; matches figure save filepath
-    def annotate(self, refpath):
-        text = self.getText()
-        refpath = refpath.split(".")[:-1]
-        pathway = ""
-        for path in refpath:
-            pathway += path
-        path = str(pathway) + ".txt"
-        #f = open(path, "w")
-        #f.write(text)
-        #f.close()
-
-    def save(self, path, ending): # doesn't save the zeroed data yet, only original raw data
-        print(f"path: {path}")
-        path = path.rstrip("/")
-        self.title = self.title.split("/")[-1]
-        filename = path + "/" + self.title + ending
         lowerbound, upperbound  = self.iaxis.get_xlim()
         column_name = 'time' # Replace with the name of your column
-        zoomed_df = self.data[(self.data[column_name] >= lowerbound) & (self.data[column_name] <= upperbound)]
-        zoomed_df.to_csv(filename, index=False) # saves data between x values in a zoomed-in view
-        #print("file saved!")
-
+        zoomed_df = self.datacopy[(self.datacopy[column_name] >= lowerbound) & (self.datacopy[column_name] <= upperbound)]
+        
+        zoomed_df_dropped = zoomed_df.drop(columns=["efret", "sum"])
+        zoomed_df.to_csv(filename, index=False) # saves zeroed data between x values in a zoomed-in view
 
     def getDwellData(self):
         return self.dwelldf
@@ -270,10 +226,10 @@ class FileViewerMaker():
     def getDwellSeries(self):
         return self.dwellseries
     
-    def saveDwellData(self, filepath, filetype):
+    def saveDwellData(self, filepath, filetype): #filepath = directly entered by user, filetype = .csv
         filename = filepath + filetype
         self.dwelldf.to_csv(filename, index=False)
-        print("dwell data saved!")
+        print(f"Dwell data saved to {filename}")
 
     
 
