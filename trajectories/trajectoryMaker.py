@@ -2,6 +2,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 import pandas
+import os
 
 
 class TrajectoryMaker():
@@ -16,7 +17,6 @@ class TrajectoryMaker():
                  legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg):
         self.data = data
         self.datacopy = data.copy()
-        #self.sub_title = sub_titles
         self.master = master
         self.color1 = refcolor1
         self.color2 = refcolor2
@@ -59,11 +59,9 @@ class TrajectoryMaker():
         self.start()
 
     def getMinMax(self):
-        #print("setting lims")
         return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
 
     def getShift(self):
-        #print(f"get: {self.yshift}")
         return self.yshift
     
     def setShift(self, yshift):
@@ -71,18 +69,7 @@ class TrajectoryMaker():
 
     def start(self):
         self.calculateEfret()
-        keys = self.title.split("/")
-        self.title = ""
-        count = False
-        for i in range(len(keys)):
-            if count:
-                self.title += "/" + keys[i]
-            if keys[i] == self.titleset:
-                count = True
-    
-        self.title = self.title.split(".")[0]
-        self.title = self.title.strip("/")
-
+        self.makeTitle()
         self.fig = Figure()
 
         self.fig.set_figwidth(self.width)
@@ -108,13 +95,26 @@ class TrajectoryMaker():
 
         self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
 
+    def makeTitle(self):
+        self.title = self.title.rstrip("\\/")
+        keys = self.title.split(os.sep)
+        self.title = ""
+
+        count = False
+        for i in range(len(keys)): #for each part of the file path
+            if count:
+                self.title += "/" + keys[i]
+            if keys[i] == self.titleset:
+                count = True
+
+        self.title = self.title.split(".")[0] #removes file type designation
+        self.title = self.title.strip("\\/") #removes trailing/leading slashes
 
 
 
     def makeIntensity(self):
         self.iaxis = self.axes[0]
         fig = self.axes[0]
-        #f = fig.gca()
         
         time = self.datacopy["time"]
         donor = self.datacopy["donor"]
@@ -125,7 +125,6 @@ class TrajectoryMaker():
         
         if self.legend == 1:
             fig.legend()
-        #fig.set_title("Intensity")
         fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
         fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
         fig.set_xlim([self.xmin, self.xmax])
@@ -147,7 +146,6 @@ class TrajectoryMaker():
         elif self.intensitytoggle == 0:
             fig = self.axes[0]
             self.eaxis = self.axes[0]
-        #f = fig.gca()
         
         time = self.datacopy["time"]
         efret = self.datacopy["efret"]
@@ -161,7 +159,6 @@ class TrajectoryMaker():
 
         self.y2min, self.y2max = fig.get_ylim()
 
-        #fig.set_title("FRET Efficiency")
         if self.subtitle2 == 1:
             fig.annotate(text=self.title, xy=(10, 10), xycoords='axes pixels', zorder=2) #toggle on and off
 

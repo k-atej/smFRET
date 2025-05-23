@@ -64,7 +64,6 @@ class TrajectoryMainApplication(tk.Toplevel):
 
     def onclick(self):
         keys = self.processPath()
-        #print(keys)
         if self.ref_choice.get() == "Single":
             trajectory_window = TrajectoryWindow(self.ref_input.get(), keys)
         elif self.ref_choice.get() == "Stacked":
@@ -72,7 +71,6 @@ class TrajectoryMainApplication(tk.Toplevel):
 
     def processPath(self):
         filepath = self.ref_input.get()
-        #print(filepath)
         filetype = '* tr*.dat'
         keys = []
         for root, dirs, files in os.walk(filepath):
@@ -81,6 +79,7 @@ class TrajectoryMainApplication(tk.Toplevel):
             for file in files:
                 if glob.fnmatch.fnmatch(file, filetype):
                     keys.append(os.path.join(root, file))
+        print(keys)
         return keys
 
         

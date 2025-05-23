@@ -4,27 +4,29 @@ from histograms.histogramMaker import *
 from histograms.histogramWindow import *
 from histograms.stackedHistogramWindow import *
 from trajectories.trajectoryMaker import *
+import os
 
 
 
 
 class TrajectoryWindow(tk.Toplevel):
-    def __init__(self, path, files):
+    def __init__(self, path, files): #path = user input, files = full file paths for files in folder
         super().__init__()
         self.minsize(200, 200)
         self.df = []
-        self.files = [] # name of final file
+
+        self.files = [] # names of final file
         for file in files:
-            self.files.append(file.split("/")[-1])
-        self.paths = files # full file path
+            self.files.append(os.path.basename(file))
+        self.paths = files # full file paths
+
         self.numfiles = len(self.paths)
         self.index = 0
         self.trajectory = None
 
-        self.savepath = path.rstrip("/")
-        print(self.savepath)
+        self.savepath = path.rstrip("\\/")
         
-        self.titleset = path.split("/")[-1] # final folder in the input path
+        self.titleset = os.path.basename(self.savepath) # final folder in the input path
         self.title(self.titleset)
         self.yshift = 0
         self.generation = 0
@@ -433,8 +435,6 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get())
-        #self.yshift = self.trajectory.getShift()
-        #print(self.yshift)
 
         xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
         self.ref_xmin.set(xmin)

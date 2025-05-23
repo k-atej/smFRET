@@ -14,8 +14,9 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.minsize(200, 200)
         self.path = path  # what the user input into the box in the menu
         self.files = files  # list of filepaths for every trace file found within the folder
-        self.figtitle = self.path.split("/")[-1]
+        self.figtitle = os.path.basename(self.path)
         self.title(self.figtitle)
+
         self.trajectory = None
         self.generation = 0
         self.yshift = []
@@ -408,7 +409,6 @@ class stackedTrajectoryWindow(tk.Toplevel):
             self.trajectory.destroy()
 
         self.get_data()
-        #self.calculateEfret()
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
         ymax = self.checkMinMax(self.ref_ymax.get())
@@ -534,7 +534,6 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
-        #self.win.mainloop()
     
     def save(self):
         self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())

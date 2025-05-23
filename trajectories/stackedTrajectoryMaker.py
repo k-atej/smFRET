@@ -2,6 +2,7 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 from matplotlib import pyplot as plt
+import os
 
 
 class StackedTrajectoryMaker():
@@ -17,6 +18,7 @@ class StackedTrajectoryMaker():
         self.all_data = all_data
         self.yshift = yshift
         self.datacopy = []
+
         for i in range(len(self.all_data)):
             datum = self.all_data[i]
             datumcopy = datum.copy()
@@ -114,8 +116,7 @@ class StackedTrajectoryMaker():
             self.ymin, self.ymax = ax.get_ylim()
             ax.set_xticks([])
             if self.subtitle == 1:
-                key = self.files[i].split("/")[-1]
-                #ax.annotate(text=self.subtitles[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                key = os.path.basename(self.files[i])
                 if len(self.subtitles) != 0:
                     ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
                 else:
@@ -130,15 +131,12 @@ class StackedTrajectoryMaker():
         self.ymin, self.ymax = self.axes[0].get_ylim()
         if self.legend ==1:
             self.axes[len(self.all_data) - 1].legend()
- #toggle on and off
-        #self.fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
-        # remove x-tick labels on subplots, except for last one
+            
         for i in range(1, len(self.all_data)):
            self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
            self.axes[i].set_xticklabels([])
 
         self.axes[0].set_xlabel(self.xlabel, fontsize=self.xfontsize)
-        #self.fig.supylabel("Intensity (AU)", fontsize=12, x=0.1)
         if self.intensitytoggle == 1:
             self.fig.text(0.1, 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
@@ -157,8 +155,7 @@ class StackedTrajectoryMaker():
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_xticks([])
             if self.subtitle2 == 1:
-                key = self.files[i].split("/")[-1]
-                #ax.annotate(text=self.subtitles[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                key = os.path.basename(self.files[i])
 
                 if len(self.subtitles) != 0:
                     ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
@@ -172,8 +169,6 @@ class StackedTrajectoryMaker():
         self.y2min, self.y2max = self.Eaxes[0].get_ylim()
 
         self.Eaxes[0].xaxis.set_major_locator(plt.AutoLocator())
-
-        #f.annotate(text=self.title, xy=(0.03, 0.05), xycoords='axes fraction') #toggle on and off
     
         # remove x-tick labels on subplots, except for last one
         for i in range(1, len(self.all_data)):
@@ -181,7 +176,6 @@ class StackedTrajectoryMaker():
            self.Eaxes[i].set_xticklabels([])
 
         self.Eaxes[0].set_xlabel(self.x2label, fontsize=self.x2fontsize)
-        #self.fig.supylabel("FRET Efficiency", fontsize=12, x=0.5)
         if self.numdata == 2:
             self.fig.text(0.515, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         else:
