@@ -58,18 +58,20 @@ class HistogramMainApplication(tk.Toplevel):
     # and opens the corresponding window. 
     def start(self):
         self.path = self.ref_input.get()
-        keys = []
+        #keys = []
+        keys2 = []
         for root, dirs, files in os.walk(self.path):
                for file in files:
                 if file.endswith(self.ref_file.get()):
-                    keys.append(file)
-        if len(keys) == 1:
-            histapp = HistApplication(self.path, self.ref_file.get(), self.getTitle())
-        elif len(keys) > 1:
-            stackedhistapp = StackedHistApplication(self.path, self.ref_file.get(), self.getTitle())
+                    #keys.append(file)
+                    keys2.append(os.path.join(root, file))
+        print(f"keys: {keys2}")
+
+        if len(keys2) == 1:
+            histapp = HistApplication(self.path, self.ref_file.get(), self.getTitle(), keys2)
+        elif len(keys2) > 1:
+            stackedhistapp = StackedHistApplication(self.path, self.ref_file.get(), self.getTitle(), keys2)
 
     #returns the name of the final folder in the file path, to set as the window title
     def getTitle(self):
-        path = self.path.split("/")
-        title = path[-1]
-        return title
+        return os.path.basename(self.path)

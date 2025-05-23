@@ -14,12 +14,16 @@ class StackedHistApplication(tk.Toplevel):
     # path - filepath provided in entry box in histogram main menu
     # filename - name of file that was being searched for, set in histogram main menu
     # title - name to set as the window title
-    def __init__(self, path, filename, title):
+    # keys - list of full file paths to each file
+    def __init__(self, path, filename, title, keys):
         super().__init__()
         self.title(title)
         self.minsize(200, 200)
+
         self.path = path
         self.savepath = path
+        self.keys = keys
+
         self.annotations = []
         self.hist = None
         self.filename = filename
@@ -72,7 +76,7 @@ class StackedHistApplication(tk.Toplevel):
         
         self.files = []
         for key in keys:
-            self.files.append(self.path + "/" + key)
+            self.files.append(os.path.join(self.path, key))
 
     # initializes and creates the customizability options in the side menu
     def start(self):
@@ -487,7 +491,11 @@ class StackedHistApplication(tk.Toplevel):
             subtitlesizes.append(jfontsize.get())
 
          # create the new histogram
-        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, datacol, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, linetogg, linewidth, offset)
+        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, datacol, self.subframe2, 
+                                     0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, 
+                                     edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, 
+                                     toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, 
+                                     linetogg, linewidth, offset)
         
         # save annotations & subtitles on histogram
         self.annotations = self.hist.get_annotations()
@@ -551,11 +559,16 @@ class StackedHistApplication(tk.Toplevel):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
 
-        path = self.path + "/" + self.filename
+        path = os.path.join(self.path, self.filename)
+
         s = ""
         savepath = path.split(".")
-        for path in savepath[:-1]:
-            s+= path
+        if len(savepath) > 1:
+            for path in savepath[:-1]:
+                s+= path
+        else:
+            s = path
+            
         #input area for file name, automatically sets to the filepath that was input originally
         self.path_label = tk.Label(self.win, text="Save File Path:")
         self.path_label.grid(row=0, column=0)

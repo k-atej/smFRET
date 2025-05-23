@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import colorchooser
 from matplotlib.figure import Figure
 from histograms.histogramMaker import *
+import os
 
 
 #Example MacOS filepath for a single histogram
@@ -16,11 +17,13 @@ class HistApplication(tk.Toplevel):
     # path - filepath provided in entry box in histogram main menu
     # filename - name of file that was being searched for, set in histogram main menu
     # title - name to set as the window title
-    def __init__(self, path, filename, title):
+    # keys - list of full file paths to each file
+    def __init__(self, path, filename, title, keys):
         super().__init__()
         self.title(title)
         self.minsize(200, 200)
-        self.path = path + "/" + filename
+
+        self.path = keys[0]
         self.savepath = path
         self.annotations =[]
         self.hist = None
@@ -456,7 +459,10 @@ class HistApplication(tk.Toplevel):
         titlefontsize = float(self.ref_titlefontsize.get())
 
         # create the new histogram
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, linestyle, linetogg, linewidth, offset)
+        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, 
+                              titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, 
+                              ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, 
+                              linestyle, linetogg, linewidth, offset)
         
         # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
@@ -488,8 +494,11 @@ class HistApplication(tk.Toplevel):
         
         s = ""
         savepath = self.path.split(".")
-        for path in savepath[:-1]:
-            s+= path
+        if len(savepath) > 1:
+            for path in savepath[:-1]:
+                s+= path
+        else:
+            s = savepath
 
         #input area for file name, automatically sets to the filepath that was input originally
         self.path_label = tk.Label(self.win, text="Save File Path:")

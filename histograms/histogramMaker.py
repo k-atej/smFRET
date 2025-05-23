@@ -228,10 +228,15 @@ class HistMaker():
     #   - refpath: filepath input in save window; matches figure save filepath
     def annotate(self, refpath):
         text = self.getText()
-        refpath = refpath.split(".")[:-1]
+        
+        refpath2 = refpath.split(".")[:-1]
         pathway = ""
-        for path in refpath:
-            pathway += path
+        if len(refpath2) > 0:
+            for path in refpath2:
+                pathway += path
+        else:
+            pathway = refpath
+
         path = str(pathway) + ".txt"
         f = open(path, "w")
         f.write(text)

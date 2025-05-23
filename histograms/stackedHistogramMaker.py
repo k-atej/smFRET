@@ -5,8 +5,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
-
-
+import os
 
 # creates a stack of histograms to display in the stackedHistogramWindow
 class StackedHistMaker():
@@ -191,8 +190,8 @@ class StackedHistMaker():
 
         self.lastFolder = []
         for file in self.files:
-            self.lastFolder.append(file.split("/")[-1])
-            path = file + "/" + self.filename
+            self.lastFolder.append(os.path.basename(file))
+            path = os.path.join(file, self.filename)
             data = self.get_eFRET_data(path)
 
             if len(data) < min_length:
@@ -237,7 +236,6 @@ class StackedHistMaker():
             numbins = rangebin // bin_width
             bins = np.linspace(self.min_data, self.max_data + bin_width, int(numbins) + 1)
             self.bins = bins 
-            #print(self.bins)
             self.return_bins = bin_width
         else:
             self.bins = int(self.bins)
@@ -271,7 +269,6 @@ class StackedHistMaker():
             df[self.datacolumn] = df[self.datacolumn] - float(self.offset)
             zeroed_data.append(df)
         self.all_data_shifted = zeroed_data
-        #print(zeroed_data)
 
     # returns the count of the highest bin, not currently in use
     #   - data: pandas dataframe column 
@@ -316,10 +313,15 @@ class StackedHistMaker():
     #   - refpath: filepath input in save window; matches figure save filepath
     def annotate(self, refpath):
         text = self.getText()
-        refpath = refpath.split(".")[:-1]
+
+        refpath2 = refpath.split(".")[:-1]
         pathway = ""
-        for path in refpath:
-            pathway += path
+        if len(refpath2) > 0:
+            for path in refpath2:
+                pathway += path
+        else:
+            pathway = refpath
+
         path = str(pathway) + ".txt"
         f = open(path, "w")
         f.write(text)
