@@ -9,12 +9,13 @@ import os
 # /Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy
 
 #opens a window that displays a stacked histogram based on the files provided
+#   path: filepath provided in entry box in histogram main menu
+#   filename: name of file that was being searched for, set in histogram main menu
+#   title: name to set as the window title
+#   keys: list of full file paths to each file
 class StackedHistApplication(tk.Toplevel):
 
-    # path - filepath provided in entry box in histogram main menu
-    # filename - name of file that was being searched for, set in histogram main menu
-    # title - name to set as the window title
-    # keys - list of full file paths to each file
+    # initializes variables within the class
     def __init__(self, path, filename, title, keys):
         super().__init__()
         self.title(title)
@@ -30,9 +31,8 @@ class StackedHistApplication(tk.Toplevel):
         self.subtitle_inputs = []
         self.generation = 0
 
+        # collect each designated file into a list
         self.find_files()
-
-        #setting up the layout of the window!
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -62,6 +62,7 @@ class StackedHistApplication(tk.Toplevel):
         self.subframe4 = tk.Frame(self.window0, background='white')
         self.subframe4.grid(row=2, column=0)
         
+        # make the window with the histogram and all of the options
         self.start()
 
     # parses the folders into list of folders with the designated filename in them
@@ -79,8 +80,10 @@ class StackedHistApplication(tk.Toplevel):
             self.files.append(os.path.join(self.path, key))
 
     # initializes and creates the customizability options in the side menu
+    # then makes the histogram
     def start(self):
         self.makeFeatures()
+        self.his()
         
 
     # creates the dropdowns & buttons available in the customizability menu, 
@@ -92,7 +95,6 @@ class StackedHistApplication(tk.Toplevel):
         self.makeButtons()
         self.bind('<Return>', self.his)
         self.bind('<BackSpace>', self.undoLastLine)
-        self.his()
 
     # sets up the layout of the customizability menu
     def makeFormat(self):
@@ -431,13 +433,12 @@ class StackedHistApplication(tk.Toplevel):
         self.combo.grid(row=3, column=2)
 
 
-    # generates histogram without data, not currently in use
+    # generates histogram without line annotations
     def emptyHis(self):
         self.annotations = []
         self.his()
 
     # generates a histogram based on the parameters set in the customizability menu
-    # - event: press of the enter key (optional)
     def his(self, event=None): 
 
         # clear any existing histogram
@@ -445,44 +446,24 @@ class StackedHistApplication(tk.Toplevel):
             self.hist.destroy()
         self.generation += 1
 
-        # collect new parameters from customization menu
-        datacol = self.ref_col.get()
-        bins = self.ref_bins.get()
-        title = str(self.ref_title.get())
-        x_ax = str(self.ref_x.get())
-        y_ax = str(self.ref_y.get())
-
+        # collect and check parameters from the customization menus
         color = str(self.ref_color.get())
         if color == "None":
-            color = 0
+            color = "black"
 
         edgecolor = str(self.ref_edgecolor.get())
         if edgecolor == "None":
-            edgecolor = 0
+            edgecolor = "black"
         
         linecolor = str(self.ref_linecolor.get())
         if linecolor == "None":
             linecolor = "red"
-        
-        linetogg = self.linetoggle.get()
-        linestyle = self.ref_linestyle.get()
-        linewidth = self.ref_lw.get()
-        edgewidth = float(self.ref_edgewidth.get())
-        offset = self.ref_offset.get()
+
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
         ymax = self.checkMinMax(self.ref_ymax.get())
         ymin = self.checkMinMax(self.ref_ymin.get())
-
-        width = float(self.ref_width.get())
-        height = float(self.ref_height.get())
-
-        toggle = self.toggle.get()
-        bin1 = self.bin1.get()
-
-        xfontsize = float(self.ref_xfontsize.get())
-        yfontsize = float(self.ref_yfontsize.get())
-        titlefontsize = float(self.ref_titlefontsize.get())
+     
         subtitles = []
         subtitlesizes = []
         for subtitle in self.subtitle_inputs:
@@ -490,12 +471,15 @@ class StackedHistApplication(tk.Toplevel):
             subtitles.append(j.get())
             subtitlesizes.append(jfontsize.get())
 
-         # create the new histogram
-        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, datacol, self.subframe2, 
-                                     0, 0, bins, bin1, title, titlefontsize, x_ax, y_ax, color, edgecolor, 
-                                     edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, width, height, 
-                                     toggle, self.annotations, subtitles, subtitlesizes, linecolor, linestyle, 
-                                     linetogg, linewidth, offset)
+         # create the new histogram based on parameters from the customization menu
+        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, self.ref_col.get(), self.subframe2, 
+                                     0, 0, self.ref_bins.get(), self.bin1.get(), str(self.ref_title.get()), 
+                                     float(self.ref_titlefontsize.get()), str(self.ref_x.get()),str(self.ref_y.get()), 
+                                     color, edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, ymax, ymin, 
+                                     float(self.ref_xfontsize.get()), float(self.ref_yfontsize.get()), float(self.ref_width.get()), 
+                                     float(self.ref_height.get()), self.toggle.get(), self.annotations, subtitles, 
+                                     subtitlesizes, linecolor, self.ref_linestyle.get(), 
+                                     self.linetoggle.get(), self.ref_lw.get(), self.ref_offset.get())
         
         # save annotations & subtitles on histogram
         self.annotations = self.hist.get_annotations()
@@ -505,23 +489,30 @@ class StackedHistApplication(tk.Toplevel):
         
         # make input areas for subtitles based on hist size
         if self.generation == 1:
-            self.makeSubtitleInputs()
-            folders = self.hist.get_lastfolder()
-            for i in range(len(self.subtitle_inputs)):
-                j, jtext, jfontsize = self.subtitle_inputs[i]
-                jtext.set(folders[i])
+            self.makeSubtitles()
 
         # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
 
         # reset subtitle input sizes
+        self.resetSubtitles()
+
+    # reset subtitle input sizes
+    def resetSubtitles(self):
         if len(self.subtitle_inputs) == len(self.subtitles):
             for i in range(len(self.subtitle_inputs)):
                 j, jtext, jfontsize = self.subtitle_inputs[i]
                 jtext.set(self.subtitles[i])
                 jfontsize.set(self.subtitlesizes[i])
 
-
+    # set up inputs based on stacked hist size
+    def makeSubtitles(self):
+        self.makeSubtitleInputs()
+        folders = self.hist.get_lastfolder()
+        for i in range(len(self.subtitle_inputs)):
+            j, jtext, jfontsize = self.subtitle_inputs[i]
+            jtext.set(folders[i])
+                          
     # creates input areas and fontsize dropdowns based on length of data provided to histogram
     def makeSubtitleInputs(self):
         self.subtitle_inputs = []

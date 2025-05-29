@@ -54,23 +54,24 @@ class HistogramMainApplication(tk.Toplevel):
         self.combo4.config(width=30)
         self.combo4.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady="10")
 
-    # walks through folders in the file path and identifies that number of eFRET_FILE_NAMEs present. decides whether a single or stacked histogram is appropriate,
+    # walks through folders in the file path and identifies that number of eFRET_FILE_NAMEs present. 
+    # decides whether a single or stacked histogram is appropriate,
     # and opens the corresponding window. 
     def start(self):
         self.path = self.ref_input.get()
-        #keys = []
-        keys2 = []
+        keys = []
         for root, dirs, files in os.walk(self.path):
                for file in files:
                 if file.endswith(self.ref_file.get()):
-                    #keys.append(file)
-                    keys2.append(os.path.join(root, file))
-        print(f"keys: {keys2}")
+                    keys.append(os.path.join(root, file))
 
-        if len(keys2) == 1:
-            histapp = HistApplication(self.path, self.ref_file.get(), self.getTitle(), keys2)
-        elif len(keys2) > 1:
-            stackedhistapp = StackedHistApplication(self.path, self.ref_file.get(), self.getTitle(), keys2)
+        # if only one file is found, opens a singular histogram
+        if len(keys) == 1:
+            histapp = HistApplication(self.path, self.ref_file.get(), self.getTitle(), keys)
+            
+        # if multiple files are found, opens a stacked histogram
+        elif len(keys) > 1:
+            stackedhistapp = StackedHistApplication(self.path, self.ref_file.get(), self.getTitle(), keys)
 
     #returns the name of the final folder in the file path, to set as the window title
     def getTitle(self):

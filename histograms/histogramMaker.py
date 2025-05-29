@@ -4,10 +4,6 @@ from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg)
 from matplotlib.figure import Figure
 
-
-# creates a histogram to display in the histogramWindow
-class HistMaker():
-
 #   - data: pandas dataframe column to input into a histogram
 #   - savepath: what to set as the default save path
 #   - master: which frame of the gui to add the histogram to
@@ -37,7 +33,10 @@ class HistMaker():
 #   - linewidth: line width for vertical line annotations
 #   - shift (optional): how much to shift the data by in order to zero the first column
 
+# creates a histogram to display in the histogramWindow
+class HistMaker():
 
+    # initializes variables within the class
     def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, 
                  x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, 
                  width, height, annotations, linecolor, linestyle, linetogg, linewidth, shift=None):
@@ -70,29 +69,33 @@ class HistMaker():
         self.linetogg = linetogg
         self.linewidth = linewidth
 
+        # create the figure to be pasted into a HistogramWindow
         self.fig = self.makeHistogram()
 
 
     # makes a single histogram from a given data frame column
     def makeHistogram(self):
-
+        
+        # copy and modify data according to shift
         self.zero_data()
 
         # create a new matplotlib figure
         fig = Figure(dpi=100)
         fig.set_figwidth(self.width)
         fig.set_figheight(self.height)
-        f = fig.gca() #gca = get current axes
+        f = fig.gca()
+
+        # calculate the number of bins to use in the histogram
         self.setBins()
 
         # create a new histogram, set parameters
         f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
+        # set axes options
         f.set_xlabel(self.x, fontsize=self.xfontsize)
         f.set_ylabel(self.y, fontsize=self.yfontsize)
         f.set_xlim([self.xmin, self.xmax])
         f.set_ylim([self.ymin, self.ymax])
-
         self.xlim = f.get_xlim()
         self.ylim = f.get_ylim()
 
@@ -103,65 +106,77 @@ class HistMaker():
         self.hist_canvas.draw()
         self.hist_canvas.get_tk_widget().grid(row=self.row, column=self.col)
 
-        # annotate figure with lines
+        # annotate figure with lines, carry over previous annotations
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
         self.restoreAnnotations(f)
 
         return fig
     
     # re-add lines from previous generation of histogram
+    #   - f: figure to add the annotations to
     def restoreAnnotations(self, f):
         if len(self.annotations) != 0:
             for annotation in self.annotations:
                 x, color, style, lw = annotation
                 self.draw_annotations(f, x, color, style, lw)
     
-    # simple bin logic, not currently in use
-    def simpleBins(self):
-        if self.bintype == 0:
-            # this is a bin number
+
+    # sets the number/width of bins to use in the histogram based on input in the customization menu
+    # sets the number/width of bins to display in the customization menu
+    def setBins(self):
+        # if the user didn't enter 'Auto,' check to see if it was a typo
+        if self.bins != 'Auto':
+            self.autoBinCheck()
+
+        # if the user entered 'Auto,' figure out whether to use auto binning
+        # for bin width or bin number
+        if self.bins == 'Auto':
+            self.makeAutoBins()
+        
+        # otherwise, if the user selected to enter a bin width
+        # use that value as the bin width
+        elif self.bintype == 1:
+            self.makeBinWidth()
+        
+        # otherwise, if the user selected to enter a bin number
+        # use the many bins
+        else:
             self.bins = int(self.bins)
             self.return_bins = int(self.bins)
-        elif self.bintype == 1:
-            bin_width = float(self.bins)
+    
+    # check to see if the user meant to type 'Auto' for binning
+    def autoBinCheck(self):
+        if 'Auto' in str(self.bins):
+                self.bins = 'Auto'
+        elif 'auto' in str(self.bins):
+                self.bins = 'Auto'
+        elif float(self.bins) < 1.0:
+            if self.bintype == 0:
+                self.bins = 'Auto'
+
+    # if the user chose to do auto binning, check to see whether we are using
+    # bin width or bin number
+    def makeAutoBins(self):
+        if self.bintype == 0:
+                self.bins = int(self.auto_bin())
+                self.return_bins = f'Auto:{self.bins}'
+        else:
+            bin_width = float(self.auto_bin_width())
             rangebin = max(self.data_shifted) - min(self.data_shifted)
             numbins = rangebin // bin_width
             bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
             self.bins = bins 
             self.return_bins = bin_width
 
-    # sets the number/width of bins to use in the histogram based on input in the customization menu
-    # sets the number/width of bins to display in the customization menu
-    def setBins(self):
-        
-        if self.bins != 'Auto':
-            if 'Auto' in str(self.bins):
-                self.bins = 'Auto'
-            elif float(self.bins) < 1.0:
-                if self.bintype == 0:
-                    self.bins = 'Auto'
-        if self.bins == 'Auto':
-            if self.bintype == 0:
-                self.bins = int(self.auto_bin())
-                self.return_bins = f'Auto:{self.bins}'
-            else:
-                bin_width = float(self.auto_bin_width())
-                rangebin = max(self.data_shifted) - min(self.data_shifted)
-                numbins = rangebin // bin_width
-                bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
-                self.bins = bins 
-                self.return_bins = bin_width
-        elif self.bintype == 1:
-            bin_width = float(self.bins)
-            rangebin = max(self.data_shifted) - min(self.data_shifted)
-            numbins = rangebin // bin_width
-            bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
-            self.bins = bins 
-            self.return_bins = bin_width
-        else:
-            self.bins = int(self.bins)
-            self.return_bins = int(self.bins)
-    
+    # if we are using a non-auto bin width, create the bins
+    def makeBinWidth(self):
+        bin_width = float(self.bins)
+        rangebin = max(self.data_shifted) - min(self.data_shifted)
+        numbins = rangebin // bin_width
+        bins = np.linspace(min(self.data_shifted), max(self.data_shifted) + bin_width, int(numbins) + 1)
+        self.bins = bins 
+        self.return_bins = bin_width
+
     #returns number of bins used in the histogram
     def getBins(self):
         return self.return_bins
@@ -173,24 +188,18 @@ class HistMaker():
     # zeroes the data in the dataframe; can shift by a designated value or do it automatically
     # authored by Kate Sanders
     def zero_data(self):
-        # Make a histogram with two bins
-        # so one bin in actual fret and the other is photobleaching
+
+        # Make a histogram with two bins, so one bin in actual fret and the other is photobleaching
         if self.offset == 'Auto':
             bin_edges = np.histogram(self.data, bins=2)[1]
-            # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
-            self.offset = bin_edges[1] / 2
+            self.offset = bin_edges[1] / 2 # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
+
         elif self.offset == 'None':
             self.offset = 0.0
+
         # subtract that midpoint of from all of the eFRET data
         self.data = self.data.astype(float)
         self.data_shifted = self.data - float(self.offset)
-
-    # returns the count of the highest bin, not currently in use
-    #   - data: pandas dataframe column 
-    def getHighestCount(data):
-        hist = np.histogram(data)
-        sizes = hist[0]
-        return max(sizes)
 
     # calculates the number of bins based on size of dataset, using Sturges's Rule (log2n + 1) * 5
     def auto_bin(self):
@@ -218,7 +227,6 @@ class HistMaker():
         refpath += reftype
         self.fig.savefig(refpath, dpi=dpi)
         self.annotate(refpath)
-        print("SAVED!")
 
     # removes canvas
     def destroy(self):
@@ -227,8 +235,10 @@ class HistMaker():
     # creates .txt file to save parameters, saves at same filepath
     #   - refpath: filepath input in save window; matches figure save filepath
     def annotate(self, refpath):
+        # generate annotation text to save
         text = self.getText()
         
+        # generate save path
         refpath2 = refpath.split(".")[:-1]
         pathway = ""
         if len(refpath2) > 0:
@@ -237,18 +247,21 @@ class HistMaker():
         else:
             pathway = refpath
 
+        # write and save file
         path = str(pathway) + ".txt"
         f = open(path, "w")
         f.write(text)
+        f.close()
 
     # gathers input parameters and formats it into text to save as a .txt file
     def getText(self):
         # if bintype = 1, bin width; otherwise bin number
         if self.bintype == 1:
-            binny = "bin width"
+            binning = "bin width"
         elif self.bintype == 0:
-            binny = "bin number"
+            binning = "bin number"
         
+        # get the axes limits
         xmin, xmax = self.xlim
         ymin, ymax = self.ylim
 
@@ -257,7 +270,7 @@ class HistMaker():
         data: {self.data}
         savepath: {self.savepath}
         bins: {self.bins}
-        bintype: {binny}
+        bintype: {binning}
         title: {self.title}
         title fontsize: {self.titlesize}
         x-axis label: {self.x}

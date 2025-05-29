@@ -8,8 +8,6 @@ from matplotlib.figure import Figure
 import os
 
 # creates a stack of histograms to display in the stackedHistogramWindow
-class StackedHistMaker():
-
 #   - files: files from which to pull data
 #   - savepath: what to set as the default save path
 #   - filename: name of the file that we were searching for
@@ -43,7 +41,9 @@ class StackedHistMaker():
 #   - linetogg: whether line edits are currently toggled on
 #   - linewidth: line width for vertical line annotations
 #   - shift (optional): how much to shift the data by in order to zero the first column
+class StackedHistMaker():
 
+    # initializes the variables within the window
     def __init__(self, files, savepath, filename, datacolumn, master, row, col, bins, bintype, 
                  title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, 
                  xfontsize, yfontsize, width, height, toggle, annotations, subtitles, subtitlesizes,
@@ -98,7 +98,8 @@ class StackedHistMaker():
         self.axes = []
         for i in reversed(range(len(self.all_data_shifted))):
             ax = fig.add_subplot(len(self.all_data_shifted), 1, i+1)
-            ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
+            ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, 
+                    edgecolor=self.edgecolor, linewidth=self.edgewidth)
             if len(self.subtitles) != 0:
                 ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.75), xycoords='axes fraction')
             
@@ -181,13 +182,17 @@ class StackedHistMaker():
     def get_subtitlesizes(self):
         return self.subtitlesizes
 
-    # collects data from individual files, compiles them into a list of dataframes and sets the number of bins to use
+    # collects data from individual files, compiles them into a list of dataframes
+    # and sets the number of bins to use
     def processData(self):
-        self.all_data = [] # list of dataframes
+        
+        # initialize a list of dataframes
+        self.all_data = []
         min_length = float('inf')
         self.min_data = float('inf')
         self.max_data = 0
 
+        # for each file, get the data and the data's bounds
         self.lastFolder = []
         for file in self.files:
             self.lastFolder.append(os.path.basename(file))
@@ -200,46 +205,72 @@ class StackedHistMaker():
                 self.min_data = data["eFRET"].min()
             if data["eFRET"].max() > self.max_data:
                 self.max_data = data["eFRET"].max()
+
+            # add data to list
             self.all_data.append(data)
             self.minlength = min_length
 
+        # zero & bin the data
         self.zero_data()
-
         self.min_data -= float(self.offset)
         self.max_data -= float(self.offset)
-
         self.setBins()
     
     # sets the number/width of bins to use in the histogram based on input in the customization menu
     # sets the number/width of bins to display in the customization menu
     def setBins(self):
+        # if the user didn't enter 'Auto,' check to see if it was a typo
         if self.bins != 'Auto':
-            if 'Auto' in str(self.bins):
-                self.bins = 'Auto'
-            elif float(self.bins) < 1.0:
-                if self.bintype == 0:
-                    self.bins = 'Auto'
+            self.autoBinCheck()
+
+        # if the user entered 'Auto,' figure out whether to use auto binning
+        # for bin width or bin number
         if self.bins == 'Auto':
-            if self.bintype == 0:
+            self.makeAutoBins()
+
+        # otherwise, if the user selected to enter a bin width
+        # use that value as the bin width
+        elif self.bintype == 1:
+            self.makeBinWidth()
+        
+        # otherwise, if the user selected to enter a bin number
+        # use the many bins
+        else:
+            self.bins = int(self.bins)
+            self.return_bins = int(self.bins)
+
+    # if we are using a non-auto bin width, create the bins
+    def makeBinWidth(self):
+        bin_width = float(self.bins)
+        rangebin = self.max_data - self.min_data
+        numbins = rangebin // bin_width
+        bins = np.linspace(self.min_data, self.max_data + bin_width, int(numbins) + 1)
+        self.bins = bins 
+        self.return_bins = bin_width
+
+    # if the user chose to do auto binning, check to see whether we are using
+    # bin width or bin number
+    def makeAutoBins(self):
+        if self.bintype == 0:
                 self.bins = int(self.auto_bin())
                 self.return_bins = f'Auto:{self.bins}'
-            else:
-                bin_width = float(self.auto_bin_width())
-                rangebin = self.max_data - self.min_data
-                numbins = rangebin // bin_width
-                bins = np.linspace(self.min_data, self.max_data + bin_width, int(numbins) + 1)
-                self.bins = bins 
-                self.return_bins = bin_width
-        elif self.bintype == 1:
-            bin_width = float(self.bins)
+        else:
+            bin_width = float(self.auto_bin_width())
             rangebin = self.max_data - self.min_data
             numbins = rangebin // bin_width
             bins = np.linspace(self.min_data, self.max_data + bin_width, int(numbins) + 1)
             self.bins = bins 
             self.return_bins = bin_width
-        else:
-            self.bins = int(self.bins)
-            self.return_bins = int(self.bins)
+
+    # check to see if the user meant to type 'Auto' for binning
+    def autoBinCheck(self):
+        if 'Auto' in str(self.bins):
+                self.bins = 'Auto'
+        elif 'auto' in str(self.bins):
+                self.bins = 'Auto'
+        elif float(self.bins) < 1.0:
+            if self.bintype == 0:
+                self.bins = 'Auto'
 
     # returns the number of bins used in a histogram
     def getBins(self):
@@ -248,7 +279,10 @@ class StackedHistMaker():
     # returns dataframe from one file
     def get_eFRET_data(self, path):
         FRETresult = open(path, "r") 
-        data = pd.read_fwf(FRETresult, header=None)
+        if ".csv" in path:
+            data = pd.read_csv(FRETresult, header=None)
+        else:
+            data = pd.read_fwf(FRETresult, header=None)
         data.columns = ["eFRET", "other"]
         return data
 
@@ -256,15 +290,9 @@ class StackedHistMaker():
     def zero_data(self):
         zeroed_data = []
         for df in self.all_data:
-            if self.offset == 'Auto':
-                # Make a histogram with two bins
-                # so one bin in actual fret and the other is photobleaching
-                bin_edges = np.histogram(self.data, bins=2)[1]
-                # divide the far edge of the first bin (photobleached) by 2 to get the midpoint
-                self.offset = bin_edges[1] / 2
-            elif self.offset == 'None':
+            if self.offset == 'None':
                 self.offset = 0.0
-            # subtract that midpoint of from all of the eFRET data
+            # subtract that value off from all of the eFRET data
             df[self.datacolumn] = df[self.datacolumn].astype(float)
             df[self.datacolumn] = df[self.datacolumn] - float(self.offset)
             zeroed_data.append(df)
@@ -303,7 +331,6 @@ class StackedHistMaker():
         refpath += reftype
         self.fig.savefig(refpath, dpi=dpi)
         self.annotate(refpath)
-        print("SAVED!")
 
     # removes canvas
     def destroy(self):
@@ -312,8 +339,10 @@ class StackedHistMaker():
     # creates .txt file to save parameters, saves at same filepath
     #   - refpath: filepath input in save window; matches figure save filepath
     def annotate(self, refpath):
+        # generate annotation text to save
         text = self.getText()
 
+        # generate save path
         refpath2 = refpath.split(".")[:-1]
         pathway = ""
         if len(refpath2) > 0:
@@ -322,17 +351,20 @@ class StackedHistMaker():
         else:
             pathway = refpath
 
+        # write and save file
         path = str(pathway) + ".txt"
         f = open(path, "w")
         f.write(text)
+        f.close()
 
     # gathers input parameters and formats it into text to save as a .txt file
     def getText(self):
-        # if bintype = 1, bin width; otherwise bin number
+
+        # collect information about paramets
         if self.bintype == 1:
-            binny = "bin width"
+            binning = "bin width"
         elif self.bintype == 0:
-            binny = "bin number"
+            binning = "bin number"
         
         xmin, xmax = self.xlim
         ymin, ymax = self.ylim
@@ -347,7 +379,7 @@ class StackedHistMaker():
         data: {self.datacolumn}
         savepath: {self.savepath}
         bins: {self.bins}
-        bintype: {binny}
+        bintype: {binning}
         title: {self.title}
         title fontsize: {self.titlesize}
         x-axis label: {self.x}
@@ -376,16 +408,7 @@ class StackedHistMaker():
         if self.linetogg == 1:
             if event.inaxes:
                 if event.dblclick:
-                    axis, x, y, dbl, color, style, lw = self.annotations[-1]
-                    for ax in self.axes:
-                        ax_pos = ax.get_position()
-                        axis_pos = axis.get_position()
-                        ax0 = ax_pos.y0
-                        axis0 = axis_pos.y0
-                        if (ax0 != axis0):
-                            dbl=True
-                            self.draw_annotations(ax, x, y, self.linecolor, self.linestyle, self.linewidth)
-                            self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle, self.linewidth))
+                    self.handleDblClick()
                 
                 else:
                     axis = (event.inaxes)
@@ -394,12 +417,27 @@ class StackedHistMaker():
 
                     dbl=False
                     self.draw_annotations(axis, x, y, self.linecolor, self.linestyle, self.linewidth)
-                    self.annotations.append((axis, x, y, False, self.linecolor, self.linestyle, self.linewidth))
+                    self.annotations.append((axis, x, y, dbl, self.linecolor, self.linestyle, self.linewidth))
     
+    
+    # double clicking adds a vertical line spanning all subplots
+    def handleDblClick(self):
+        axis, x, y, dbl, color, style, lw = self.annotations[-1]
+        for ax in self.axes:
+            ax_pos = ax.get_position()
+            axis_pos = axis.get_position()
+            ax0 = ax_pos.y0
+            axis0 = axis_pos.y0
+            if (ax0 != axis0):
+                dbl=True
+                self.draw_annotations(ax, x, y, self.linecolor, self.linestyle, self.linewidth)
+                self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle, self.linewidth))
+
 
     # draws lines on the matplotlib figure, parameters set in customization menu
     #   - axis: where to draw the annotations (on the plot)
     #   - x: x-coordinate (based on the x-axis data) to draw the line at
+    #   - y: y-coordinate (unused)
     #   - color: color of the line to paste onto the canvas
     #   - linestyle: style of line to paste onto the canvas
     #   - linewidth: size of line to paste onto the canvas

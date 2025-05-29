@@ -12,12 +12,13 @@ import os
 
 
 #opens a window that displays a single histogram based on the file provided
+#   path: filepath provided in entry box in histogram main menu
+#   filename: name of file that was being searched for, set in histogram main menu
+#   title: name to set as the window title
+#   keys: list of full file paths to each file
 class HistApplication(tk.Toplevel):
 
-    # path - filepath provided in entry box in histogram main menu
-    # filename - name of file that was being searched for, set in histogram main menu
-    # title - name to set as the window title
-    # keys - list of full file paths to each file
+    # initializes variables within the class
     def __init__(self, path, filename, title, keys):
         super().__init__()
         self.title(title)
@@ -28,9 +29,8 @@ class HistApplication(tk.Toplevel):
         self.annotations =[]
         self.hist = None
         
+        # get data frome file
         self.get_data()
-
-        #setting up the layout of the window!
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -63,9 +63,13 @@ class HistApplication(tk.Toplevel):
         self.start()         
            
     # parses the data file into a pandas dataframe
+    # must be a .dat (fwf) file # GENERALIZE THIS TO INCLUDE CSVs?
     def get_data(self):
         FRETresult = open(self.path, "r") 
-        data = pd.read_fwf(FRETresult, header=None)
+        if ".csv" in self.path:
+            data = pd.read_csv(FRETresult, header=None)
+        else:
+            data = pd.read_fwf(FRETresult, header=None)
         data.columns = ["eFRET", "other"]
         self.df = data
 
@@ -407,62 +411,45 @@ class HistApplication(tk.Toplevel):
         self.combo.config(width=2)
         self.combo.grid(row=3, column=2)
 
-    # generates histogram without data, not currently in use
+    # generates histogram without any annotations
     def emptyHis(self):
         self.annotations = []
         self.his()
 
     # generates a histogram based on the parameters set in the customizability menu
-    # - event: press of the enter key (optional)
+    # PROBABLY WANT SOME MORE EXTENSIVE TYPE CHECKING HERE IN THE FUTURE
     def his(self, event=None): 
 
         # clear any existing histogram
         if self.hist is not None:
             self.hist.destroy()
 
-        # collect new parameters from customization menu
-        col = self.ref_col.get()
-        bins = self.ref_bins.get()
-        title = str(self.ref_title.get())
-        x_ax = str(self.ref_x.get())
-        y_ax = str(self.ref_y.get())
-        
+        # collect & check new parameters from customization menu        
         color = str(self.ref_color.get())
         if color == "None":
-            color = 0
+            color = "black"
 
         edgecolor = str(self.ref_edgecolor.get())
         if edgecolor == "None":
-            edgecolor = 0
+            edgecolor = "black"
 
         linecolor = str(self.ref_linecolor.get())
         if linecolor == "None":
             linecolor = "red"
 
-        linestyle = self.ref_linestyle.get()
-        linetogg = self.linetoggle.get()
-        linewidth = self.ref_lw.get()
-        edgewidth = float(self.ref_edgewidth.get())
-        offset = self.ref_offset.get()
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
         ymax = self.checkMinMax(self.ref_ymax.get())
         ymin = self.checkMinMax(self.ref_ymin.get())
 
-        width = float(self.ref_width.get())
-        height = float(self.ref_height.get())
-
-        bin1 = self.bin1.get()
-
-        xfontsize = float(self.ref_xfontsize.get())
-        yfontsize = float(self.ref_yfontsize.get())
-        titlefontsize = float(self.ref_titlefontsize.get())
-
         # create the new histogram
-        self.hist = HistMaker(self.df[col], self.savepath, self.subframe2, 0, 0, bins, bin1, title, 
-                              titlefontsize, x_ax, y_ax, color, edgecolor, edgewidth, xmax, xmin, ymax, 
-                              ymin, xfontsize, yfontsize, width, height, self.annotations, linecolor, 
-                              linestyle, linetogg, linewidth, offset)
+        self.hist = HistMaker(self.df[self.ref_col.get()], self.savepath, self.subframe2, 0, 0, self.ref_bins.get(), 
+                              self.bin1.get(), str(self.ref_title.get()), 
+                              float(self.ref_titlefontsize.get()), str(self.ref_x.get()), str(self.ref_y.get()), color, 
+                              edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, ymax, ymin, 
+                              float(self.ref_xfontsize.get()), float(self.ref_yfontsize.get()), float(self.ref_width.get()), 
+                              float(self.ref_height.get()), self.annotations, linecolor, 
+                              self.ref_linestyle.get(), self.linetoggle.get(), self.ref_lw.get(), self.ref_offset.get())
         
         # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
@@ -478,20 +465,13 @@ class HistApplication(tk.Toplevel):
         else:
             val = None
         return val
-    
-    # currently unused, can create an empty figure to take up space
-    def emptyFig(self):
-        fig = Figure()
-        canvas = FigureCanvasTkAgg(fig, master=self.subframe2)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=0, column=1)
-
 
     # generates a new pop up window to set the file path to save the figure at
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
         
+        # determination of automatic save path
         s = ""
         savepath = self.path.split(".")
         if len(savepath) > 1:
