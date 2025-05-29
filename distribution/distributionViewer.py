@@ -5,14 +5,19 @@ import os
 
 #  ex file:   /Users/katejackson/Desktop/testdata
 
+# when importing a folder, there shouldn't be any files in the folder other than trace files (dat or csv)
+# files should contain data in three columns: time, donor, acceptor
 
+FILETYPE = '* tr*.dat' #only relevant when importing dat files instead of csvs
 
+# creates the FRET Efficiency distribution file builder as a tkinter toplevel
 class DistApplication(tk.Toplevel):
-
     def __init__(self):
         super().__init__()
         self.buildMenu()
 
+    # builds the menu for inserting a file path in order to open trajectory files
+    # trace files should be included in a single, accesible folder
     def buildMenu(self):
         self.title("Open Folder of Trajectory Files")
         self.minsize(300, 200)
@@ -25,7 +30,7 @@ class DistApplication(tk.Toplevel):
         self.subframe1 = tk.Frame(self.frame, background='white')
         self.subframe1.grid(row=0, column=0)
 
-        #Title
+        # label
         self.title_label = tk.Label(self.subframe1, text="Open A Folder:")
         self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
 
@@ -43,7 +48,7 @@ class DistApplication(tk.Toplevel):
         self.combo4.config(width=30)
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
-        # dropdown for designation of filetype
+        # dropdown for designation of filetype (either csv or dat)
         self.type_label = tk.Label(self.subframe1, text="File Types:")
         self.type_label.grid(row=2, column=0)
 
@@ -55,7 +60,8 @@ class DistApplication(tk.Toplevel):
         self.combo8.config(width=5)
         self.combo8.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady="10")
 
-
+    # when the start button is clicked, this function is run
+    # finds all files of the correct file type and opens a new distribution window
     def onclick(self):
         if (self.ref_type.get() == ".csv"):
             keys = self.processPath()
@@ -65,7 +71,7 @@ class DistApplication(tk.Toplevel):
             filetype = 1
         distribution_window = DistributionWindow(self.ref_input.get(), keys, filetype)
 
-
+    # finds all files of the designated file type within the folder specified by the user (CSV)
     def processPath(self):
         filepath = self.ref_input.get()
         extension = 'csv'
@@ -73,9 +79,10 @@ class DistApplication(tk.Toplevel):
         keys = glob.glob('*.{}'.format(extension))
         return keys #individual file names, not full paths
     
+    # finds all files of the designated file type within the folder specified by the user (DAT)
     def processPath2(self):
         filepath = self.ref_input.get()
-        filetype = '* tr*.dat'
+        filetype = FILETYPE
         keys = []
         for root, dirs, files in os.walk(filepath):
             dirs.sort()
