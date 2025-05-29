@@ -139,7 +139,7 @@ class FileViewerMaker():
         # connect clicks to zeroing & dwell time activities
         self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
 
-    # get figure title from keys (WHY ARE WE DOING THIS AGAIN? WE ALREADY SET IT IN INIT)
+    # get figure subtitle from keys
     def makeTitle(self):
         keys = self.title.split("/")
         self.title = ""
@@ -200,6 +200,8 @@ class FileViewerMaker():
         
         # set axis options
         fig.set_xlim([self.xmin, None])
+        fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
+        fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
         fig.set_axisbelow(True)
         fig.grid(True, linestyle="--", linewidth=0.8, color='xkcd:light grey')
 
@@ -233,6 +235,8 @@ class FileViewerMaker():
         # set axis options
         fig.set_ylim([0, 1]) 
         fig.set_xlim([self.xmin, None])
+        fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
+        fig.set_ylabel(self.y2label, fontsize=self.y2fontsize)
         fig.set_axisbelow(True)
         fig.grid(True, linestyle="--", linewidth=0.8, color='xkcd:light grey')
         
