@@ -155,7 +155,6 @@ class DistributionWindow(tk.Toplevel):
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
 
-    # this needs to be updated to save a .dat file that can be used for the graphing software
     def save(self):
         self.distribution.save(self.ref_path.get())
         self.win.destroy()
