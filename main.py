@@ -35,10 +35,10 @@ class Application(tk.Tk):
         self.chooseHists.grid(row=4, column=0, sticky="nsew", padx=(50, 50), pady=(20,40))
 
         self.chooseTraj = tk.Button(self, text="Make Trajectory Graphs", command=self.makeTrajectories)
-        self.chooseTraj.grid(row=3, column=0, sticky="nsew", padx=(50, 50), pady=(20,10))
+        self.chooseTraj.grid(row=2, column=0, sticky="nsew", padx=(50, 50), pady=(20,10))
 
         self.chooseDist = tk.Button(self, text="View Distribution", command=self.viewDist)
-        self.chooseDist.grid(row=2, column=0, sticky="nsew", padx=(50, 50), pady=(20,10))
+        self.chooseDist.grid(row=3, column=0, sticky="nsew", padx=(50, 50), pady=(20,10))
 
         self.chooseTrace = tk.Button(self, text="View Traces", command=self.viewTrace)
         self.chooseTrace.grid(row=1, column=0, sticky="nsew", padx=(50, 50), pady=(20,10))
