@@ -10,10 +10,11 @@ import os
 
 
 class TrajectoryWindow(tk.Toplevel):
-    def __init__(self, path, files): #path = user input, files = full file paths for files in folder
+    def __init__(self, path, files, filetype): #path = user input, files = full file paths for files in folder
         super().__init__()
         self.minsize(200, 200)
         self.df = []
+        self.type = filetype
 
         self.files = [] # names of final file
         for file in files:
@@ -400,7 +401,10 @@ class TrajectoryWindow(tk.Toplevel):
     # parses the data file into a pandas dataframe
     def get_data(self):
         trajectories = open(self.paths[self.index], "r") 
-        data = pd.read_fwf(trajectories, header=None)
+        if ".csv" in self.type:
+            data = pd.read_csv(trajectories, header=None)
+        else:
+            data = pd.read_fwf(trajectories, header=None)
         data.columns = ["time", "donor", "acceptor"]
         self.df = data
 

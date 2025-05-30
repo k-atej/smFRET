@@ -14,7 +14,7 @@ import os
 
 #example MacOS filepath
 #path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
-
+FILETYPE = '* tr*.dat'
 #def main():
  #   app = Application()
   #  app.mainloop()
@@ -65,13 +65,13 @@ class TrajectoryMainApplication(tk.Toplevel):
     def onclick(self):
         keys = self.processPath()
         if self.ref_choice.get() == "Single":
-            trajectory_window = TrajectoryWindow(self.ref_input.get(), keys)
+            trajectory_window = TrajectoryWindow(self.ref_input.get(), keys, FILETYPE)
         elif self.ref_choice.get() == "Stacked":
-            stackedtrajectory_window = stackedTrajectoryWindow(self.ref_input.get(), keys)
+            stackedtrajectory_window = stackedTrajectoryWindow(self.ref_input.get(), keys, FILETYPE)
 
     def processPath(self):
         filepath = self.ref_input.get()
-        filetype = '* tr*.dat'
+        filetype = FILETYPE
         keys = []
         for root, dirs, files in os.walk(filepath):
             dirs.sort()
@@ -79,7 +79,6 @@ class TrajectoryMainApplication(tk.Toplevel):
             for file in files:
                 if glob.fnmatch.fnmatch(file, filetype):
                     keys.append(os.path.join(root, file))
-        print(keys)
         return keys
 
         

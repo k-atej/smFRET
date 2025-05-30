@@ -9,10 +9,11 @@ from trajectories.stackedTrajectoryMaker import *
 
 
 class stackedTrajectoryWindow(tk.Toplevel):
-    def __init__(self, path, files):
+    def __init__(self, path, files, filetype):
         super().__init__()
         self.minsize(200, 200)
         self.path = path  # what the user input into the box in the menu
+        self.type = filetype
         self.files = files  # list of filepaths for every trace file found within the folder
         self.figtitle = os.path.basename(self.path)
         self.title(self.figtitle)
@@ -384,14 +385,16 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.togglesub2 = tk.Checkbutton(self.tabText, text="Subtitles", variable=self.sub2togg, onvalue=1, offvalue=0)
         self.togglesub2.grid(row=8, column=0, sticky="ew", padx=(15,10), pady="5", columnspan=2)
         self.sub2togg.set(1)
-    # HOW DO I NEED TO RESTRUCTURE THIS?
 
     # parses the files into a series of pandas dataframes
     def get_data(self):
         self.all_data = []
         for file in self.files:
-            trajectory = open(file, "r") 
-            data = pd.read_fwf(trajectory, header=None)
+            trajectory = open(file, "r")
+            if ".csv" in self.type:
+                data = pd.read_csv(trajectory, header=None)
+            else:
+                data = pd.read_fwf(trajectory, header=None)
             data.columns = ["time", "donor", "acceptor"]
             self.all_data.append(data)
 
