@@ -8,9 +8,14 @@ import os
 
 
 
-
+# creates the window containing the customization menu & the graphs
+#   - path: what the user inputted into the window
+#   - file: fill file paths for each of the designated files in folder
+#   - filetype: what kind of file the program was initially looking for
 class TrajectoryWindow(tk.Toplevel):
-    def __init__(self, path, files, filetype): #path = user input, files = full file paths for files in folder
+
+    # initializes the variables within the class
+    def __init__(self, path, files, filetype): 
         super().__init__()
         self.minsize(200, 200)
         self.df = []
@@ -31,7 +36,6 @@ class TrajectoryWindow(tk.Toplevel):
         self.title(self.titleset)
         self.yshift = 0
         self.generation = 0
-
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -59,17 +63,26 @@ class TrajectoryWindow(tk.Toplevel):
 
         self.start()
 
+    # create window, menus, and trajectory graphs
     def start(self):
-        self.makeFormat() #not visible, for now
+
+        # set up customization menus
+        self.makeFormat()
         self.makeButtons()
         self.makeOptions()
+
+        # create the graphs and paste into window
         self.maketrajectory()
+
+        # bind keys to functions
         self.bind('<Return>', self.maketrajectory)
         self.bind('<BackSpace>', self.undo)
         self.bind('<Left>', self.back)
         self.bind('<Right>', self.next1)
     
+    # set up buttons at the top of window
     def makeButtons(self):
+
         # generate button, bound to the generation of a histogram
         makeTraj = tk.Button(self.subframetop, text="Generate", command=self.maketrajectory)
         makeTraj.grid(row=1, column=2, padx="10")
@@ -98,11 +111,11 @@ class TrajectoryWindow(tk.Toplevel):
         self.togglesub4.grid(row=0, column=5, sticky="ew", padx="10", pady="10")
         self.sub4togg.set(0)
 
+    # set up tabular menu on side of window
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.subframerighttop)
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabControl.grid(row=0, column=0, rowspan=2, padx=10, sticky='n')
-        
 
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
@@ -112,22 +125,23 @@ class TrajectoryWindow(tk.Toplevel):
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
 
-
-
+    # insert options into tabular window
     def makeOptions(self):
         # tab 1: format
-         # input area to designate maximum value on x axis
+
         #check box for toggling to bin width input
         self.intensitytogg = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.tabFormat, text="Intensity Plot", variable=self.intensitytogg, onvalue=1, offvalue=0)
         self.toggle1.grid(row=3, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.intensitytogg.set(1)
 
+        # checkbox for displaying the efficiency plot
         self.efficiencytogg = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
         self.toggle2.grid(row=6, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.efficiencytogg.set(1)
 
+        # input area to designate maximum value on x axis
         self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
         self.xmax_label.grid(row=4, column=2, pady="5")
         self.ref_xmax = tk.StringVar(self)
@@ -238,8 +252,6 @@ class TrajectoryWindow(tk.Toplevel):
         self.color1button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotAcolor)
         self.color1button.grid(row=2, column=3)
 
-        
-        
         # input area for designation of plot2 color
         self.color_label = tk.Label(self.tabStyle, text="Acceptor:")
         self.color_label.grid(row=3, column=0, padx=(15,0))
@@ -273,7 +285,6 @@ class TrajectoryWindow(tk.Toplevel):
 
 
         # third tab: text
-        # all of these should be toggled on & off with each subplot, should toggle overall title individually
 
         # input area for designation of graph title
         self.title_label = tk.Label(self.tabText, text="Title:")
@@ -408,16 +419,20 @@ class TrajectoryWindow(tk.Toplevel):
         data.columns = ["time", "donor", "acceptor"]
         self.df = data
 
-
+    # creates the trajectories and pastes them into the window
     def maketrajectory(self, event=None):
+
+        # set up variables from last generation
         if self.generation != 0:
             self.updateZero()
         self.generation += 1
-        
         if self.trajectory is not None:
             self.trajectory.destroy()
+        
+        # parse incoming data
         self.get_data()
 
+        # typechecking for parameters
         title = self.paths[self.index]
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
@@ -432,7 +447,7 @@ class TrajectoryWindow(tk.Toplevel):
         y2fontsize = float(self.ref_y2fontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
 
-
+        # generate trajectory 
         self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
@@ -440,6 +455,7 @@ class TrajectoryWindow(tk.Toplevel):
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get())
 
+        # update stored variables
         xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
         self.ref_xmin.set(xmin)
         self.ref_xmax.set(xmax)
@@ -458,6 +474,8 @@ class TrajectoryWindow(tk.Toplevel):
             val = None
         return val
 
+    # return to previous trajectory
+    # if used on first trajectory, will loop to last trajectory in list
     def back(self, event=None):
         if self.sub4togg.get() == 0:
             self.index -= 1
@@ -466,7 +484,8 @@ class TrajectoryWindow(tk.Toplevel):
             self.trajectory.setShift(0.0)
             self.maketrajectory()
 
-
+    # proceed to next trajectory
+    # if used on last trajectory, will loop to first trajectory in list
     def next1(self, event=None):
         if self.sub4togg.get() == 0:
             self.index += 1
@@ -475,10 +494,14 @@ class TrajectoryWindow(tk.Toplevel):
             self.trajectory.setShift(0.0)
             self.maketrajectory()
 
+    # generate label displaying numerically which trajectory is being viewed
     def makeLabel(self):
         self.label = tk.Label(self.subframetop, text=f"{self.index + 1} of {self.numfiles}")    
         self.label.grid(row=0, column=0, padx="10")
 
+    # creates a small window for user to enter the path to save the trajectories to
+    # only needs to be set once, defaults to the same folder provided by the user
+    #   when originally opening the data
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
@@ -513,11 +536,11 @@ class TrajectoryWindow(tk.Toplevel):
         self.combo9.config(width=5)
         self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
 
-
+        # save button
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
-        #self.win.mainloop()
     
+    # save trajectory to designated file path at given type & quality
     def save(self):
         self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
         self.win.destroy()
@@ -537,9 +560,13 @@ class TrajectoryWindow(tk.Toplevel):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color3.set(hexcode)
 
+    # get shift data from trajectory
+    # to be carried over to the next trajectory generation  
     def updateZero(self, event=None):
         self.yshift = self.trajectory.getShift()
 
+    # if click-to-zero is active, will set the zeroing to none
+    # so displayed data is un-modified
     def undo(self, event=None):
         if self.sub3togg.get() == 1:
             self.trajectory.setShift(0.0)

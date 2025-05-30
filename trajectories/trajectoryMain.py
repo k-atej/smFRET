@@ -9,17 +9,14 @@ from trajectories.stackedTrajectoryWindow import *
 import os
 
 
-#file name to look for results in, should probably be able to change this
-#trajectory_search_name = "FRETresult.dat"
-
 #example MacOS filepath
-#path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11 copy"
-FILETYPE = '* tr*.dat'
-#def main():
- #   app = Application()
-  #  app.mainloop()
+#path = "/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11traces/(3) THROMBIN APTAMER, 20 mM KCl"
 
+FILETYPE = '* tr*' 
+
+# creates a window for inputting the path to a folder containing trace files
 class TrajectoryMainApplication(tk.Toplevel):
+    # initalize the window
     def __init__(self):
         super().__init__()
         self.title("Trajectory Menu")
@@ -39,7 +36,7 @@ class TrajectoryMainApplication(tk.Toplevel):
 
         #start button
         self.startButton = tk.Button(self.subframe1, text="START", command=self.onclick)
-        self.startButton.grid(row=3, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+        self.startButton.grid(row=4, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
         #input area for file path
         self.input_label = tk.Label(self.subframe1, text="File Path:")
@@ -51,27 +48,43 @@ class TrajectoryMainApplication(tk.Toplevel):
         self.combo4.config(width=30)
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
+        # dropdown for designation of filetype (either csv or dat)
+        self.type_label = tk.Label(self.subframe1, text="File Types:")
+        self.type_label.grid(row=2, column=0)
+
+        reftype = ['.csv', '.dat']
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.dat')
+
+        self.combo8 = tk.OptionMenu(self.subframe1, self.ref_type, *reftype)
+        self.combo8.config(width=5)
+        self.combo8.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady="10")
+
         # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
         self.choice_label = tk.Label(self.subframe1, text="View Type:")
-        self.choice_label.grid(row=2, column=0)
+        self.choice_label.grid(row=3, column=0)
         choices = ["Single", "Stacked"]
         self.ref_choice = tk.StringVar(self)
         self.ref_choice.set("Single")
 
         self.combo = tk.OptionMenu(self.subframe1, self.ref_choice, *choices)
         self.combo.config(width=10)
-        self.combo.grid(row=2, column=1, sticky="w", padx=10)
+        self.combo.grid(row=3, column=1, sticky="w", padx=10)
 
+    # when the button is clicked, the program looks for the number of traces to graph
+    # if the option is set to single, initializes a single view
+    # otherwise it initializes a stacked view
     def onclick(self):
-        keys = self.processPath()
+        keys, filetype = self.processPath()
         if self.ref_choice.get() == "Single":
-            trajectory_window = TrajectoryWindow(self.ref_input.get(), keys, FILETYPE)
+            trajectory_window = TrajectoryWindow(self.ref_input.get(), keys, filetype)
         elif self.ref_choice.get() == "Stacked":
-            stackedtrajectory_window = stackedTrajectoryWindow(self.ref_input.get(), keys, FILETYPE)
-
+            stackedtrajectory_window = stackedTrajectoryWindow(self.ref_input.get(), keys, filetype)
+    
+    # combs through given folder and finds all files matching the designate filetype
     def processPath(self):
         filepath = self.ref_input.get()
-        filetype = FILETYPE
+        filetype = FILETYPE + self.ref_type.get()
         keys = []
         for root, dirs, files in os.walk(filepath):
             dirs.sort()
@@ -79,7 +92,7 @@ class TrajectoryMainApplication(tk.Toplevel):
             for file in files:
                 if glob.fnmatch.fnmatch(file, filetype):
                     keys.append(os.path.join(root, file))
-        return keys
+        return keys, filetype
 
         
 

@@ -6,9 +6,14 @@ from histograms.stackedHistogramWindow import *
 from trajectories.trajectoryMaker import *
 from trajectories.stackedTrajectoryMaker import *
 
-
-
+GAMMA = 1.0
+# creates the window containing the customization menu & the graphs
+#   - path: what the user inputted into the window
+#   - file: fill file paths for each of the designated files in folder
+#   - filetype: what kind of file the program was initially looking for
 class stackedTrajectoryWindow(tk.Toplevel):
+
+    # initializes the variables within the class
     def __init__(self, path, files, filetype):
         super().__init__()
         self.minsize(200, 200)
@@ -51,15 +56,22 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
         self.start()
 
+    # create window, menus, and trajectory graphs
     def start(self):
+
+        # set up customization menu
         self.makeFormat()
         self.makeButtons()
         self.makeOptions() 
+
+        # create the graphs and paste into window
         self.maketrajectory()
+
+        # binds keys to functions
         self.bind('<BackSpace>', self.undo)
         self.bind('<Return>', self.maketrajectory)
 
-
+    # set up buttons at the top of window
     def makeButtons(self):
         # generate button, bound to the generation of a histogram
         makeTraj = tk.Button(self.subframetop, text="Generate", command=self.maketrajectory)
@@ -75,7 +87,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.togglesub3.grid(row=0, column=2, sticky="ew", padx="10", pady="10")
         self.sub3togg.set(0)
     
-    
+    # set up tabular menu on side of window
     def makeFormat(self):
         self.tabControl = ttk.Notebook(master=self.subframerighttop)
         self.tabFormat = tk.Frame(self.tabControl)
@@ -91,6 +103,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.tabControl.add(self.tabText, text="Text")
         self.tabControl.add(self.tabSub, text="Subtitles")
 
+    # insert options into tabular window
     def makeOptions(self):
         # tab 1: format
          # input area to designate maximum value on x axis
@@ -100,11 +113,13 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.toggle1.grid(row=3, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.intensitytogg.set(1)
 
+        # checkbox for displaying the efficiency plot
         self.efficiencytogg = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
         self.toggle2.grid(row=6, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.efficiencytogg.set(1)
 
+        # input area to designate maximum value on x axis
         self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
         self.xmax_label.grid(row=4, column=2, pady="5")
         self.ref_xmax = tk.StringVar(self)
@@ -398,20 +413,20 @@ class stackedTrajectoryWindow(tk.Toplevel):
             data.columns = ["time", "donor", "acceptor"]
             self.all_data.append(data)
 
-    def calculateEfret(self):
-        for data in self.all_data:
-            gamma = 1
-            data['efret'] = data['acceptor'] / (data['acceptor'] + (gamma * data['donor']))
-
+    # creates the trajectories and pastes them into the window
     def maketrajectory(self, event=None):
+
+        # set up variables from last generation
         if self.generation != 0:
             self.updateZero()
         self.generation += 1
-
         if self.trajectory is not None:
             self.trajectory.destroy()
 
+        # parse incoming data
         self.get_data()
+
+        # typechecking for parameters
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
         ymax = self.checkMinMax(self.ref_ymax.get())
@@ -425,6 +440,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         y2fontsize = float(self.ref_y2fontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
 
+        # generate subtitles
         subtitles = []
         subtitlesizes = []
         for subtitle in self.subtitle_inputs:
@@ -432,6 +448,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
             subtitles.append(j.get())
             subtitlesizes.append(jfontsize.get())
 
+        # generate trajectory
         self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
@@ -440,9 +457,17 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           self.subtogg.get(), self.sub2togg.get(), self.toggle.get(), self.togglevar2.get(), self.yshift,
                                           self.sub3togg.get(), subtitles, subtitlesizes)
         
+        # update stored variables
         self.subtitle_length = self.trajectory.get_height()
         self.subtitles = self.trajectory.get_subtitles()
         self.subtitlesizes = self.trajectory.get_subtitlesizes()
+        xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
+        self.ref_xmin.set(xmin)
+        self.ref_xmax.set(xmax)
+        self.ref_ymin.set(ymin)
+        self.ref_ymax.set(ymax)
+        self.ref_y2min.set(y2min)
+        self.ref_y2max.set(y2max)
 
         # make input areas for subtitles based on hist size
         if self.generation == 1:
@@ -459,13 +484,6 @@ class stackedTrajectoryWindow(tk.Toplevel):
                 jtext.set(self.subtitles[i])
                 jfontsize.set(self.subtitlesizes[i])
 
-        xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
-        self.ref_xmin.set(xmin)
-        self.ref_xmax.set(xmax)
-        self.ref_ymin.set(ymin)
-        self.ref_ymax.set(ymax)
-        self.ref_y2min.set(y2min)
-        self.ref_y2max.set(y2max)
 
     # creates input areas and fontsize dropdowns based on length of data provided to histogram
     def makeSubtitleInputs(self):
@@ -499,7 +517,9 @@ class stackedTrajectoryWindow(tk.Toplevel):
             val = None
         return val
     
-    
+    # creates a small window for user to enter the path to save the trajectories to
+    # only needs to be set once, defaults to the same folder provided by the user
+    #   when originally opening the data
     def savewindow(self):
         self.win = tk.Toplevel()
         self.win.title("Set Filepath: ")
@@ -534,16 +554,16 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.combo9.config(width=5)
         self.combo9.grid(row=1, column=1, sticky="w", padx=(0, 10), pady="10")
 
-
+        # save button
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.save)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
-    
+
+    # save trajectory to designated file path at given type & quality  
     def save(self):
         self.trajectory.save(self.ref_path.get(), self.ref_type.get(), self.ref_qual.get())
         self.win.destroy()
     
-
-        # opens native color chooser dialog
+    # opens native color chooser dialog
     def choose_plotAcolor(self):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color1.set(hexcode)
@@ -558,9 +578,13 @@ class stackedTrajectoryWindow(tk.Toplevel):
         color_code, hexcode = colorchooser.askcolor(title="Choose Color")
         self.ref_color3.set(hexcode)
     
+    # get shift data from trajectory
+    # to be carried over to the next trajectory generation  
     def updateZero(self, event=None):
         self.yshift = self.trajectory.getShift()
     
+    # if click-to-zero is active, will set the zeroing to none
+    # so displayed data is un-modified
     def undo(self, event=None):
         if self.sub3togg.get() == 1:
             self.trajectory.setShift(0.0)
