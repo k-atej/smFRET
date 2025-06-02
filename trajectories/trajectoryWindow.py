@@ -7,7 +7,6 @@ from trajectories.trajectoryMaker import *
 import os
 
 
-
 # creates the window containing the customization menu & the graphs
 #   - path: what the user inputted into the window
 #   - file: fill file paths for each of the designated files in folder
