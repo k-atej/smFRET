@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 TIME = 0.1 # time resolution
 WINDOW = 3 # rolling average window size
+THRESHOLD = 2000
 
 
 class TraceReader():
@@ -22,14 +23,14 @@ class TraceReader():
     # creates matplotlib pop-up window to analyze one molecule at a time
     def quickplot(self, paired_df):
         plt.figure(figsize=(10,6))
-        plt.plot(paired_df['frame'], paired_df['acceptor'], label='Acceptor', color='red')
-        plt.plot(paired_df['frame'], paired_df['donor'], label='Donor', color='green')
+        plt.plot(paired_df['time'], paired_df['acceptor'], label='Acceptor', color='red')
+        plt.plot(paired_df['time'], paired_df['donor'], label='Donor', color='green')
         
 
-        plt.xlabel('Frame')
-        plt.ylabel('Intensity')
+        plt.xlabel('Time (s)')
+        plt.ylabel('Intensity (AU)')
         plt.xlim(1, 100)
-        plt.ylim(-100, 2500)
+        plt.ylim(-100, THRESHOLD)
         plt.title('Donor and Acceptor Intensities Over Time')
         plt.legend()
         plt.grid(True)
@@ -82,16 +83,9 @@ class TraceReader():
         return dfs
     
     def editdfs(self, df):
-        
-        # Apply smoothing: this is also done in the Matlab program
-        # rolling average helps to prevent some noise
-        window_size = WINDOW
-        df['donor_smoothed'] = df['donor'].rolling(window=window_size, min_periods=1, center=True).mean()
-        df['acceptor_smoothed'] = df['acceptor'].rolling(window=window_size, min_periods=1, center=True).mean()
-
         # exclude outliers: any value over these thresholds is excluded from the plot
-        donor_threshold = 5000
-        acceptor_threshold = 5000
+        donor_threshold = THRESHOLD
+        acceptor_threshold = THRESHOLD
         df_filtered = df.copy()
         df_filtered['donor'] = df_filtered['donor'].where(df_filtered['donor'] <= donor_threshold, np.nan)
         df_filtered['acceptor'] = df_filtered['acceptor'].where(df_filtered['acceptor'] <= acceptor_threshold, np.nan)
@@ -99,6 +93,12 @@ class TraceReader():
         # fill in gaps between excluded points with a straight line
         df_filtered['donor'] = df_filtered['donor'].interpolate(method='linear')
         df_filtered['acceptor'] = df_filtered['acceptor'].interpolate(method='linear')
+
+        # Apply smoothing: this is also done in the Matlab program
+        # rolling average helps to prevent some noise
+        window_size = WINDOW
+        df_filtered['donor_smoothed'] = df_filtered['donor'].rolling(window=window_size, min_periods=1, center=True).mean()
+        df_filtered['acceptor_smoothed'] = df_filtered['acceptor'].rolling(window=window_size, min_periods=1, center=True).mean()
 
         # arrange data to be in the time/donor/acceptor format
         finaldata = pd.DataFrame()
@@ -115,7 +115,10 @@ class TraceReader():
 def main():
     path = "/Users/katejackson/Desktop/Rev1 data/May30_23b/(1) 1&9, 50 mM KCl 5 mM Mg/hel16.traces"
     read = TraceReader(path)
-    print(read.getData()[0])
+    test = read.getData()[0]
+    print(test)
+    read.quickplot(test)
+    
 
 
 if __name__ == "__main__":
