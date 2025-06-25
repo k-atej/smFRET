@@ -94,8 +94,8 @@ def newmain():
 
     # display the data
     # 3. CHANGE "DF" TO "DF_FILTERED" TO SEE DATA AFTER OUTLIERS HAVE BEEN EXCLUDED
-    print(df)
-    quickplot(df)
+    print(df_filtered)
+    quickplot(df_filtered)
 
 
 newmain()
