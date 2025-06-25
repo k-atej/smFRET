@@ -1,12 +1,13 @@
 import tkinter as tk
 import glob
 from fileviewer.fileViewerWindow import *
+from traceReaderClass import *
 import os
 
 #/Users/katejackson/Desktop/Thrombin Aptamer/Apr15_11traces/(1) THROMBIN APTAMER, 0 mM KCl
 #/Users/katejackson/Desktop/matlab_rec/
 
-FILETYPE = '* tr*.dat'
+FILETYPE = '* tr*.dat' # not currently in use
 
 # creates the trace viewing application as a tkinter toplevel
 class TraceApplication(tk.Toplevel):
@@ -49,12 +50,20 @@ class TraceApplication(tk.Toplevel):
 
 
     # when the start button is clicked, this function is run
-    # finds all files of the correct file type and opens a new trajectory window
+    # processes input path to find data
     def onclick(self):
-        keys = self.processPath()
+        keys = self.processPath2()
         trajectory_window = FileViewerWindow(self.ref_input.get(), keys)
 
+    # initializes a TraceReader to parse the data in the file
+    def processPath2(self):
+        filepath = self.ref_input.get()
+        reader = TraceReader(filepath)
+        keys = reader.getData()
+        return keys
+
     # finds all files of the designated file type within the folder specified by the user
+    # not currently in use
     def processPath(self):
         filepath = self.ref_input.get() #creates variable from the file path set by the user
         filetype = FILETYPE #file type to look for

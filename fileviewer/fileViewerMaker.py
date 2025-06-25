@@ -10,7 +10,7 @@ GAMMA = 1.0
 
 # creates the graph which is pasted into the fileViewerWindow
 # must be regenerated after changes are made in the window
-#   - title: full file path
+#   - title: molecule number
 #   - titleset: window title, parent folder input by the user
 #   - data: dataframe containing input data
 #   - master: frame to paste the graph into
@@ -40,6 +40,8 @@ GAMMA = 1.0
 #   - dwellActive: designates whether the click-to-select dwell times is active, default = OFF
 #   - dwelltimedf: stores the dwell time data, carries over between generations but not separate trajectories (IS THIS TRUE?)
 #   - series: tracks what value the series variable is at between generations
+#   - tracenum: hel number, used for saving the molecule
+#   - molnum: molecule number
 
 class FileViewerMaker():
 
@@ -49,11 +51,13 @@ class FileViewerMaker():
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  intensitytoggle, efficiencytoggle, legendtoggle, subtitletoggle, 
                  subtitletoggle2, yshift, clicktogg, sumtogg,
-                 dwellActive, dwelltimedf, series):
+                 dwellActive, dwelltimedf, series, tracenum, molnum):
         # designate data
         self.data = data
         self.datacopy = data.copy() # copy data to new dataframe, so it can be modified without loss
         self.master = master
+        self.tracenum = tracenum[0]
+        self.molnum = molnum
         
         # set colors for graph
         self.color1 = refcolor1
@@ -285,7 +289,8 @@ class FileViewerMaker():
     #   - ending: filetype to save the data as, default .csv
     def save(self, path, ending):
         path = path.rstrip("\\/")
-        self.title = os.path.basename(self.title)
+        # make exact name of file
+        self.title = str(self.tracenum) + " tr" + str(self.molnum)
         filename = os.path.join(path, self.title)
         filename = filename + ending
 

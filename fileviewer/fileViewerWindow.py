@@ -3,6 +3,7 @@ import pandas as pd
 import tkinter as tk
 from fileviewer.fileViewerMaker import *
 import os
+import re
 
 # easily modifiable parameters, all are cosmetic
 XFONT = 12.0
@@ -26,25 +27,31 @@ class FileViewerWindow(tk.Toplevel):
     
     # initializes the window for viewing files
     #   - path = user input file
-    #   - files = keys (found by traceViewer.processPath), full filepaths
+    #   - files = keys: list of dataframes
     def __init__(self, path, files):
         super().__init__()
         self.minsize(200, 200)
         self.df = []
+        self.files = files
 
         # list of files (not full paths!) found at the given path 
-        self.files = [] 
-        for file in files:
-            self.files.append(os.path.basename(file)) 
+        #self.files = [] 
+        #for file in files:
+        #    self.files.append(os.path.basename(file)) 
 
         # list of full file paths found at the given path
-        self.filepaths = files 
-        self.numfiles = len(self.filepaths)
+        #self.filepaths = files 
+        self.numfiles = len(self.files)
         
         # processing the user input to set the save path and the window title
-        self.savepath = path.rstrip("\\/")  #user input without final slashes
-        self.titleset = os.path.basename(self.savepath) # folder set in the input path
-        self.title(self.titleset)
+        self.savepath = path.rstrip("\\/")  #user input without any final slashes
+        self.tracenum = os.path.basename(self.savepath) # should be helx.traces
+        self.tracenum = re.findall('\d+', self.tracenum)
+        self.titleset = os.path.dirname(self.savepath) # last folder in file path
+        self.savepath = self.titleset
+        self.windowtitle = os.path.basename(self.titleset)
+        print(f"trace: {self.tracenum}")
+        self.title(self.windowtitle)
 
         # variables for tracking traces between generations
         self.index = 0
@@ -190,9 +197,10 @@ class FileViewerWindow(tk.Toplevel):
 
     # parses the data file into a pandas dataframe
     def get_data(self):
-        trajectories = open(self.filepaths[self.index], "r") 
-        data = pd.read_fwf(trajectories, header=None)
-        data.columns = ["time", "donor", "acceptor"]
+        data = self.files[self.index]
+        #trajectories = open(self.filepaths[self.index], "r") 
+        #data = pd.read_fwf(trajectories, header=None)
+        #data.columns = ["time", "donor", "acceptor"]
         self.df = data
 
     # makes the trajectory to paste into the window 
@@ -213,7 +221,8 @@ class FileViewerWindow(tk.Toplevel):
         self.get_data()
 
         # label the window with the filepath of the trajectory of interest
-        title = self.filepaths[self.index]
+        title = f"Molecule {self.index + 1}"
+        molnum = self.index + 1
 
         # check if the toggle for showing the sum is on
         summ = self.sumtogg.get() # on = 1
@@ -221,11 +230,12 @@ class FileViewerWindow(tk.Toplevel):
         # generate a trajectory with the FileViewerMaker class
         # see parameters in fileViewerMaker.py
         self.trajectory = FileViewerMaker(title, self.titleset, self.df, self.subframeleft, DONORCOLOR, 
-                                          ACCEPTORCOLOR, EFFICIENCYCOLOR, self.titleset, TITLEFONT,
+                                          ACCEPTORCOLOR, EFFICIENCYCOLOR, title, TITLEFONT,
                                           "Time (s)", XFONT, "Time (s)", X2FONT, "I (A.U.)", YFONT, 
                                           "E", Y2FONT, 4.5, 6.0, INTENSITY, EFFICIENCY, LEGEND,
                                           SUBTITLE, SUBTITLE2, self.yshift, self.sub3togg.get(), summ, 
-                                          self.dwelltogg.get(), self.dwelltimedf, self.dwellseries)
+                                          self.dwelltogg.get(), self.dwelltimedf, self.dwellseries, 
+                                          self.tracenum, molnum)
 
         # update dwell time data
         self.dwelltimedf = self.trajectory.getDwellData()
