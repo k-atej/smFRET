@@ -407,10 +407,10 @@ class stackedTrajectoryWindow(tk.Toplevel):
         for file in self.files:
             trajectory = open(file, "r")
             if ".csv" in self.type:
-                data = pd.read_csv(trajectory, header=None)
+                data = pd.read_csv(trajectory)
             else:
                 data = pd.read_fwf(trajectory, header=None)
-            data.columns = ["time", "donor", "acceptor"]
+                data.columns = ["time", "donor", "acceptor"]
             self.all_data.append(data)
 
     # creates the trajectories and pastes them into the window

@@ -299,7 +299,11 @@ class FileViewerMaker():
         column_name = 'time'
         zoomed_df = self.datacopy[(self.datacopy[column_name] >= lowerbound) & (self.datacopy[column_name] <= upperbound)]
         zoomed_df_dropped = zoomed_df.drop(columns=["efret", "sum"])
-        zoomed_df_dropped.to_csv(filename, index=False) 
+        if ending == ".csv":
+            zoomed_df_dropped.to_csv(filename, index=False) 
+        else:
+            col_widths = [20, 20, 20]
+            self.write_fwf(zoomed_df_dropped, filename, col_widths)
 
     # returns dataframe containing dwell time data
     def getDwellData(self):
@@ -321,7 +325,12 @@ class FileViewerMaker():
         self.dwelldf.to_csv(filename, index=False)
 
 
-    
-
-
- 
+    # export data to a fwf (dat) file, using white space as the delimiter
+    def write_fwf(self, df, filepath, col_widths, justify='left'):
+        with open(filepath, 'w') as f:
+            for _, row in df.iterrows():
+                formatted_row = ''
+                for i, value in enumerate(row):
+                    format_string = '{:<' + str(col_widths[i]) + '}' if justify == 'left' else '{:>' + str(col_widths[i]) + '}'
+                    formatted_row += format_string.format(str(value))
+                f.write(formatted_row + '\n')

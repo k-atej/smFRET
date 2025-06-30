@@ -66,7 +66,7 @@ class FileViewerWindow(tk.Toplevel):
 
         # variables initialized for saving the data
         self.filepath = self.savepath
-        self.type = '.csv'
+        self.type = '.dat'
 
         # full window 
         self.frame = tk.Frame(self, background='white')
@@ -292,11 +292,20 @@ class FileViewerWindow(tk.Toplevel):
         # save button for the file path
         self.saveButton = tk.Button(self.win, text="SAVE", command=self.setfilepath)
         self.saveButton.grid(row=2, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
+
+        # dropdown for designation of filetype
+        reftype = ['.csv', '.dat']
+        self.ref_type = tk.StringVar(self)
+        self.ref_type.set('.dat')
+
+        self.combo8 = tk.OptionMenu(self.win, self.ref_type, *reftype)
+        self.combo8.config(width=5)
+        self.combo8.grid(row=0, column=2, sticky="ew", padx=(0, 10), pady="10")
     
     # sets the user input into the save window as the path to which to save each trajectory
     def setfilepath(self, event=None):
         self.filepath = self.ref_path.get()
-        self.type = ".csv"
+        self.type = self.ref_type.get()
 
         # close window and revert key binds
         self.win.destroy()

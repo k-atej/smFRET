@@ -412,10 +412,10 @@ class TrajectoryWindow(tk.Toplevel):
     def get_data(self):
         trajectories = open(self.paths[self.index], "r") 
         if ".csv" in self.type:
-            data = pd.read_csv(trajectories, header=None)
+            data = pd.read_csv(trajectories)
         else:
             data = pd.read_fwf(trajectories, header=None)
-        data.columns = ["time", "donor", "acceptor"]
+            data.columns = ["time", "donor", "acceptor"]
         self.df = data
 
     # creates the trajectories and pastes them into the window
@@ -445,6 +445,8 @@ class TrajectoryWindow(tk.Toplevel):
         x2fontsize = float(self.ref_x2fontsize.get())
         y2fontsize = float(self.ref_y2fontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
+
+  
 
         # generate trajectory 
         self.trajectory = TrajectoryMaker(title, self.titleset, self.df, self.subframeleft, self.ref_color1.get(), 
