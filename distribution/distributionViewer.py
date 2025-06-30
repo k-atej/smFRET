@@ -3,6 +3,8 @@ import glob
 from distribution.distributionWindow import *
 import os
 
+from traceReaderClass import TraceReader
+
 #  ex file:   /Users/katejackson/Desktop/testdata
 
 # when importing a folder, there shouldn't be any files in the folder other than trace files (dat or csv)
@@ -52,9 +54,9 @@ class DistApplication(tk.Toplevel):
         self.type_label = tk.Label(self.subframe1, text="File Types:")
         self.type_label.grid(row=2, column=0)
 
-        reftype = ['.csv', '.dat']
+        reftype = ['.csv', '.dat', '.traces']
         self.ref_type = tk.StringVar(self)
-        self.ref_type.set('.csv')
+        self.ref_type.set('.traces')
 
         self.combo8 = tk.OptionMenu(self.subframe1, self.ref_type, *reftype)
         self.combo8.config(width=5)
@@ -64,11 +66,14 @@ class DistApplication(tk.Toplevel):
     # finds all files of the correct file type and opens a new distribution window
     def onclick(self):
         if (self.ref_type.get() == ".csv"):
-            keys = self.processPath()
+            keys = self.processPath() # individual file names
             filetype = 0
         elif (self.ref_type.get() == ".dat"):
-            keys = self.processPath2()
+            keys = self.processPath2() # individual file names
             filetype = 1
+        elif (self.ref_type.get() == ".traces"):
+            keys = self.processPath3() # list of dataframes
+            filetype = 2
         distribution_window = DistributionWindow(self.ref_input.get(), keys, filetype)
 
     # finds all files of the designated file type within the folder specified by the user (CSV)
@@ -91,3 +96,10 @@ class DistApplication(tk.Toplevel):
                 if glob.fnmatch.fnmatch(file, filetype):
                     keys.append(file)
         return keys #individual file names, not full filepaths
+    
+    # initializes a TraceReader to parse the data from the file
+    def processPath3(self):
+        filepath = self.ref_input.get()
+        reader = TraceReader(filepath)
+        keys = reader.getData()
+        return keys

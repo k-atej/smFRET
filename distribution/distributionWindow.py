@@ -12,8 +12,8 @@ class DistributionWindow(tk.Toplevel):
     # initializes the window for viewing files
     #   - path: user input filepath
     #   - files: keys, individual file names found in designated folder
-    #   - filetype: .csv (0) or .dat (1)
-    def __init__(self, path, files, filetype): #path = user input, files = keys, filetype = csv or dat
+    #   - filetype: .csv (0), .dat (1), or .traces (2)
+    def __init__(self, path, files, filetype): #path = user input, files = keys, filetype = csv, dat, traces
         super().__init__()
         self.minsize(200, 200)
         self.df = []
@@ -32,6 +32,8 @@ class DistributionWindow(tk.Toplevel):
         self.savepath = path.rstrip("\\/")
         self.titleset = os.path.basename(self.savepath) 
         self.title(self.titleset)
+        if self.filetype == 2:
+            self.savepath = os.path.dirname(self.savepath)
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -77,16 +79,22 @@ class DistributionWindow(tk.Toplevel):
     def get_data(self):
         all_data = pd.DataFrame(columns=["efret", "intensity"])
 
-        for file in self.files:
-            # open file
-            filename = os.path.join(self.savepath, file)
-            newdata = open(filename, "r") 
+        pd.options.mode.chained_assignment = None
+
+        for i in range(len(self.files)):
+            
+            if self.filetype in [0, 1]:
+                # open file
+                filename = os.path.join(self.savepath, self.files[i])
+                newdata = open(filename, "r") 
 
             #get data into a dataframe
             if self.filetype == 0:
                 data = pd.read_csv(newdata, header=None)
             elif self.filetype == 1:
                 data = pd.read_fwf(newdata, header=None)
+            elif self.filetype == 2:
+                data = self.files[i]
             
             # select only the desired frames from the beginning of the trace
             startframe = SKIPPEDFRAMES + 1
@@ -107,6 +115,7 @@ class DistributionWindow(tk.Toplevel):
             newdat_df = pd.DataFrame(newdat)
             all_data = pd.concat([newdat_df, all_data])
 
+        pd.options.mode.chained_assignment = "warn"
         self.df = all_data
 
     def makehist(self, event=None):
