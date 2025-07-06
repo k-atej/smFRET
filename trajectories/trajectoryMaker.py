@@ -123,7 +123,7 @@ class TrajectoryMaker():
         # get the title from the input keys
         self.makeTitle()
         # configure size of figure
-        self.fig = Figure()
+        self.fig = Figure(constrained_layout=True)
         self.fig.set_figwidth(self.width)
         self.fig.set_figheight(self.height)
 
@@ -131,8 +131,8 @@ class TrajectoryMaker():
         self.makeSubplots()
 
         # configure the canvas containing the subplots
-        self.fig.subplots_adjust(wspace=0, hspace=0.5, left=0.1, right=0.9)
-        self.fig.suptitle(self.graphtitle, fontsize=self.titlefontsize, y=0.93)
+        #self.fig.subplots_adjust(wspace=0, hspace=0.5, left=0.1, right=0.9)
+        self.fig.suptitle(self.graphtitle, fontsize=self.titlefontsize) #y=0.93
         self.trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.trajectorycanvas.draw()
         self.trajectorycanvas.get_tk_widget().grid(row=0, column=0)
