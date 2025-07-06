@@ -99,7 +99,27 @@ class DistApplication(tk.Toplevel):
     
     # initializes a TraceReader to parse the data from the file
     def processPath3(self):
-        filepath = self.ref_input.get()
-        reader = TraceReader(filepath)
-        keys = reader.getData()
+        files = self.processPath4()
+        print(f"traces files found: {len(files)}")
+        path = self.ref_input.get()
+        keys = []
+        i = 0
+        for file in files:
+            name = os.path.join(path, file)
+            print(f"file {i+1}: ")
+            reader = TraceReader(name)
+            keys += reader.getData()
+            i+=1
         return keys
+    
+    def processPath4(self):
+        filepath = self.ref_input.get()
+        filetype = 'hel*.traces'
+        keys = []
+        for root, dirs, files in os.walk(filepath):
+            dirs.sort()
+            files.sort()
+            for file in files:
+                if glob.fnmatch.fnmatch(file, filetype):
+                    keys.append(file)
+        return keys #individual file names, not full filepaths

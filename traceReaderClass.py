@@ -53,7 +53,7 @@ class TraceReader():
         frames = int(df.iloc[0, 0])              # Frames per molecule
         signals = int(df.iloc[2, 0])              # Total number of signals (donor + acceptor)
         pairs = signals // 2                          # Number of molecules
-        print(f"total: {signals}, frames: {frames}, pairs: {pairs}")
+        print(f"frames: {frames}, pairs: {pairs}")
         
         # Drop metadata rows
         data = df.iloc[3:].reset_index(drop=True)
