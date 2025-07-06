@@ -133,15 +133,31 @@ class StackedTrajectoryMaker():
         if self.efficiencytoggle == 1:
             self.numdata += 1
         
+        bottompad = 0.1
+        if self.height >= 3.9:
+            heightpad = 0.9
+        elif self.height >= 3.2:
+            heightpad = 0.875
+        else:
+            heightpad = 0.85
+            if self.height <= 2:
+                bottompad = 0.25
+                if self.height <=1:
+                    bottompad = 0.4
+        self.leftpad = 0
+        if self.width <= 5:
+            self.leftpad = 0.1
+        
         # make subplots
         if self.intensitytoggle == 1:
             self.makeIntensity()
         if self.efficiencytoggle == 1:
             self.makeEfficiency()
+    
         
         # configure the canvas containing the subplots
-        self.fig.subplots_adjust(wspace=0.4, hspace=0, left=0.2, right=0.9)
-        self.fig.suptitle(self.title, y = 0.93, x=0.55, fontsize=self.titlefontsize)
+        self.fig.subplots_adjust(wspace=(0.4 + self.leftpad), hspace=0, left=(0.2 + self.leftpad), right=0.95, top=heightpad, bottom=((1.0-heightpad)+bottompad))
+        self.fig.suptitle(self.title, y=0.95, x=0.55, fontsize=self.titlefontsize)  
         self.trajectorycanvas = FigureCanvasTkAgg(self.fig, master=self.master)
         self.trajectorycanvas.draw()
         self.trajectorycanvas.get_tk_widget().grid(row=0, column=0, padx=(5, 5))
@@ -196,7 +212,7 @@ class StackedTrajectoryMaker():
         if self.legend ==1:
             self.axes[len(self.all_data) - 1].legend() 
         if self.intensitytoggle == 1:
-            self.fig.text(0.1, 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
+            self.fig.text((0.1 + self.leftpad/2), 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
         self.axes.reverse()
 
@@ -243,9 +259,9 @@ class StackedTrajectoryMaker():
         self.Eaxes[0].set_xlabel(self.x2label, fontsize=self.x2fontsize)
         
         if self.numdata == 2:
-            self.fig.text(0.515, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
+            self.fig.text((0.53+self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         else:
-            self.fig.text(0.1, 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
+            self.fig.text((0.1 + self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         
     # combs through data to find bounds
     def processData(self):
