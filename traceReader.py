@@ -19,7 +19,7 @@ def quickplot(paired_df):
     plt.xlabel('Frame')
     plt.ylabel('Intensity')
     plt.xlim(1, 100)
-    plt.ylim(-100, 2500)
+    plt.ylim(-100, 1000)
     plt.title('Donor and Acceptor Intensities Over Time')
     plt.legend()
     plt.grid(True)
@@ -35,7 +35,7 @@ def newmain():
     # data put into a one-column DataFrame (fancy table)
     with open(path, "rb") as signals:
         data = signals.read()
-        values = np.frombuffer(data, dtype='<u2')
+        values = np.frombuffer(data, dtype='<i2')
         df = pd.DataFrame(values, columns=['value'])
     
     # Extract metadata from the top of the file
@@ -94,8 +94,8 @@ def newmain():
 
     # display the data
     # 3. CHANGE "DF" TO "DF_FILTERED" TO SEE DATA AFTER OUTLIERS HAVE BEEN EXCLUDED
-    print(df_filtered)
-    quickplot(df_filtered)
+    print(df)
+    quickplot(df)
 
 
 newmain()

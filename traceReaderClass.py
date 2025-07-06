@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 TIME = 0.1 # time resolution
 WINDOW = 3 # rolling average window size
-THRESHOLD = 2000
+THRESHOLD = 6000
 
 
 class TraceReader():
@@ -46,7 +46,7 @@ class TraceReader():
         # data put into a one-column DataFrame (fancy table)
         with open(path, "rb") as signals:
             data = signals.read()
-            values = np.frombuffer(data, dtype='<u2')
+            values = np.frombuffer(data, dtype='<i2')
             df = pd.DataFrame(values, columns=['value'])
         
         # Extract metadata from the top of the file
