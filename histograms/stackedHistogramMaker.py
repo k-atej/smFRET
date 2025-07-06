@@ -113,7 +113,22 @@ class StackedHistMaker():
         #set title & append figure to canvas
         fig.supylabel(self.y, fontsize=self.yfontsize, x = self.width / 50)
         fig.suptitle(self.title, y = 0.93, x=0.57, fontsize=self.titlesize)
-        fig.subplots_adjust(wspace=0, hspace=0, left=0.25, right=0.9)
+        
+        widthpad = 0
+        heightpad = 0
+        if self.width <= 3.5:
+            widthpad = 0.05
+            if self.width <= 2.5:
+                widthpad = 0.1
+        if self.height <= 0.4:
+            heightpad = 0.05
+            if self.height <=0.3:
+                heightpad = 0.1
+                if self.height <= 0.25:
+                    heightpad = 0.2
+
+        
+        fig.subplots_adjust(wspace=0, hspace=0, left=(0.25+widthpad), right=0.9, bottom = (0.2 + heightpad))
 
         self.hist_canvas = FigureCanvasTkAgg(fig, master=self.master)
         self.hist_canvas.draw()
