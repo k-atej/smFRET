@@ -103,6 +103,8 @@ class FileViewerWindow(tk.Toplevel):
         self.bind('<Left>', self.back)
         self.bind('<Right>', self.next1)
         self.bind('<Return>', self.save)
+        self.bind('<Key-q>', self.updateDwellTable)
+
 
     # pastes the buttons/options onto the window and creates the trajectory 
     def makeButtons(self):
@@ -153,16 +155,15 @@ class FileViewerWindow(tk.Toplevel):
 
     # creates the data table for the dwell time analysis shown on the window
     def updateDwellTable(self, event=None):
-        # turn of click-to-zero
+        # turn off click-to-zero
         self.sub3togg.set(0)
 
         # set up the tree in the side menu
-        self.original_size = (self.winfo_width(), self.winfo_height())
         self.tree = ttk.Treeview(self.subframeright, show="headings")
         self.tree["columns"] = list(self.dwelltimedf.columns)
         self.tree.column("Series", anchor="center", width=50, stretch=False)
         self.tree.heading("Series", text="Series")
-        self.tree.column("deltaT", anchor="center", width=250, stretch=False)
+        self.tree.column("deltaT", anchor="center", width=200, stretch=False)
         self.tree.heading("deltaT", text="deltaT")
 
         # insert the values into the tree
@@ -171,20 +172,24 @@ class FileViewerWindow(tk.Toplevel):
 
         # dwell time selection toggle
         self.toggledwell = tk.Checkbutton(self.subframeright, text="Click to Select Dwell Times", variable=self.dwelltogg, onvalue=1, offvalue=0)
-        self.toggledwell.grid(row=0, column=0, padx=(10, 20), pady="10", columnspan=3)
+        self.toggledwell.grid(row=0, column=0, padx=(10, 20), pady="10", columnspan=4)
 
         # dwell time refresh button
-        self.tree.grid(row=1, column=0, sticky="ew", padx=(10, 20), pady="10", columnspan=3)
-        self.refreshButton = tk.Button(self.subframeright, text="Refresh", command=self.updateDwellTable)
-        self.refreshButton.grid(row=2, column=0, sticky="ew", padx=(10,20), pady="10")
+        self.tree.grid(row=1, column=0, sticky="ew", padx=(10, 20), pady="10", columnspan=4)
+        self.refreshButton = tk.Button(self.subframeright, text="Refresh (Q)", command=self.updateDwellTable)
+        self.refreshButton.grid(row=2, column=0, sticky="ew", padx=(10,10), pady="10")
 
         # dwell time increment series button
         self.seriesButton = tk.Button(self.subframeright, text="+ Series", command=self.addSeries)
-        self.seriesButton.grid(row=2, column=1, sticky="ew", padx=(10,20), pady="10")
+        self.seriesButton.grid(row=3, column=1, sticky="ew", padx=(10,10), pady="10")
+
+        # ADD CURRENT SERIES LABEL? WHICH SHOWS WHAT THE SERIES IS WITHOUT HAVING TO REFRESH
+        self.seriesLabel = tk.Label(self.subframeright, text=f"Current Series: {self.dwellseries}")
+        self.seriesLabel.grid(row=3, column=0, sticky="ew", padx=(10,10), pady="10")
 
         # dwell time save series data button
         self.seriesSaveButton = tk.Button(self.subframeright, text="Save", command=self.saveSeries)
-        self.seriesSaveButton.grid(row=2, column=2, sticky="ew", padx=(10,20), pady="10")
+        self.seriesSaveButton.grid(row=2, column=1, sticky="ew", padx=(10,20), pady="10")
 
         # save series data across trajectory generations
         self.dwellActive = True
@@ -193,6 +198,8 @@ class FileViewerWindow(tk.Toplevel):
 
     # increments the series value displayed in the chart by 1
     def addSeries(self):
+        self.makeSeriesLabel()
+        self.dwellseries += 1
         self.trajectory.incrementDwellSeries()
 
     # parses the data file into a pandas dataframe
@@ -362,3 +369,9 @@ class FileViewerWindow(tk.Toplevel):
         self.win.destroy()
         self.win.unbind_all('<Return>')
         self.bind('<Return>', self.save)
+
+    # updates series label in window when "+ Series" button is pressed
+    def makeSeriesLabel(self, event=None):
+        self.seriesLabel.destroy()
+        self.seriesLabel = tk.Label(self.subframeright, text=f"Current Series: {self.dwellseries}")
+        self.seriesLabel.grid(row=3, column=0, sticky="ew", padx=(10,10), pady="10")

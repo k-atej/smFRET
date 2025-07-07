@@ -31,7 +31,7 @@ class TraceApplication(tk.Toplevel):
         self.subframe1.grid(row=0, column=0)
 
         # label
-        self.title_label = tk.Label(self.subframe1, text="Open A Folder:")
+        self.title_label = tk.Label(self.subframe1, text="Open a .traces file:")
         self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
 
         # start button
