@@ -184,7 +184,7 @@ class StackedTrajectoryMaker():
             # axis options
             ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
             ax.set_xlim([self.xmin, self.xmax])
-            self.ymin, self.ymax = ax.get_ylim()
+            #self.ymin, self.ymax = ax.get_ylim()
             ax.set_xticks([])
             
             # subtitles
@@ -201,8 +201,7 @@ class StackedTrajectoryMaker():
         
         # share axes between figures
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
-        self.xmin, self.xmax = self.axes[0].get_xlim()
-        self.ymin, self.ymax = self.axes[0].get_ylim()   
+        self.xmin, self.xmax = self.axes[0].get_xlim()  
         for i in range(1, len(self.all_data)):
            self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
            self.axes[i].set_xticklabels([])

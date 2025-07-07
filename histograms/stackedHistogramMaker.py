@@ -101,10 +101,10 @@ class StackedHistMaker():
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, 
                     edgecolor=self.edgecolor, linewidth=self.edgewidth)
             if len(self.subtitles) != 0:
-                ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.75), xycoords='axes fraction')
+                ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.85), xycoords='axes fraction')
             
             else:
-                ax.annotate(text=self.lastFolder[i], fontsize=9, xy=(0.03, 0.75), xycoords='axes fraction')
+                ax.annotate(text=self.lastFolder[i], fontsize=9, xy=(0.03, 0.85), xycoords='axes fraction')
             self.axes.append(ax)
 
         self.format_axes()
@@ -147,7 +147,7 @@ class StackedHistMaker():
             self.xmax = self.max_data
             
         for ax in self.axes:
-            ax.sharey(self.axes[0])
+            #ax.sharey(self.axes[0])
             ax.set_xticks([])
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_ylim([self.ymin, self.ymax]) 
