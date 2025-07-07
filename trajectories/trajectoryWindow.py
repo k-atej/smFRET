@@ -147,7 +147,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.ref_xmax.set("None")
 
         self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
-        self.comboxmax.config(width=5)
+        self.comboxmax.config(width=9)
         self.comboxmax.grid(row=4, column=3, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate minimum value on x axis
@@ -157,7 +157,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.ref_xmin.set("0")
 
         self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
-        self.comboxmin.config(width=5)
+        self.comboxmin.config(width=9)
         self.comboxmin.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate maximum value on y axis
@@ -251,6 +251,15 @@ class TrajectoryWindow(tk.Toplevel):
         self.color1button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotAcolor)
         self.color1button.grid(row=2, column=3)
 
+        # dropdown for plot1 line size
+        linex = [0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        self.ref_linesize = tk.StringVar(self)
+        self.ref_linesize.set("1.5")
+
+        self.line4 = tk.OptionMenu(self.tabStyle, self.ref_linesize, *linex)
+        self.line4.config(width=1)
+        self.line4.grid(row=2, column=4, pady="5")
+        
         # input area for designation of plot2 color
         self.color_label = tk.Label(self.tabStyle, text="Acceptor:")
         self.color_label.grid(row=3, column=0, padx=(15,0))
@@ -265,8 +274,19 @@ class TrajectoryWindow(tk.Toplevel):
         self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotBcolor)
         self.color2button.grid(row=3, column=3)
 
+        # dropdown for plot2 line size
+        linex2 = [0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        self.ref_linesize2 = tk.StringVar(self)
+        self.ref_linesize2.set("1.5")
+
+        self.line5 = tk.OptionMenu(self.tabStyle, self.ref_linesize2, *linex2)
+        self.line5.config(width=1)
+        self.line5.grid(row=3, column=4, pady="5")
+
+
         self.e_label = tk.Label(self.tabStyle, text="Efficiency Plot:")
         self.e_label.grid(row=4, column=0, columnspan=2, pady=(10,5), sticky="w")
+        
 
         # input area for designation of plot3 color
         self.color_label = tk.Label(self.tabStyle, text="Efficiency:")
@@ -282,6 +302,15 @@ class TrajectoryWindow(tk.Toplevel):
         self.color2button = tk.Button(self.tabStyle, text="Select Color", command=self.choose_plotCcolor)
         self.color2button.grid(row=5, column=3)
 
+        # dropdown for plot3 line size
+        linex3 = [0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        self.ref_linesize3 = tk.StringVar(self)
+        self.ref_linesize3.set("1.5")
+
+        self.line6 = tk.OptionMenu(self.tabStyle, self.ref_linesize3, *linex3)
+        self.line6.config(width=1)
+        self.line6.grid(row=5, column=4, pady="5")
+
 
         # third tab: text
 
@@ -292,7 +321,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.ref_title.set(self.titleset)
 
         self.combo2 = tk.Entry(self.tabText, textvariable=self.ref_title)
-        self.combo2.config(width=10)
+        self.combo2.config(width=15)
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for title font size
@@ -454,7 +483,8 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get())
+                                          self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get(),
+                                          self.ref_linesize.get(), self.ref_linesize2.get(), self.ref_linesize3.get())
 
         # update stored variables
         xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()

@@ -42,6 +42,7 @@ GAMMA = 1.0
 #   - clicktogg: designates whether the click-to-zero function is active, default = OFF
 #   - subtitles: labels applied to each subfigure
 #   - subtitlesizes: size of each label for each subfigure
+#   - linesize1, 2, & 3: linewidths for each plot
 class StackedTrajectoryMaker():
 
     # initializes the variables within the class
@@ -49,7 +50,7 @@ class StackedTrajectoryMaker():
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
                  legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift, clicktogg,
-                 subtitles, subtitlesizes):
+                 subtitles, subtitlesizes, linesize1, linesize2, linesize3):
         # designate data
         self.all_data = all_data
         self.yshift = yshift
@@ -105,6 +106,11 @@ class StackedTrajectoryMaker():
         self.y2min = y2min
         self.iaxes = None
         self.eaxes = None
+
+        # set linewidths
+        self.linewidth1 = linesize1
+        self.linewidth2 = linesize2
+        self.linewidth3 = linesize3
 
         # set figure dimensions
         self.width = width
@@ -178,8 +184,8 @@ class StackedTrajectoryMaker():
             
             # plot data
             ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*i+1)
-            ax.plot(time, donor, color=self.color1, label="Donor")
-            ax.plot(time, acceptor, color=self.color2, label="Acceptor")
+            ax.plot(time, donor, color=self.color1, label="Donor", linewidth=self.linewidth1)
+            ax.plot(time, acceptor, color=self.color2, label="Acceptor", linewidth=self.linewidth2)
             
             # axis options
             ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
@@ -227,7 +233,7 @@ class StackedTrajectoryMaker():
 
             # plot data
             ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*(i+1))
-            ax.plot(time, efret, color=self.color3)
+            ax.plot(time, efret, color=self.color3, linewidth=self.linewidth3)
 
             # set axis options
             ax.set_ylim([self.y2min, self.y2max]) 

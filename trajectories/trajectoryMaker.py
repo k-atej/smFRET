@@ -40,6 +40,7 @@ GAMMA = 1.0
 #   - subtitletoggle2: FRET efficiency subtitle graph toggle, default = ON
 #   - yshift: how much to subtract from the data when zeroing, carries over between generations but not separate trajectories
 #   - clicktogg: designates whether the click-to-zero function is active, default = OFF
+#   - linesize1, 2, & 3: linewidths for each plot
 class TrajectoryMaker():
 
     # initializes variables within the class
@@ -47,7 +48,8 @@ class TrajectoryMaker():
                  refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg):
+                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg,
+                 linesize1, linesize2, linesize3):
         #designate data
         self.data = data
         self.datacopy = data.copy()
@@ -97,6 +99,11 @@ class TrajectoryMaker():
         self.y2min = y2min
         self.iaxis = None
         self.eaxis = None
+
+        # set linewidths
+        self.linewidth1 = linesize1
+        self.linewidth2 = linesize2
+        self.linewidth3 = linesize3
 
         # generate zeroed data
         self.datacopy['donor'] = self.data['donor'] - self.yshift
@@ -180,8 +187,8 @@ class TrajectoryMaker():
         time = self.datacopy["time"]
         donor = self.datacopy["donor"]
         acceptor = self.datacopy["acceptor"]
-        fig.plot(time, donor, color=self.color1, label="Donor", zorder=1)
-        fig.plot(time, acceptor, color=self.color2, label="Acceptor", zorder=2)
+        fig.plot(time, donor, color=self.color1, label="Donor", zorder=1, linewidth=self.linewidth1)
+        fig.plot(time, acceptor, color=self.color2, label="Acceptor", zorder=2, linewidth=self.linewidth2)
     
         # set axis options
         fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
@@ -215,7 +222,7 @@ class TrajectoryMaker():
         # set up & plot the data columns on the figure
         time = self.datacopy["time"]
         efret = self.datacopy["efret"]
-        fig.plot(time, efret, color=self.color3, zorder=1)
+        fig.plot(time, efret, color=self.color3, zorder=1, linewidth=self.linewidth3)
 
         # set axis options
         fig.set_ylim([0, 1]) 
