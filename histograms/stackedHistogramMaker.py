@@ -153,6 +153,7 @@ class StackedHistMaker():
             ax.set_ylim([self.ymin, self.ymax]) 
             self.xlim = ax.get_xlim()
             self.ylim = ax.get_ylim()
+            
             yticks = ax.get_yticklabels()
             if self.toggle == 1:
                 yticks[0].set_visible(False)
@@ -457,7 +458,7 @@ class StackedHistMaker():
     #   - linestyle: style of line to paste onto the canvas
     #   - linewidth: size of line to paste onto the canvas
     def draw_annotations(self, axis, x, y, color, style, lw):
-        ymin, ymax = self.ylim
+        ymin, ymax = axis.get_ylim()
         annotation = axis.annotate('', xy=(x, 0), xytext=(x, ymax), xycoords='data', 
                                    arrowprops=dict(arrowstyle='-', color=color, 
                                                    linestyle=style, lw=lw))
