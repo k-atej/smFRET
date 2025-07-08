@@ -106,9 +106,9 @@ class StackedHistApplication(tk.Toplevel):
         self.tabAxes = tk.Frame(self.tabControl)
 
         self.tabControl.add(self.tabFormat, text="Format")
+        self.tabControl.add(self.tabAxes, text="Y-Axes")
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
-        self.tabControl.add(self.tabAxes, text="Axes")
         self.tabControl.grid(row=0, column=0, rowspan=3, padx=10)
 
         self.tabFormat_0 = tk.Frame(self.tabFormat)
@@ -472,9 +472,11 @@ class StackedHistApplication(tk.Toplevel):
             subtitlesizes.append(jfontsize.get())
 
         yaxes = []
+        ymaxes = []
         for axis in self.yaxis_inputs:
-            ii, itext = axis
+            ii, itext, imax = axis
             yaxes.append(ii.get())
+            ymaxes.append(imax.get())
 
          # create the new histogram based on parameters from the customization menu
         self.hist = StackedHistMaker(self.files, self.savepath, self.filename, self.ref_col.get(), self.subframe2, 
@@ -484,7 +486,7 @@ class StackedHistApplication(tk.Toplevel):
                                      float(self.ref_xfontsize.get()), float(self.ref_yfontsize.get()), float(self.ref_width.get()), 
                                      float(self.ref_height.get()), self.annotations, subtitles, 
                                      subtitlesizes, linecolor, self.ref_linestyle.get(), 
-                                     self.linetoggle.get(), self.ref_lw.get(), yaxes, self.ref_offset.get())
+                                     self.linetoggle.get(), self.ref_lw.get(), yaxes, ymaxes, self.ref_offset.get())
         
         # save annotations & subtitles on histogram
         self.annotations = self.hist.get_annotations()
@@ -492,6 +494,7 @@ class StackedHistApplication(tk.Toplevel):
         self.subtitles = self.hist.get_subtitles()
         self.subtitlesizes = self.hist.get_subtitlesizes()
         self.yaxisticks = self.hist.get_yticks()
+        self.ymaxes = self.hist.get_ymaxes()
         
         
         # make input areas for subtitles based on hist size
@@ -507,34 +510,46 @@ class StackedHistApplication(tk.Toplevel):
         self.resetYAxis()
 
     def makeYAxes(self):
-        
         self.makeYAxisInputs()
         for i in range(len(self.yaxis_inputs)):
-            ii, itext = self.yaxis_inputs[i]
+            ii, itext, imax = self.yaxis_inputs[i]
             itext.set(self.yaxisticks[i])
+            imax.set(self.ymaxes[i])
 
-    
+
     def makeYAxisInputs(self):
         self.yaxis_inputs = []
         k = tk.Label(self.tabAxes,text="Y-Ticks: ")
         k.grid(row=0, column=0, sticky="w", padx=(5,0), pady="5", columnspan=2)
         for i in range(self.subtitle_length):
             l = tk.Label(self.tabAxes, text=f"{i+1}: ")
-            l.grid(row=i + 1, column=0, padx=(20,0), sticky="w")
+            l.grid(row=(2*i) + 1, column=0, padx=(20,0), sticky="w")
 
             itext = tk.StringVar(self)
             ii = tk.Entry(self.tabAxes, textvariable=itext)
             ii.config(width=20)
-            ii.grid(row=i+1, column=1, sticky="w", padx=(0, 5), pady="5")
+            ii.grid(row=(2*i)+1, column=1, sticky="w", padx=(0, 5), pady="5", columnspan=3)
 
-            self.yaxis_inputs.append((ii, itext))
+            # input area to designate maximum value on y axis
+            ymax_label = tk.Label(self.tabAxes, text="Y Max:")
+            ymax_label.grid(row=(2*i)+2, column=1)
+            imax = tk.StringVar(self)
+            imax.set('None')
+
+            comboymax = tk.Entry(self.tabAxes, textvariable=imax)
+            comboymax.config(width=5)
+            comboymax.grid(row=(2*i)+2, column=2, sticky="w", padx=(0, 0), pady="5")
+
+
+            self.yaxis_inputs.append((ii, itext, imax))
 
     # reset subtitle input sizes
     def resetYAxis(self):
         if len(self.yaxis_inputs) == len(self.yaxisticks):
             for i in range(len(self.yaxis_inputs)):
-                ii, itext = self.yaxis_inputs[i]
+                ii, itext, imax = self.yaxis_inputs[i]
                 itext.set(self.yaxisticks[i])
+                imax.set(self.ymaxes[i])
 
                 temp = itext.get()
                 temp = temp.strip("[]")

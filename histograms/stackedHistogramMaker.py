@@ -45,7 +45,7 @@ class StackedHistMaker():
     def __init__(self, files, savepath, filename, datacolumn, master, row, col, bins, bintype, 
                  title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, 
                  xfontsize, yfontsize, width, height, annotations, subtitles, subtitlesizes,
-                 linecolor, linestyle, linetogg, linewidth, yaxes, shift=None):
+                 linecolor, linestyle, linetogg, linewidth, yaxes, ymaxes, shift=None):
         self.files = files
         self.savepath = savepath
         self.filename = filename
@@ -79,6 +79,7 @@ class StackedHistMaker():
         self.linetogg = linetogg
         self.linewidth = linewidth
         self.yaxes = yaxes
+        self.ymaxes = ymaxes
 
         self.fig = self.makeStackedHistogram()
 
@@ -146,6 +147,7 @@ class StackedHistMaker():
         
         i = 0
         self.yticklabels = []
+        self.ymaxlbls = []
         for ax in self.axes:
             #ax.sharey(self.axes[0])
             ax.set_xticks([])
@@ -158,10 +160,15 @@ class StackedHistMaker():
             # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
             if len(self.yaxes) == 0:
                 tick = ax.get_yticks()
+                ymin, ymax = ax.get_ylim()
+                self.ymaxlbls.append(ymax)
                 self.yticklabels.append(tick)
                 ax.set_yticks(tick)
             else:
+                self.ymaxlbls = self.ymaxes[::-1]
                 self.yticklabels = self.yaxes[::-1]
+
+            
             i+=1
     
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
@@ -174,9 +181,13 @@ class StackedHistMaker():
     def get_yticks(self):
         return self.yticklabels[::-1]
     
+    def get_ymaxes(self):
+        return self.ymaxlbls[::-1]
+    
     def restore_axes(self):
         if len(self.axes) == len(self.yaxes):
             self.yaxes = self.yaxes[::-1]
+            self.ymaxes = self.ymaxes[::-1]
             i = 0
             for ax in self.axes:
                 tix = []
@@ -187,6 +198,9 @@ class StackedHistMaker():
                     val = val.strip()
                     tix.append(float(val))
                 ax.set_yticks(tix)
+
+                val2 = float(self.ymaxes[i])
+                ax.set_ylim([None, val2])
                 i += 1
 
     # re-add lines from previous generation of histogram
