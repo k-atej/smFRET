@@ -29,6 +29,7 @@ class StackedHistApplication(tk.Toplevel):
         self.hist = None
         self.filename = filename
         self.subtitle_inputs = []
+        self.yaxis_inputs = []
         self.generation = 0
 
         # collect each designated file into a list
@@ -102,10 +103,12 @@ class StackedHistApplication(tk.Toplevel):
         self.tabFormat = tk.Frame(self.tabControl)
         self.tabStyle = tk.Frame(self.tabControl)
         self.tabText = tk.Frame(self.tabControl)
+        self.tabAxes = tk.Frame(self.tabControl)
 
         self.tabControl.add(self.tabFormat, text="Format")
         self.tabControl.add(self.tabStyle, text="Style")
         self.tabControl.add(self.tabText, text="Text")
+        self.tabControl.add(self.tabAxes, text="Axes")
         self.tabControl.grid(row=0, column=0, rowspan=3, padx=10)
 
         self.tabFormat_0 = tk.Frame(self.tabFormat)
@@ -182,19 +185,20 @@ class StackedHistApplication(tk.Toplevel):
         self.bin_label = tk.Label(self.tabFormat, text="Bins:")
         self.bin_label.grid(row=5, column=0, pady="5", padx=(20,0), sticky="w")
         self.ref_bins = tk.StringVar(self)
-        self.ref_bins.set("10")
+        self.ref_bins.set("0.02")
 
         #check box for toggling to bin number input
         self.bin2 = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
         self.toggle2.grid(row=4, column=2, sticky="w", padx=(0,0), pady="5", columnspan=2)
-        self.bin2.set(1)
+        self.bin2.set(0)
 
         #check box for toggling to bin width input
         self.bin1 = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.tabFormat, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
         self.toggle1.grid(row=4, column=0, sticky="w", padx=(20,0), pady="5", columnspan=2)
-       
+        self.bin1.set(1)
+        
         self.combo1 = tk.Entry(self.tabFormat, textvariable=self.ref_bins)
         self.combo1.config(width=5)
         self.combo1.grid(row=5, column=1, padx=(0, 10), pady="5", sticky="w")
@@ -232,6 +236,7 @@ class StackedHistApplication(tk.Toplevel):
         self.comboxmin.config(width=5)
         self.comboxmin.grid(row=8, column=1, sticky="w", padx=(0, 0), pady="5")
 
+        '''
         # input area to designate maximum value on y axis
         self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
         self.ymax_label.grid(row=9, column=2)
@@ -251,6 +256,7 @@ class StackedHistApplication(tk.Toplevel):
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
         self.comboymin.grid(row=9, column=1, sticky="w", padx=(0, 10), pady="5")
+        '''
 
         # input area for figure width
         self.width_label = tk.Label(self.tabFormat, text="Width:")
@@ -359,12 +365,6 @@ class StackedHistApplication(tk.Toplevel):
         self.combolw.grid(row=8, column=1, sticky="w", padx=(0, 10), pady="5")
 
 
-        
-        #check box for toggling zero on y axis
-        self.toggle = tk.IntVar()
-        self.toggle1 = tk.Checkbutton(self.tabStyle, text="Toggle Zero on Y-Axis", variable=self.toggle, onvalue=1, offvalue=0)
-        self.toggle1.grid(row=4, column=0, sticky="w", padx=(20,0), pady=(5), columnspan=2)
-
 
 
 
@@ -461,8 +461,8 @@ class StackedHistApplication(tk.Toplevel):
 
         xmax = self.checkMinMax(self.ref_xmax.get())
         xmin = self.checkMinMax(self.ref_xmin.get())
-        ymax = self.checkMinMax(self.ref_ymax.get())
-        ymin = self.checkMinMax(self.ref_ymin.get())
+        #ymax = self.checkMinMax(self.ref_ymax.get())
+        #ymin = self.checkMinMax(self.ref_ymin.get())
      
         subtitles = []
         subtitlesizes = []
@@ -471,31 +471,76 @@ class StackedHistApplication(tk.Toplevel):
             subtitles.append(j.get())
             subtitlesizes.append(jfontsize.get())
 
+        yaxes = []
+        for axis in self.yaxis_inputs:
+            ii, itext = axis
+            yaxes.append(ii.get())
+
          # create the new histogram based on parameters from the customization menu
         self.hist = StackedHistMaker(self.files, self.savepath, self.filename, self.ref_col.get(), self.subframe2, 
                                      0, 0, self.ref_bins.get(), self.bin1.get(), str(self.ref_title.get()), 
                                      float(self.ref_titlefontsize.get()), str(self.ref_x.get()),str(self.ref_y.get()), 
-                                     color, edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, ymax, ymin, 
+                                     color, edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, 
                                      float(self.ref_xfontsize.get()), float(self.ref_yfontsize.get()), float(self.ref_width.get()), 
-                                     float(self.ref_height.get()), self.toggle.get(), self.annotations, subtitles, 
+                                     float(self.ref_height.get()), self.annotations, subtitles, 
                                      subtitlesizes, linecolor, self.ref_linestyle.get(), 
-                                     self.linetoggle.get(), self.ref_lw.get(), self.ref_offset.get())
+                                     self.linetoggle.get(), self.ref_lw.get(), yaxes, self.ref_offset.get())
         
         # save annotations & subtitles on histogram
         self.annotations = self.hist.get_annotations()
         self.subtitle_length = self.hist.get_height()
         self.subtitles = self.hist.get_subtitles()
         self.subtitlesizes = self.hist.get_subtitlesizes()
+        self.yaxisticks = self.hist.get_yticks()
+        
         
         # make input areas for subtitles based on hist size
         if self.generation == 1:
             self.makeSubtitles()
+            self.makeYAxes()
 
         # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
 
         # reset subtitle input sizes
         self.resetSubtitles()
+        self.resetYAxis()
+
+    def makeYAxes(self):
+        
+        self.makeYAxisInputs()
+        for i in range(len(self.yaxis_inputs)):
+            ii, itext = self.yaxis_inputs[i]
+            itext.set(self.yaxisticks[i])
+
+    
+    def makeYAxisInputs(self):
+        self.yaxis_inputs = []
+        k = tk.Label(self.tabAxes,text="Y-Ticks: ")
+        k.grid(row=0, column=0, sticky="w", padx=(5,0), pady="5", columnspan=2)
+        for i in range(self.subtitle_length):
+            l = tk.Label(self.tabAxes, text=f"{i+1}: ")
+            l.grid(row=i + 1, column=0, padx=(20,0), sticky="w")
+
+            itext = tk.StringVar(self)
+            ii = tk.Entry(self.tabAxes, textvariable=itext)
+            ii.config(width=20)
+            ii.grid(row=i+1, column=1, sticky="w", padx=(0, 5), pady="5")
+
+            self.yaxis_inputs.append((ii, itext))
+
+    # reset subtitle input sizes
+    def resetYAxis(self):
+        if len(self.yaxis_inputs) == len(self.yaxisticks):
+            for i in range(len(self.yaxis_inputs)):
+                ii, itext = self.yaxis_inputs[i]
+                itext.set(self.yaxisticks[i])
+
+                temp = itext.get()
+                temp = temp.strip("[]")
+                temp = temp.strip()
+                temp = temp.strip(".")
+                itext.set(temp)
 
     # reset subtitle input sizes
     def resetSubtitles(self):

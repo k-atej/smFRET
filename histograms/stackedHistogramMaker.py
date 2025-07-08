@@ -26,13 +26,11 @@ import os
 #   - edgewidth: linewidth of bin edges in histogram
 #   - xmax: upper limit of x-axis
 #   - xmin: lower limit of x-axis
-#   - ymax: upper limit of y-axis
-#   - ymin: lower limit of y-axis
+
 #   - xfontsize: size to set x-axis label to
 #   - yfontsize: size to set y-axis label to
 #   - width: figure width 
 #   - height: figure height
-#   - toggle: toggle for whether to show the 0-tick on the y-axis
 #   - annotations: list of lines that were added to the figure (from the previous generation)
 #   - subtitles: list of subtitles that were added to the figure (from the previous generation)
 #   - subtitlesizes: size of subtitles that were added to the figure (from the previous generation)
@@ -45,9 +43,9 @@ class StackedHistMaker():
 
     # initializes the variables within the window
     def __init__(self, files, savepath, filename, datacolumn, master, row, col, bins, bintype, 
-                 title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, 
-                 xfontsize, yfontsize, width, height, toggle, annotations, subtitles, subtitlesizes,
-                 linecolor, linestyle, linetogg, linewidth, shift=None):
+                 title, titlefontsize, x, y, color, edgecolor, edgewidth, xmax, xmin, 
+                 xfontsize, yfontsize, width, height, annotations, subtitles, subtitlesizes,
+                 linecolor, linestyle, linetogg, linewidth, yaxes, shift=None):
         self.files = files
         self.savepath = savepath
         self.filename = filename
@@ -66,15 +64,13 @@ class StackedHistMaker():
         self.edgewidth = edgewidth
         self.xmax = xmax
         self.xmin = xmin
-        self.ymax = ymax
-        self.ymin = ymin
+
         self.xfontsize = xfontsize
         self.yfontsize = yfontsize
         self.offset = shift
         self.minlength = float('inf')
         self.width = width
         self.height = height
-        self.toggle = toggle
         self.annotations = annotations
         self.subtitles = subtitles
         self.subtitlesizes = subtitlesizes
@@ -82,6 +78,7 @@ class StackedHistMaker():
         self.linestyle = linestyle
         self.linetogg = linetogg
         self.linewidth = linewidth
+        self.yaxes = yaxes
 
         self.fig = self.makeStackedHistogram()
 
@@ -137,6 +134,7 @@ class StackedHistMaker():
         # annotate figure with lines
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
         self.restore_annotations()
+        self.restore_axes()
         return fig
     
     #set up axis ticks, range, & scale
@@ -145,18 +143,26 @@ class StackedHistMaker():
             self.xmin = self.min_data
         if self.xmax is None:
             self.xmax = self.max_data
-            
+        
+        i = 0
+        self.yticklabels = []
         for ax in self.axes:
             #ax.sharey(self.axes[0])
             ax.set_xticks([])
+
             ax.set_xlim([self.xmin, self.xmax])
-            ax.set_ylim([self.ymin, self.ymax]) 
+            #ax.set_ylim([self.ymin, self.ymax]) 
             self.xlim = ax.get_xlim()
             self.ylim = ax.get_ylim()
             
-            yticks = ax.get_yticklabels()
-            if self.toggle == 1:
-                yticks[0].set_visible(False)
+            # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
+            if len(self.yaxes) == 0:
+                tick = ax.get_yticks()
+                self.yticklabels.append(tick)
+                ax.set_yticks(tick)
+            else:
+                self.yticklabels = self.yaxes[::-1]
+            i+=1
     
         self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
 
@@ -165,6 +171,24 @@ class StackedHistMaker():
            self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
            self.axes[i].set_xticklabels([])
     
+    def get_yticks(self):
+        return self.yticklabels[::-1]
+    
+    def restore_axes(self):
+        if len(self.axes) == len(self.yaxes):
+            self.yaxes = self.yaxes[::-1]
+            i = 0
+            for ax in self.axes:
+                tix = []
+                temp = self.yaxes[i]
+                temp = temp.strip()
+                temp = temp.split(".")
+                for val in temp:
+                    val = val.strip()
+                    tix.append(float(val))
+                ax.set_yticks(tix)
+                i += 1
+
     # re-add lines from previous generation of histogram
     def restore_annotations(self):
         if len(self.annotations) != 0:
