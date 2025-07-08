@@ -48,9 +48,9 @@ class StackedTrajectoryMaker():
     # initializes the variables within the class
     def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
-                 height, width, xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, zerotoggle, zerotoggle2, yshift, clicktogg,
-                 subtitles, subtitlesizes, linesize1, linesize2, linesize3):
+                 height, width, xmax, xmin, y2max, y2min, intensitytoggle, efficiencytoggle,
+                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg,
+                 subtitles, subtitlesizes, linesize1, linesize2, linesize3, yaxes, ymaxes, y2ticks):
         # designate data
         self.all_data = all_data
         self.yshift = yshift
@@ -93,19 +93,30 @@ class StackedTrajectoryMaker():
         self.legend = legendtoggle
         self.subtitle = subtitletoggle
         self.subtitle2 = subtitletoggle2
-        self.zero = zerotoggle
-        self.zero2 = zerotoggle2
         self.clicktoggle = clicktogg
 
         # set axis variables
+        self.y2ticks = y2ticks
+        if self.y2ticks == "":
+            self.y2ticks = [0, 0.5, 1.0]
+        else:
+            temp = []
+            self.y2ticks = self.y2ticks.split(" ")
+            for value in self.y2ticks:
+                temp.append((float(value)))
+            self.y2ticks = temp
+
+
         self.xmax = xmax
         self.xmin = xmin
-        self.ymax = ymax
-        self.ymin = ymin
+        #self.ymax = ymax
+        #self.ymin = ymin
         self.y2max = y2max
         self.y2min = y2min
         self.iaxes = None
         self.eaxes = None
+        self.yaxes = yaxes
+        self.ymaxes = ymaxes
 
         # set linewidths
         self.linewidth1 = linesize1
@@ -170,10 +181,14 @@ class StackedTrajectoryMaker():
 
         # connect clicks to zeroing
         self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
+
+        self.restore_axes()
     
     # generate fluorophore intensity graph
     def makeIntensity(self):
         
+        self.yticklabels = []
+        self.ymaxlbls = []
         # configure axes for each plot
         self.axes = []
         for i in reversed(range(len(self.all_data))):
@@ -188,10 +203,24 @@ class StackedTrajectoryMaker():
             ax.plot(time, acceptor, color=self.color2, label="Acceptor", linewidth=self.linewidth2)
             
             # axis options
-            ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
+            #ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
             ax.set_xlim([self.xmin, self.xmax])
             #self.ymin, self.ymax = ax.get_ylim()
             ax.set_xticks([])
+
+            self.ylim = ax.get_ylim()
+            
+            # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
+            if len(self.yaxes) == 0:
+                tick = ax.get_yticks()
+                self.yticklabels.append(tick)
+                ax.set_yticks(tick)
+                ymin, ymax = ax.get_ylim()
+                self.ymaxlbls.append(ymax)
+            else:
+                self.ymaxlbls = self.ymaxes
+                self.yticklabels = self.yaxes
+
             
             # subtitles
             if self.subtitle == 1:
@@ -200,9 +229,10 @@ class StackedTrajectoryMaker():
                     ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
                 else:
                     ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.05), xycoords='axes fraction')
-            yticks = ax.get_yticklabels()
-            if self.zero == 0:
-                yticks[0].set_visible(False)
+            
+            #yticks = ax.get_yticklabels()
+            #if self.zero == 0:
+            #    yticks[0].set_visible(False)
             self.axes.append(ax)
         
         # share axes between figures
@@ -220,7 +250,36 @@ class StackedTrajectoryMaker():
             self.fig.text((0.1 + self.leftpad/2), 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
         self.axes.reverse()
+        #self.yticklabels = self.yticklabels[::-1]
+        #self.ymaxlbls = self.ymaxlbls[::-1]
 
+    def get_yticks(self):
+        return self.yticklabels
+    
+    def get_ymaxes(self):
+        return self.ymaxlbls
+    
+    def restore_axes(self):
+        if len(self.axes) == len(self.yaxes):
+            #self.yaxes = self.yaxes[::-1]
+            #self.ymaxes = self.ymaxes[::-1]
+            i = 0
+            #axes = self.axes[::-1]
+            for ax in self.axes:
+                tix = []
+                temp = self.yaxes[i]
+                temp = temp.strip()
+                temp = temp.split(".")
+
+                val2 = float(self.ymaxes[i])
+                for val in temp:
+                    val = val.strip()
+                    tix.append(float(val))
+                ax.set_yticks(tix)
+                
+                ax.set_ylim([None, val2])
+                i += 1
+    
     # generate FRET efficiency graph
     def makeEfficiency(self):
 
@@ -236,9 +295,12 @@ class StackedTrajectoryMaker():
             ax.plot(time, efret, color=self.color3, linewidth=self.linewidth3)
 
             # set axis options
-            ax.set_ylim([self.y2min, self.y2max]) 
             ax.set_xlim([self.xmin, self.xmax])
             ax.set_xticks([])
+
+            # set ticks for y-axis
+            ax.set_yticks(self.y2ticks)
+            ax.set_ylim([self.y2min, self.y2max]) 
 
             # subtitles
             if self.subtitle2 == 1:
@@ -248,9 +310,8 @@ class StackedTrajectoryMaker():
                     ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
                 else:
                     ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.05), xycoords='axes fraction')
-            yticks = ax.get_yticklabels()
-            if self.zero2 == 0:
-                yticks[0].set_visible(False)
+            
+  
             self.Eaxes.append(ax)
 
         # shared axis options
@@ -304,7 +365,7 @@ class StackedTrajectoryMaker():
 
     # return x and y limit for both the fluorophore intensity and FRET efficiency graphs
     def getMinMax(self):
-        return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
+        return self.xmin, self.xmax, self.y2min, self.y2max, self.y2ticks
 
     # calculate FRET efficiency
     def calculateEfret(self):
@@ -385,8 +446,6 @@ class StackedTrajectoryMaker():
         color 3: {self.color3}
         x-axis max: {self.xmax}
         x-axis min: {self.xmin}
-        y-axis max: {self.ymax}
-        y-axis min: {self.ymin}
         y-axis 2 max: {self.y2max}
         y-axis 2 min: {self.y2min}
         
