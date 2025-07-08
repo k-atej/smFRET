@@ -134,8 +134,9 @@ class StackedHistMaker():
 
         # annotate figure with lines
         fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
-        self.restore_annotations()
+        
         self.restore_axes()
+        self.restore_annotations()
         return fig
     
     #set up axis ticks, range, & scale
@@ -160,10 +161,10 @@ class StackedHistMaker():
             # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
             if len(self.yaxes) == 0:
                 tick = ax.get_yticks()
-                ymin, ymax = ax.get_ylim()
-                self.ymaxlbls.append(ymax)
                 self.yticklabels.append(tick)
                 ax.set_yticks(tick)
+                ymin, ymax = ax.get_ylim()
+                self.ymaxlbls.append(ymax)
             else:
                 self.ymaxlbls = self.ymaxes[::-1]
                 self.yticklabels = self.yaxes[::-1]
@@ -189,17 +190,19 @@ class StackedHistMaker():
             self.yaxes = self.yaxes[::-1]
             self.ymaxes = self.ymaxes[::-1]
             i = 0
+
             for ax in self.axes:
                 tix = []
                 temp = self.yaxes[i]
                 temp = temp.strip()
                 temp = temp.split(".")
+
+                val2 = float(self.ymaxes[i])
                 for val in temp:
                     val = val.strip()
                     tix.append(float(val))
                 ax.set_yticks(tix)
-
-                val2 = float(self.ymaxes[i])
+                
                 ax.set_ylim([None, val2])
                 i += 1
 
@@ -467,7 +470,6 @@ class StackedHistMaker():
                 else:
                     axis = (event.inaxes)
                     x, y = event.xdata, event.ydata
-                    ymin, ymax = self.ylim
 
                     dbl=False
                     self.draw_annotations(axis, x, y, self.linecolor, self.linestyle, self.linewidth)

@@ -540,7 +540,6 @@ class StackedHistApplication(tk.Toplevel):
             comboymax.config(width=5)
             comboymax.grid(row=(2*i)+2, column=2, sticky="w", padx=(0, 0), pady="5")
 
-
             self.yaxis_inputs.append((ii, itext, imax))
 
     # reset subtitle input sizes
