@@ -69,6 +69,7 @@ class HistMaker():
         self.linetogg = linetogg
         self.linewidth = linewidth
         self.ticktext = ticktext
+        self.bininput = bins
 
         # create the figure to be pasted into a HistogramWindow
         self.fig = self.makeHistogram()
@@ -289,13 +290,14 @@ class HistMaker():
         # get the axes limits
         xmin, xmax = self.xlim
         ymin, ymax = self.ylim
+        
 
         # format text to insert into .txt file
         text = f"""
         data: {self.data}
         savepath: {self.savepath}
-        bins: {self.bins}
-        bintype: {binning}
+        bins: {self.bins} 
+        bintype: {binning} ({self.bininput})
         title: {self.title}
         title fontsize: {self.titlesize}
         x-axis label: {self.x}
@@ -307,12 +309,17 @@ class HistMaker():
         x-axis min: {xmin}
         y-axis max: {ymax}
         y-axis min: {ymin}
+        y-ticks: {self.ticktext}
         x-axis label fontsize: {self.xfontsize}
         y-axis label fontsize: {self.yfontsize}
         offset: {self.offset}
         figure width: {self.width}
         figure height: {self.height} 
         annotations: {self.annotations}
+        linecolor: {self.linecolor}
+        linestyle: {self.linestyle}
+        linetogg: {self.linetogg}
+        linewidth: {self.linewidth}
 
         """
         return text

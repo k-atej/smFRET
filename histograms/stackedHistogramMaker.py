@@ -80,6 +80,7 @@ class StackedHistMaker():
         self.linewidth = linewidth
         self.yaxes = yaxes
         self.ymaxes = ymaxes
+        self.bininput = bins
 
         self.fig = self.makeStackedHistogram()
 
@@ -420,31 +421,29 @@ class StackedHistMaker():
         path = str(pathway) + ".txt"
         f = open(path, "w")
         f.write(text)
+        print("SAVING LOG FILE")
         f.close()
 
     # gathers input parameters and formats it into text to save as a .txt file
     def getText(self):
 
-        # collect information about paramets
+        # collect information about parameters
         if self.bintype == 1:
             binning = "bin width"
         elif self.bintype == 0:
             binning = "bin number"
         
         xmin, xmax = self.xlim
-        ymin, ymax = self.ylim
+        ymaxes = self.ymaxes
+        yticks = self.axes
 
-        if self.toggle == 1:
-            togg = "off"
-        else:
-            togg = "on"
 
         # format text to insert into .txt file
         text = f"""
         data: {self.datacolumn}
         savepath: {self.savepath}
         bins: {self.bins}
-        bintype: {binning}
+        bintype: {binning} ({self.bininput})
         title: {self.title}
         title fontsize: {self.titlesize}
         x-axis label: {self.x}
@@ -454,16 +453,19 @@ class StackedHistMaker():
         edge width: {self.edgewidth}
         x-axis max: {xmax}
         x-axis min: {xmin}
-        y-axis max: {ymax}
-        y-axis min: {ymin}
+        y-axis maxes: {ymaxes}
+        y-axis ticks: {yticks}
         x-axis label fontsize: {self.xfontsize}
         y-axis label fontsize: {self.yfontsize}
         offset: {self.offset}
         figure width: {self.width}
         figure height: {self.height} 
-        zero tick: {togg}
         annotations: {self.annotations}
         subtitles: {self.subtitles}
+        linestyle: {self.linestyle}
+        linetoggle: {self.linetogg}
+        linecolor: {self.linecolor}
+        linewidth: {self.linewidth}
         """
         return text
 
