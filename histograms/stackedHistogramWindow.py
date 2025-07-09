@@ -542,7 +542,7 @@ class StackedHistApplication(tk.Toplevel):
 
             self.yaxis_inputs.append((ii, itext, imax))
 
-    # reset subtitle input sizes
+    # reset y-axis inputs
     def resetYAxis(self):
         if len(self.yaxis_inputs) == len(self.yaxisticks):
             for i in range(len(self.yaxis_inputs)):
@@ -552,6 +552,7 @@ class StackedHistApplication(tk.Toplevel):
 
                 temp = itext.get()
                 temp = temp.strip("[]")
+                temp = temp.strip("()")
                 temp = temp.strip()
                 temp = temp.strip(".")
                 itext.set(temp)

@@ -161,8 +161,13 @@ class StackedHistMaker():
             # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
             if len(self.yaxes) == 0:
                 tick = ax.get_yticks()
-                self.yticklabels.append(tick)
-                ax.set_yticks(tick)
+                temp = []
+                for val in tick:
+                    val = float(val)
+                    val = round(val, 1)
+                    temp.append(val)
+                self.yticklabels.append(temp)
+                ax.set_yticks(temp)
                 ymin, ymax = ax.get_ylim()
                 self.ymaxlbls.append(ymax)
             else:
@@ -195,14 +200,17 @@ class StackedHistMaker():
                 tix = []
                 temp = self.yaxes[i]
                 temp = temp.strip()
-                temp = temp.split(".")
-
+                temp = temp.strip(",")
+                temp = temp.strip()
+                temp = temp.split(",")
+                
                 val2 = float(self.ymaxes[i])
                 for val in temp:
                     val = val.strip()
-                    tix.append(float(val))
+                    val = float(val)
+                    val = round(val, 1)
+                    tix.append(val)
                 ax.set_yticks(tix)
-                
                 ax.set_ylim([None, val2])
                 i += 1
 
