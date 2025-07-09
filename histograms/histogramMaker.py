@@ -39,7 +39,7 @@ class HistMaker():
     # initializes variables within the class
     def __init__(self, data, savepath, master, row, col, bins, bin1, title, titlefontsize, 
                  x, y, color, edgecolor, edgewidth, xmax, xmin, ymax, ymin, xfontsize, yfontsize, 
-                 width, height, annotations, linecolor, linestyle, linetogg, linewidth, shift=None):
+                 width, height, annotations, linecolor, linestyle, linetogg, linewidth, ticktext, shift=None):
         self.data = data
         self.savepath = savepath
         self.master = master
@@ -68,6 +68,7 @@ class HistMaker():
         self.linestyle = linestyle
         self.linetogg = linetogg
         self.linewidth = linewidth
+        self.ticktext = ticktext
 
         # create the figure to be pasted into a HistogramWindow
         self.fig = self.makeHistogram()
@@ -88,6 +89,7 @@ class HistMaker():
         # calculate the number of bins to use in the histogram
         self.setBins()
 
+
         # create a new histogram, set parameters
         f.hist(self.data_shifted, bins=self.bins, color=self.color, edgecolor=self.edgecolor, linewidth=self.edgewidth)
         
@@ -96,6 +98,9 @@ class HistMaker():
         f.set_ylabel(self.y, fontsize=self.yfontsize)
         f.set_xlim([self.xmin, self.xmax])
         f.set_ylim([self.ymin, self.ymax])
+
+        self.processTicks(f)
+        f.set_yticks(self.ticktext)
         self.xlim = f.get_xlim()
         self.ylim = f.get_ylim()
 
@@ -111,6 +116,26 @@ class HistMaker():
         self.restoreAnnotations(f)
 
         return fig
+    
+    def processTicks(self, f):
+        if self.ticktext == "":
+            print("fetching ticks")
+            self.ticktext = f.get_yticks()
+        else:
+            self.ticktext = self.ticktext.strip(",")
+            self.ticktext = self.ticktext.strip()
+            self.ticktext = self.ticktext.strip(",")
+            self.ticktext = self.ticktext.split(",")
+            temp = []
+            for val in self.ticktext:
+                val = val.strip()
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
+            self.ticktext = temp
+    
+    def getTicks(self):
+        return self.ticktext
     
     # re-add lines from previous generation of histogram
     #   - f: figure to add the annotations to

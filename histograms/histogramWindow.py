@@ -170,19 +170,20 @@ class HistApplication(tk.Toplevel):
         self.bin_label = tk.Label(self.tabFormat, text="Bins:")
         self.bin_label.grid(row=5, column=0, pady="5", padx=(20,0), sticky="w")
         self.ref_bins = tk.StringVar(self)
-        self.ref_bins.set("10")
+        self.ref_bins.set("0.02")
 
         #check box for toggling to bin number input
         self.bin2 = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat, text="Bin Number", variable=self.bin2, onvalue=1, offvalue=0, command=self.togglebins)
         self.toggle2.grid(row=4, column=2, sticky="w", padx=(0,0), pady="5", columnspan=2)
-        self.bin2.set(1)
+        
 
         #check box for toggling to bin width input
         self.bin1 = tk.IntVar()
         self.toggle1 = tk.Checkbutton(self.tabFormat, text="Bin Width", variable=self.bin1, onvalue=1, offvalue=0, command=self.changeLabel)
         self.toggle1.grid(row=4, column=0, sticky="w", padx=(20,0), pady="5", columnspan=2)
-       
+        self.bin1.set(1)
+
         self.combo1 = tk.Entry(self.tabFormat, textvariable=self.ref_bins)
         self.combo1.config(width=5)
         self.combo1.grid(row=5, column=1, padx=(0, 10), pady="5", sticky="w")
@@ -239,6 +240,14 @@ class HistApplication(tk.Toplevel):
         self.comboymin = tk.Entry(self.tabFormat, textvariable=self.ref_ymin)
         self.comboymin.config(width=5)
         self.comboymin.grid(row=9, column=1, sticky="w", padx=(0, 10), pady="5")
+
+        k = tk.Label(self.tabFormat,text="Y-ticks:")
+        k.grid(row=10, column=0, sticky="e", pady="5", padx=(5,0))
+        self.ticktext = tk.StringVar(self)
+        self.tickentry = tk.Entry(self.tabFormat, textvariable=self.ticktext)
+        self.tickentry.config(width=20)
+        self.tickentry.grid(row=10, column=1, sticky="ew", padx=(0, 5), pady="5", columnspan=3)
+
 
         # input area for figure width
         self.width_label = tk.Label(self.tabFormat, text="Width:")
@@ -449,13 +458,30 @@ class HistApplication(tk.Toplevel):
                               edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, ymax, ymin, 
                               float(self.ref_xfontsize.get()), float(self.ref_yfontsize.get()), float(self.ref_width.get()), 
                               float(self.ref_height.get()), self.annotations, linecolor, 
-                              self.ref_linestyle.get(), self.linetoggle.get(), self.ref_lw.get(), self.ref_offset.get())
+                              self.ref_linestyle.get(), self.linetoggle.get(), self.ref_lw.get(), self.ticktext.get(), self.ref_offset.get())
         
         # set the bin number or width if using auto-binning
         self.ref_bins.set(self.hist.getBins())
 
         # save annotations on histogram
         self.annotations = self.hist.getAnnotations()
+
+        #save ticks
+        self.processTicks()
+
+
+    def processTicks(self):
+        temp = self.hist.getTicks()
+        ls = ""
+        for val in temp:
+            val = float(val)
+            val = round(val, 1)
+            val = str(val)
+            ls += val
+            ls += ", "
+        ls = ls.strip()
+        ls = ls.strip(",")
+        self.ticktext.set(ls)
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes
