@@ -99,10 +99,10 @@ class StackedHistMaker():
             ax.hist(self.all_data_shifted[i][self.datacolumn], bins=self.bins, color=self.color, 
                     edgecolor=self.edgecolor, linewidth=self.edgewidth)
             if len(self.subtitles) != 0:
-                ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.85), xycoords='axes fraction')
+                ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.8), xycoords='axes fraction')
             
             else:
-                ax.annotate(text=self.lastFolder[i], fontsize=9, xy=(0.03, 0.85), xycoords='axes fraction')
+                ax.annotate(text=self.lastFolder[i], fontsize=9, xy=(0.03, 0.8), xycoords='axes fraction')
             self.axes.append(ax)
 
         self.format_axes()
