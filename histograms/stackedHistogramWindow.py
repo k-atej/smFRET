@@ -167,6 +167,7 @@ class StackedHistApplication(tk.Toplevel):
         self.data_label = tk.Label(self.tabFormat, text="Data:")
         self.data_label.grid(row=0, column=0, pady="5", padx=(5), sticky="w")
 
+        '''
         # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
         self.lbl_label = tk.Label(self.tabFormat, text="Source:")
         self.lbl_label.grid(row=1, column=0, padx=(20,0), pady="5")
@@ -177,6 +178,7 @@ class StackedHistApplication(tk.Toplevel):
         self.combo = tk.OptionMenu(self.tabFormat, self.ref_col, *labels)
         self.combo.config(width=5)
         self.combo.grid(row=1, column=1, columnspan=1)
+        '''
 
         self.binning_label = tk.Label(self.tabFormat, text="Bins:")
         self.binning_label.grid(row=3, column=0, pady="5", padx="5", sticky="w")
@@ -479,7 +481,7 @@ class StackedHistApplication(tk.Toplevel):
             ymaxes.append(imax.get())
 
          # create the new histogram based on parameters from the customization menu
-        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, self.ref_col.get(), self.subframe2, 
+        self.hist = StackedHistMaker(self.files, self.savepath, self.filename, "eFRET", self.subframe2, 
                                      0, 0, self.ref_bins.get(), self.bin1.get(), str(self.ref_title.get()), 
                                      float(self.ref_titlefontsize.get()), str(self.ref_x.get()),str(self.ref_y.get()), 
                                      color, edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, 

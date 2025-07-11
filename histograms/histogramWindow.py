@@ -152,6 +152,7 @@ class HistApplication(tk.Toplevel):
         self.data_label = tk.Label(self.tabFormat, text="Data:")
         self.data_label.grid(row=0, column=0, pady="5", padx=(5), sticky="w")
 
+        '''
         # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
         self.lbl_label = tk.Label(self.tabFormat, text="Source:")
         self.lbl_label.grid(row=1, column=0, padx=(20,0), pady="5")
@@ -162,6 +163,7 @@ class HistApplication(tk.Toplevel):
         self.combo = tk.OptionMenu(self.tabFormat, self.ref_col, *labels)
         self.combo.config(width=5)
         self.combo.grid(row=1, column=1, columnspan=1)
+        '''
 
         self.binning_label = tk.Label(self.tabFormat, text="Bins:")
         self.binning_label.grid(row=3, column=0, pady="5", padx="5", sticky="w")
@@ -452,7 +454,7 @@ class HistApplication(tk.Toplevel):
         ymin = self.checkMinMax(self.ref_ymin.get())
 
         # create the new histogram
-        self.hist = HistMaker(self.df[self.ref_col.get()], self.savepath, self.subframe2, 0, 0, self.ref_bins.get(), 
+        self.hist = HistMaker(self.df["eFRET"], self.savepath, self.subframe2, 0, 0, self.ref_bins.get(), 
                               self.bin1.get(), str(self.ref_title.get()), 
                               float(self.ref_titlefontsize.get()), str(self.ref_x.get()), str(self.ref_y.get()), color, 
                               edgecolor, float(self.ref_edgewidth.get()), xmax, xmin, ymax, ymin, 
