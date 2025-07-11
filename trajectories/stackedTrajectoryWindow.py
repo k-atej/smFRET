@@ -480,10 +480,12 @@ class stackedTrajectoryWindow(tk.Toplevel):
         
         yaxes = []
         ymaxes = []
+        ymins = []
         for axis in self.yaxis_inputs:
-            ii, itext, imax = axis
+            ii, itext, imax, imin = axis
             yaxes.append(ii.get())
             ymaxes.append(imax.get())
+            ymins.append(imin.get())
 
         # generate trajectory
         self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
@@ -493,7 +495,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift,
                                           self.sub3togg.get(), subtitles, subtitlesizes, self.ref_linesize.get(), self.ref_linesize2.get(), 
-                                          self.ref_linesize3.get(), yaxes, ymaxes, self.ee.get())
+                                          self.ref_linesize3.get(), yaxes, ymaxes, ymins, self.ee.get())
         
         # update stored variables
         self.subtitle_length = self.trajectory.get_height()
@@ -501,6 +503,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.subtitlesizes = self.trajectory.get_subtitlesizes()
         self.yaxisticks = self.trajectory.get_yticks()
         self.ymaxes = self.trajectory.get_ymaxes()
+        self.ymins = self.trajectory.get_ymins()
 
         xmin, xmax, y2min, y2max, y2ticks = self.trajectory.getMinMax()
         self.ref_xmin.set(xmin)
@@ -518,6 +521,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                 jtext.set(f.split(".")[0])
             self.yaxisticks = self.yaxisticks[::-1]
             self.ymaxes = self.ymaxes[::-1]
+            self.ymins = self.ymins[::-1]
             self.makeYAxes()
 
         # reset subtitle input sizes
@@ -532,9 +536,10 @@ class stackedTrajectoryWindow(tk.Toplevel):
     def makeYAxes(self):
         self.makeYAxisInputs()
         for i in range(len(self.yaxis_inputs)):
-            ii, itext, imax = self.yaxis_inputs[i]
+            ii, itext, imax, imin = self.yaxis_inputs[i]
             itext.set(self.yaxisticks[i])
             imax.set(self.ymaxes[i])
+            imin.set(self.ymins[i])
     
     def makeYAxisInputs(self):
         self.yaxis_inputs = []
@@ -549,25 +554,36 @@ class stackedTrajectoryWindow(tk.Toplevel):
             ii.config(width=27)
             ii.grid(row=(2*i)+3, column=1, sticky="w", padx=(0, 5), pady="5", columnspan=3)
 
+            # input area to designate minimum value on y axis
+            ymin_label = tk.Label(self.tabAxes, text="Y Min:")
+            ymin_label.grid(row=(2*i)+4, column=0)
+            imin = tk.StringVar(self)
+            imin.set('None')
+
+            comboymin = tk.Entry(self.tabAxes, textvariable=imin)
+            comboymin.config(width=5)
+            comboymin.grid(row=(2*i)+4, column=1, sticky="w", padx=(0, 0), pady="5")
+            
             # input area to designate maximum value on y axis
             ymax_label = tk.Label(self.tabAxes, text="Y Max:")
-            ymax_label.grid(row=(2*i)+4, column=1)
+            ymax_label.grid(row=(2*i)+4, column=2)
             imax = tk.StringVar(self)
             imax.set('None')
 
             comboymax = tk.Entry(self.tabAxes, textvariable=imax)
             comboymax.config(width=5)
-            comboymax.grid(row=(2*i)+4, column=2, sticky="w", padx=(0, 0), pady="5")
+            comboymax.grid(row=(2*i)+4, column=3, sticky="w", padx=(0, 0), pady="5")
 
-            self.yaxis_inputs.append((ii, itext, imax))
+            self.yaxis_inputs.append((ii, itext, imax, imin))
 
     # reset subtitle input sizes
     def resetYAxes(self):
         if len(self.yaxis_inputs) == len(self.yaxisticks):
             for i in range(len(self.yaxis_inputs)):
-                ii, itext, imax = self.yaxis_inputs[i]
+                ii, itext, imax, imin = self.yaxis_inputs[i]
                 itext.set(self.yaxisticks[i])
                 imax.set(self.ymaxes[i])
+                imin.set(self.ymins[i])
 
                 temp = itext.get()
                 temp = temp.strip("[]")

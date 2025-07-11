@@ -50,7 +50,7 @@ class StackedTrajectoryMaker():
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, y2max, y2min, intensitytoggle, efficiencytoggle,
                  legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg,
-                 subtitles, subtitlesizes, linesize1, linesize2, linesize3, yaxes, ymaxes, y2ticks):
+                 subtitles, subtitlesizes, linesize1, linesize2, linesize3, yaxes, ymaxes, ymins, y2ticks):
         # designate data
         self.all_data = all_data
         self.yshift = yshift
@@ -117,6 +117,7 @@ class StackedTrajectoryMaker():
         self.eaxes = None
         self.yaxes = yaxes
         self.ymaxes = ymaxes
+        self.ymins = ymins
 
         # set linewidths
         self.linewidth1 = linesize1
@@ -189,6 +190,7 @@ class StackedTrajectoryMaker():
         
         self.yticklabels = []
         self.ymaxlbls = []
+        self.yminlbls = []
         # configure axes for each plot
         self.axes = []
         for i in reversed(range(len(self.all_data))):
@@ -217,9 +219,11 @@ class StackedTrajectoryMaker():
                 ax.set_yticks(tick)
                 ymin, ymax = ax.get_ylim()
                 self.ymaxlbls.append(ymax)
+                self.yminlbls.append(ymin)
             else:
                 self.ymaxlbls = self.ymaxes
                 self.yticklabels = self.yaxes
+                self.yminlbls = self.ymins
 
             
             # subtitles
@@ -259,6 +263,9 @@ class StackedTrajectoryMaker():
     def get_ymaxes(self):
         return self.ymaxlbls
     
+    def get_ymins(self):
+        return self.yminlbls
+    
     def restore_axes(self):
         if len(self.axes) == len(self.yaxes):
             #self.yaxes = self.yaxes[::-1]
@@ -272,12 +279,13 @@ class StackedTrajectoryMaker():
                 temp = temp.split(".")
 
                 val2 = float(self.ymaxes[i])
+                val3 = float(self.ymins[i])
                 for val in temp:
                     val = val.strip()
                     tix.append(float(val))
                 ax.set_yticks(tix)
                 
-                ax.set_ylim([None, val2])
+                ax.set_ylim([val3, val2])
                 i += 1
     
     # generate FRET efficiency graph
