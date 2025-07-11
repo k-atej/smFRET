@@ -98,13 +98,14 @@ class StackedTrajectoryMaker():
         # set axis variables
         self.y2ticks = y2ticks
         if self.y2ticks == "":
-            self.y2ticks = [0, 0.5, 1.0]
-        else:
+            self.y2ticks = [0.0, 0.5, 1.0]
             temp = []
-            self.y2ticks = self.y2ticks.split(" ")
-            for value in self.y2ticks:
-                temp.append((float(value)))
+            for val in self.y2ticks:
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
             self.y2ticks = temp
+        
 
 
         self.xmax = xmax
@@ -215,8 +216,13 @@ class StackedTrajectoryMaker():
             # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
             if len(self.yaxes) == 0:
                 tick = ax.get_yticks()
-                self.yticklabels.append(tick)
-                ax.set_yticks(tick)
+                temp = []
+                for val in tick:
+                    val = float(val)
+                    val = round(val, 1)
+                    temp.append(val)
+                self.yticklabels.append(temp)
+                ax.set_yticks(temp)
                 ymin, ymax = ax.get_ylim()
                 self.ymaxlbls.append(ymax)
                 self.yminlbls.append(ymin)
@@ -276,15 +282,18 @@ class StackedTrajectoryMaker():
                 tix = []
                 temp = self.yaxes[i]
                 temp = temp.strip()
-                temp = temp.split(".")
+                temp = temp.strip(",")
+                temp = temp.strip()
+                temp = temp.split(",")
 
                 val2 = float(self.ymaxes[i])
                 val3 = float(self.ymins[i])
                 for val in temp:
                     val = val.strip()
-                    tix.append(float(val))
+                    val = float(val)
+                    val = round(val, 1)
+                    tix.append(val)
                 ax.set_yticks(tix)
-                
                 ax.set_ylim([val3, val2])
                 i += 1
     
@@ -456,6 +465,10 @@ class StackedTrajectoryMaker():
         x-axis min: {self.xmin}
         y-axis 2 max: {self.y2max}
         y-axis 2 min: {self.y2min}
+        e ticks: {self.y2ticks}
+        i ticks: {self.yticklabels}
+        i maxes: {self.ymaxlbls}
+        i mins: {self.yminlbls}
         
         offset: {self.yshift}
         legend: {self.legend}

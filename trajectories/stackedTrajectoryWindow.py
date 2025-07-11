@@ -487,6 +487,18 @@ class stackedTrajectoryWindow(tk.Toplevel):
             ymaxes.append(imax.get())
             ymins.append(imin.get())
 
+        etext = self.ee.get()
+        if etext != "":
+            etext = etext.strip()
+            etext = etext.strip(",")
+            etext = etext.strip()
+            etext = etext.split(",")
+            temp = []
+            for val in etext:
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
+            etext = temp
         # generate trajectory
         self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
@@ -495,7 +507,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift,
                                           self.sub3togg.get(), subtitles, subtitlesizes, self.ref_linesize.get(), self.ref_linesize2.get(), 
-                                          self.ref_linesize3.get(), yaxes, ymaxes, ymins, self.ee.get())
+                                          self.ref_linesize3.get(), yaxes, ymaxes, ymins, etext)
         
         # update stored variables
         self.subtitle_length = self.trajectory.get_height()
@@ -510,7 +522,15 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.ref_xmax.set(xmax)
         self.ref_y2min.set(y2min)
         self.ref_y2max.set(y2max)
-        self.etext.set(y2ticks)
+        etext = y2ticks
+        temp = ""
+        for val in etext:
+            val = str(val)
+            temp += val
+            temp += ", "
+        temp = temp.strip()
+        temp = temp.strip(",")
+        self.etext.set(temp)
 
         # make input areas for subtitles based on hist size
         if self.generation == 1:
@@ -587,6 +607,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
                 temp = itext.get()
                 temp = temp.strip("[]")
+                temp = temp.strip("()")
                 temp = temp.strip()
                 temp = temp.strip(".")
                 itext.set(temp)
