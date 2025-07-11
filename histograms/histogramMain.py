@@ -14,7 +14,7 @@ class HistogramMainApplication(tk.Toplevel):
 
     def __init__(self):
         super().__init__()
-        self.title("Histogram Maker")
+        self.title("Make Histograms")
         self.minsize(200, 200)
         self.df = []
 
@@ -27,7 +27,7 @@ class HistogramMainApplication(tk.Toplevel):
         self.subframe1.grid(row=0, column=0)
 
         #Title
-        self.title_label = tk.Label(self.subframe1, text="Open A File:")
+        self.title_label = tk.Label(self.subframe1, text="Open a folder containing distribution files:")
         self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
 
         #start button
@@ -35,7 +35,7 @@ class HistogramMainApplication(tk.Toplevel):
         self.startButton.grid(row=3, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
         #input area for file path
-        self.input_label = tk.Label(self.subframe1, text="File Path:")
+        self.input_label = tk.Label(self.subframe1, text="Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
         self.ref_input.set('')

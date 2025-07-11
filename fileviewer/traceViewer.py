@@ -19,7 +19,7 @@ class TraceApplication(tk.Toplevel):
     # builds the menu for inserting a file path in order to open trajectory files
     # trace files should be included in a single, accesible folder
     def buildMenu(self):
-        self.title("Open Trajectory Files")
+        self.title("View Traces")
         self.minsize(300, 200)
 
         # full window 
@@ -39,7 +39,7 @@ class TraceApplication(tk.Toplevel):
         self.startButton.grid(row=3, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
         # input area for file path
-        self.input_label = tk.Label(self.subframe1, text="File Path:")
+        self.input_label = tk.Label(self.subframe1, text="Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
         self.ref_input.set('')

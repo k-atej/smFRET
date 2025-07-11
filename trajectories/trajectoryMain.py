@@ -19,7 +19,7 @@ class TrajectoryMainApplication(tk.Toplevel):
     # initalize the window
     def __init__(self):
         super().__init__()
-        self.title("Trajectory Menu")
+        self.title("Make Trajectory Graphs")
         self.minsize(300, 200)
 
         #full window 
@@ -31,7 +31,7 @@ class TrajectoryMainApplication(tk.Toplevel):
         self.subframe1.grid(row=0, column=0)
 
         #Title
-        self.title_label = tk.Label(self.subframe1, text="Open A Folder:")
+        self.title_label = tk.Label(self.subframe1, text="Open a folder of single trajectory files:")
         self.title_label.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 10), pady="10")
 
         #start button
@@ -39,7 +39,7 @@ class TrajectoryMainApplication(tk.Toplevel):
         self.startButton.grid(row=4, column=0, sticky="ew", padx=(10, 10), pady="10", columnspan=2)
         
         #input area for file path
-        self.input_label = tk.Label(self.subframe1, text="File Path:")
+        self.input_label = tk.Label(self.subframe1, text="Path:")
         self.input_label.grid(row=1, column=0)
         self.ref_input = tk.StringVar(self)
         self.ref_input.set('')
@@ -49,7 +49,7 @@ class TrajectoryMainApplication(tk.Toplevel):
         self.combo4.grid(row=1, column=1, sticky="ew", padx=(10, 10), pady="10")
 
         # dropdown for designation of filetype (either csv or dat)
-        self.type_label = tk.Label(self.subframe1, text="File Types:")
+        self.type_label = tk.Label(self.subframe1, text="File types:")
         self.type_label.grid(row=2, column=0)
 
         reftype = ['.csv', '.dat']
@@ -61,7 +61,7 @@ class TrajectoryMainApplication(tk.Toplevel):
         self.combo8.grid(row=2, column=1, sticky="ew", padx=(10, 10), pady="10")
 
         # dropdown menu that allows selection of column in the dataframe, defaults to "eFRET," which is the first column
-        self.choice_label = tk.Label(self.subframe1, text="View Type:")
+        self.choice_label = tk.Label(self.subframe1, text="View type:")
         self.choice_label.grid(row=3, column=0)
         choices = ["Single", "Stacked"]
         self.ref_choice = tk.StringVar(self)
