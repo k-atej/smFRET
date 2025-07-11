@@ -137,7 +137,7 @@ class TrajectoryWindow(tk.Toplevel):
         # checkbox for displaying the efficiency plot
         self.efficiencytogg = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
-        self.toggle2.grid(row=6, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
+        self.toggle2.grid(row=7, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.efficiencytogg.set(1)
 
         # input area to designate maximum value on x axis
@@ -180,28 +180,46 @@ class TrajectoryWindow(tk.Toplevel):
         self.comboymin.config(width=5)
         self.comboymin.grid(row=5, column=1, sticky="ew", padx=(0, 10), pady="5")
 
+        # INPUT AREA FOR Y-TICKS ON I GRAPH
+        self.ilbl = tk.Label(self.tabFormat, text="Y-Ticks:")
+        self.ilbl.grid(row=6, column=0, padx=(5,0), sticky="e")
+
+        self.itext = tk.StringVar(self)
+        self.ii = tk.Entry(self.tabFormat, textvariable=self.itext)
+        self.ii.config(width=25)
+        self.ii.grid(row=6, column=1, sticky="ew", padx=(0, 10), pady="5", columnspan=3)
+
         # input area to designate maximum value on y2 axis
         self.y2max_label = tk.Label(self.tabFormat, text="Y Max:")
-        self.y2max_label.grid(row=7, column=2, pady="5")
+        self.y2max_label.grid(row=8, column=2, pady="5")
         self.ref_y2max = tk.StringVar(self)
         self.ref_y2max.set("1.2")
 
         self.comboy2max = tk.Entry(self.tabFormat, textvariable=self.ref_y2max)
         self.comboy2max.config(width=5)
-        self.comboy2max.grid(row=7, column=3, sticky="ew", padx=(0, 10), pady="5")
+        self.comboy2max.grid(row=8, column=3, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate minimum value on y2 axis
         self.y2min_label = tk.Label(self.tabFormat, text="Y Min:")
-        self.y2min_label.grid(row=7, column=0, padx=(20,0), pady="5")
+        self.y2min_label.grid(row=8, column=0, padx=(20,0), pady="5")
         self.ref_y2min = tk.StringVar(self)
         self.ref_y2min.set("None")
 
         self.comboy2min = tk.Entry(self.tabFormat, textvariable=self.ref_y2min)
         self.comboy2min.config(width=5)
-        self.comboy2min.grid(row=7, column=1, sticky="ew", padx=(0, 10), pady="5")
+        self.comboy2min.grid(row=8, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         self.fig_label = tk.Label(self.tabFormat, text="Figure Dimensions")
         self.fig_label.grid(row=0, column=0, columnspan=2, pady=(10,5))
+
+        # INPUT AREA FOR Y-TICKS ON E GRAPH
+        self.elbl = tk.Label(self.tabFormat, text="Y-Ticks:")
+        self.elbl.grid(row=9, column=0, padx=(5,0), sticky="e")
+
+        self.etext = tk.StringVar(self)
+        self.ee = tk.Entry(self.tabFormat, textvariable=self.etext)
+        self.ee.config(width=25)
+        self.ee.grid(row=9, column=1, sticky="ew", padx=(0, 10), pady="5", columnspan=3)
 
 
         # input area for figure width
