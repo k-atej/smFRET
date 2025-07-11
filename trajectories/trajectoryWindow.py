@@ -493,6 +493,30 @@ class TrajectoryWindow(tk.Toplevel):
         y2fontsize = float(self.ref_y2fontsize.get())
         titlefontsize = float(self.ref_titlefontsize.get())
 
+        etext = self.ee.get()
+        if etext != "":
+            etext = etext.strip()
+            etext = etext.strip(",")
+            etext = etext.strip()
+            etext = etext.split(",")
+            temp = []
+            for val in etext:
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
+            etext = temp
+        itext = self.ii.get()
+        if itext != "":
+            itext = itext.strip()
+            itext = itext.strip(",")
+            itext = itext.strip()
+            itext = itext.split(",")
+            temp = []
+            for val in itext:
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
+            itext = temp
   
 
         # generate trajectory 
@@ -502,17 +526,39 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get(),
-                                          self.ref_linesize.get(), self.ref_linesize2.get(), self.ref_linesize3.get())
+                                          self.ref_linesize.get(), self.ref_linesize2.get(), self.ref_linesize3.get(), itext, etext)
 
         # update stored variables
-        xmin, xmax, ymin, ymax, y2min, y2max = self.trajectory.getMinMax()
+        xmin, xmax, ymin, ymax, y2min, y2max, iticks, eticks = self.trajectory.getMinMax()
         self.ref_xmin.set(xmin)
         self.ref_xmax.set(xmax)
         self.ref_ymin.set(ymin)
         self.ref_ymax.set(ymax)
         self.ref_y2min.set(y2min)
         self.ref_y2max.set(y2max)
+        itext = iticks
+        temp = ""
+        for val in itext:
+            val = str(val)
+            temp += val
+            temp += ", "
+        temp = temp.strip()
+        temp = temp.strip(",")
+        self.itext.set(temp)
+
+
+        etext = eticks
+        temp = ""
+        for val in etext:
+            val = str(val)
+            temp += val
+            temp += ", "
+        temp = temp.strip()
+        temp = temp.strip(",")
+        self.etext.set(temp)
+
         self.makeLabel()
+
 
     # type checks the designation of x/y mins and maxes
     # - val: value input into x/y min or max entry boxes

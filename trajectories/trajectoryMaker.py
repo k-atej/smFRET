@@ -49,7 +49,7 @@ class TrajectoryMaker():
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
                  legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg,
-                 linesize1, linesize2, linesize3):
+                 linesize1, linesize2, linesize3, iticks, eticks):
         #designate data
         self.data = data
         self.datacopy = data.copy()
@@ -95,8 +95,19 @@ class TrajectoryMaker():
         self.xmin = xmin
         self.ymax = ymax
         self.ymin = ymin
+        self.yticks = iticks
         self.y2max = y2max
         self.y2min = y2min
+        self.y2ticks = eticks
+        if self.y2ticks == "":
+            self.y2ticks = [0.0, 0.5, 1.0]
+            temp = []
+            for val in self.y2ticks:
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
+            self.y2ticks = temp
+
         self.iaxis = None
         self.eaxis = None
 
@@ -113,7 +124,7 @@ class TrajectoryMaker():
 
     # return x and y limit for both the fluorophore intensity and FRET efficiency graphs
     def getMinMax(self):
-        return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max
+        return self.xmin, self.xmax, self.ymin, self.ymax, self.y2min, self.y2max, self.yticks, self.y2ticks
 
     # return y shift
     def getShift(self):
@@ -189,10 +200,20 @@ class TrajectoryMaker():
         acceptor = self.datacopy["acceptor"]
         fig.plot(time, donor, color=self.color1, label="Donor", zorder=1, linewidth=self.linewidth1)
         fig.plot(time, acceptor, color=self.color2, label="Acceptor", zorder=2, linewidth=self.linewidth2)
+
+        if self.yticks == "":
+            self.yticks = fig.get_yticks()
+            temp = []
+            for val in self.yticks:
+                val = float(val)
+                val = round(val, 1)
+                temp.append(val)
+            self.yticks = temp
     
         # set axis options
         fig.set_xlabel(self.xlabel, fontsize=self.xfontsize)
         fig.set_ylabel(self.ylabel, fontsize=self.yfontsize)
+        fig.set_yticks(self.yticks)
         fig.set_xlim([self.xmin, self.xmax])
         fig.set_ylim([self.ymin, self.ymax])
 
@@ -229,6 +250,7 @@ class TrajectoryMaker():
         fig.set_ylabel(self.y2label, fontsize=self.y2fontsize)
         fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
         fig.set_xlim([self.xmin, self.xmax])
+        fig.set_yticks(self.y2ticks)
         fig.set_ylim([self.y2min, self.y2max])
 
         self.y2min, self.y2max = fig.get_ylim()
