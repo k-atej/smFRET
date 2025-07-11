@@ -435,7 +435,7 @@ class StackedHistMaker():
         
         xmin, xmax = self.xlim
         ymaxes = self.ymaxes
-        yticks = self.axes
+        yticks = self.yaxes
 
 
         # format text to insert into .txt file
