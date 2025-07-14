@@ -133,6 +133,7 @@ class StackedTrajectoryMaker():
         self.xmaxlbls = []
         self.xminlbls = []
         self.axes = []
+        self.Eaxes = []
 
         self.start()
     
@@ -188,7 +189,6 @@ class StackedTrajectoryMaker():
 
         # connect clicks to zeroing
         self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
-
         self.restore_axes()
 
         
@@ -209,11 +209,6 @@ class StackedTrajectoryMaker():
             ax.plot(time, acceptor, color=self.color2, label="Acceptor", linewidth=self.linewidth2)
             
             # axis options
-            #ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
-            #ax.set_xlim([self.xmin, self.xmax])
-            #self.ymin, self.ymax = ax.get_ylim()
-            #ax.set_xticks([])
-
             self.xlim = ax.get_xlim()
             self.ylim = ax.get_ylim()
             
@@ -233,6 +228,8 @@ class StackedTrajectoryMaker():
                 xmin, xmax = ax.get_xlim()
                 self.xmaxlbls.append(xmax)
                 self.xminlbls.append(xmin)
+                self.xmaxlbls = self.xmaxlbls[::-1]
+                self.xminlbls = self.xminlbls[::-1]
             else:
                 self.ymaxlbls = self.ymaxes
                 self.yticklabels = self.yaxes
@@ -249,17 +246,9 @@ class StackedTrajectoryMaker():
                 else:
                     ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.7), xycoords='axes fraction')
             
-            #yticks = ax.get_yticklabels()
-            #if self.zero == 0:
-            #    yticks[0].set_visible(False)
             self.axes.append(ax)
         
         # share axes between figures
-        #self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
-        #self.xmin, self.xmax = self.axes[0].get_xlim()  
-        #for i in range(len(self.axes)):
-        #   self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
-        #   self.axes[i].set_xticklabels()
         self.axes[0].set_xlabel(self.xlabel, fontsize=self.xfontsize)
         
         # toggles
@@ -269,8 +258,7 @@ class StackedTrajectoryMaker():
             self.fig.text((0.1 + self.leftpad/2), 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
         self.axes.reverse()
-        #self.yticklabels = self.yticklabels[::-1]
-        #self.ymaxlbls = self.ymaxlbls[::-1]
+
 
     def get_yticks(self):
         return self.yticklabels
@@ -289,10 +277,7 @@ class StackedTrajectoryMaker():
     
     def restore_axes(self):
         if len(self.axes) == len(self.yaxes):
-            #self.yaxes = self.yaxes[::-1]
-            #self.ymaxes = self.ymaxes[::-1]
             i = 0
-            #axes = self.axes[::-1]
             for ax in self.axes:
                 tix = []
                 temp = self.yaxes[i]
@@ -310,7 +295,6 @@ class StackedTrajectoryMaker():
                     tix.append(val)
                 ax.set_yticks(tix)
                 ax.set_ylim([val3, val2])
-
                 val4 = self.xmins[i]
                 val5 = self.xmaxes[i]
                 val4 = float(val4)
@@ -319,12 +303,24 @@ class StackedTrajectoryMaker():
                 val5 = round(val5, 1)
                 ax.set_xlim([val4, val5])
                 i += 1
+
+        if len(self.Eaxes) == len(self.yaxes):
+            i = 0
+            for ax in self.Eaxes:
+                val4 = self.xmins[i]
+                val5 = self.xmaxes[i]
+                val4 = float(val4)
+                val4 = round(val4, 1)
+                val5 = float(val5)
+                val5 = round(val5, 1)
+                ax.set_xlim([val4, val5])
+                i += 1
+
     
     # generate FRET efficiency graph
     def makeEfficiency(self):
 
         # configure axes for each plot
-        self.Eaxes = []
         for i in reversed(range(len(self.all_data))):
             # set variables 
             time = self.datacopy[i]["time"]
@@ -333,10 +329,6 @@ class StackedTrajectoryMaker():
             # plot data
             ax = self.fig.add_subplot(len(self.all_data), self.numdata, self.numdata*(i+1))
             ax.plot(time, efret, color=self.color3, linewidth=self.linewidth3)
-
-            # set axis options
-            #ax.set_xlim([self.xmin, self.xmax])
-            ax.set_xticks([])
 
             # set ticks for y-axis
             ax.set_yticks(self.y2ticks)
@@ -356,19 +348,15 @@ class StackedTrajectoryMaker():
 
         # shared axis options
         self.y2min, self.y2max = self.Eaxes[0].get_ylim()
-        self.Eaxes[0].xaxis.set_major_locator(plt.AutoLocator())
-    
-        # remove x-tick labels on subplots, except for last one
-        for i in range(1, len(self.all_data)):
-           self.Eaxes[i].xaxis.set_major_locator(plt.AutoLocator())
-           self.Eaxes[i].set_xticklabels([])
         self.Eaxes[0].set_xlabel(self.x2label, fontsize=self.x2fontsize)
         
         if self.numdata == 2:
             self.fig.text((0.53+self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         else:
             self.fig.text((0.1 + self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
-        
+        self.Eaxes.reverse()
+
+
     # combs through data to find bounds
     def processData(self):
         max_donor_data = 0
