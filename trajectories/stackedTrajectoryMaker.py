@@ -242,20 +242,23 @@ class StackedTrajectoryMaker():
             if self.subtitle == 1:
                 key = os.path.basename(self.files[i])
                 if len(self.subtitles) != 0:
-                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.7), xycoords='axes fraction')
+                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.8), xycoords='axes fraction')
                 else:
-                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.7), xycoords='axes fraction')
+                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.8), xycoords='axes fraction')
             
             self.axes.append(ax)
-        
+       
         # share axes between figures
+        for ax in self.axes:
+            ax.tick_params(axis="x", which="both", labelbottom=False)
         self.axes[0].set_xlabel(self.xlabel, fontsize=self.xfontsize)
+        self.axes[0].tick_params(axis="x", which="both", labelbottom=True)
         
         # toggles
         if self.legend ==1:
             self.axes[len(self.all_data) - 1].legend() 
         if self.intensitytoggle == 1:
-            self.fig.text((0.1 + self.leftpad/2), 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
+            self.fig.text((0.05 + self.leftpad/2), 0.5, self.ylabel, ha="left", va="center", rotation="vertical", fontsize=self.yfontsize)
 
         self.axes.reverse()
 
@@ -348,7 +351,12 @@ class StackedTrajectoryMaker():
 
         # shared axis options
         self.y2min, self.y2max = self.Eaxes[0].get_ylim()
+        for ax in self.Eaxes:
+            ax.tick_params(axis="x", which="both", labelbottom=False)
         self.Eaxes[0].set_xlabel(self.x2label, fontsize=self.x2fontsize)
+        self.Eaxes[0].tick_params(axis="x", which="both", labelbottom=True)
+        
+
         
         if self.numdata == 2:
             self.fig.text((0.53+self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
@@ -488,8 +496,6 @@ class StackedTrajectoryMaker():
 
         intensity plot: {self.intensitytoggle}
         efficiency plot: {self.efficiencytoggle}
-        intensity zero tick: {self.zero}
-        efficiency zero tick: {self.zero2}
         subtitles:{self.subtitles}
         subtitle sizes: {self.subtitlesizes}
 
