@@ -22,6 +22,12 @@ class Application(tk.Tk):
         super().__init__()
         self.title("smFRET Toolkit: Menu")
         self.buildMenu()
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
+        self.rowconfigure(2, weight=1)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(4, weight=1)
+        self.columnconfigure(0, weight=1)
 
     # builds the start menu with options for the user to choose from
     def buildMenu(self):
