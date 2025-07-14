@@ -68,3 +68,5 @@ class Application(tk.Tk):
 
 if __name__ == "__main__":
     main()
+
+    #TO DO: make the axes on the efficiency graph match the intensity graph :)

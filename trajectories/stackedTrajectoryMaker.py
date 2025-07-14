@@ -108,10 +108,8 @@ class StackedTrajectoryMaker():
         
 
 
-        self.xmax = xmax
-        self.xmin = xmin
-        #self.ymax = ymax
-        #self.ymin = ymin
+        self.xmaxes = xmax
+        self.xmins = xmin
         self.y2max = y2max
         self.y2min = y2min
         self.iaxes = None
@@ -129,6 +127,13 @@ class StackedTrajectoryMaker():
         self.width = width
         self.height = height
 
+        self.yticklabels = []
+        self.ymaxlbls = []
+        self.yminlbls = []
+        self.xmaxlbls = []
+        self.xminlbls = []
+        self.axes = []
+
         self.start()
     
     # generate graphs and add to figure
@@ -144,8 +149,8 @@ class StackedTrajectoryMaker():
         self.calculateEfret()
 
         # toggle updates
-        if self.xmax == None:
-            self.xmax = self.maxtime
+        #if self.xmax == None:
+         #   self.xmax = self.maxtime
         self.numdata = 0
         if self.intensitytoggle == 1:
             self.numdata += 1
@@ -185,15 +190,13 @@ class StackedTrajectoryMaker():
         self.fig.canvas.mpl_connect('button_press_event', lambda event: self.onclick(event))
 
         self.restore_axes()
+
+        
     
     # generate fluorophore intensity graph
     def makeIntensity(self):
         
-        self.yticklabels = []
-        self.ymaxlbls = []
-        self.yminlbls = []
         # configure axes for each plot
-        self.axes = []
         for i in reversed(range(len(self.all_data))):
             # set variables 
             time = self.datacopy[i]["time"]
@@ -207,10 +210,11 @@ class StackedTrajectoryMaker():
             
             # axis options
             #ax.set_ylim([self.ymin, self.ymax]) #should be able to standardize this across a set?
-            ax.set_xlim([self.xmin, self.xmax])
+            #ax.set_xlim([self.xmin, self.xmax])
             #self.ymin, self.ymax = ax.get_ylim()
-            ax.set_xticks([])
+            #ax.set_xticks([])
 
+            self.xlim = ax.get_xlim()
             self.ylim = ax.get_ylim()
             
             # STILL WORKSHOPPING THIS: USERS MAY NEED TO SPECIFY WHICH TICKS TO SHOW?
@@ -226,19 +230,24 @@ class StackedTrajectoryMaker():
                 ymin, ymax = ax.get_ylim()
                 self.ymaxlbls.append(ymax)
                 self.yminlbls.append(ymin)
+                xmin, xmax = ax.get_xlim()
+                self.xmaxlbls.append(xmax)
+                self.xminlbls.append(xmin)
             else:
                 self.ymaxlbls = self.ymaxes
                 self.yticklabels = self.yaxes
                 self.yminlbls = self.ymins
+                self.xmaxlbls = self.xmaxes
+                self.xminlbls = self.xmins
 
             
             # subtitles
             if self.subtitle == 1:
                 key = os.path.basename(self.files[i])
                 if len(self.subtitles) != 0:
-                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.8), xycoords='axes fraction')
+                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.7), xycoords='axes fraction')
                 else:
-                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.8), xycoords='axes fraction')
+                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.7), xycoords='axes fraction')
             
             #yticks = ax.get_yticklabels()
             #if self.zero == 0:
@@ -246,11 +255,11 @@ class StackedTrajectoryMaker():
             self.axes.append(ax)
         
         # share axes between figures
-        self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
-        self.xmin, self.xmax = self.axes[0].get_xlim()  
-        for i in range(1, len(self.all_data)):
-           self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
-           self.axes[i].set_xticklabels([])
+        #self.axes[0].xaxis.set_major_locator(plt.AutoLocator())
+        #self.xmin, self.xmax = self.axes[0].get_xlim()  
+        #for i in range(len(self.axes)):
+        #   self.axes[i].xaxis.set_major_locator(plt.AutoLocator())
+        #   self.axes[i].set_xticklabels()
         self.axes[0].set_xlabel(self.xlabel, fontsize=self.xfontsize)
         
         # toggles
@@ -271,6 +280,12 @@ class StackedTrajectoryMaker():
     
     def get_ymins(self):
         return self.yminlbls
+    
+    def get_xmins(self):
+        return self.xminlbls
+
+    def get_xmaxes(self):
+        return self.xmaxlbls
     
     def restore_axes(self):
         if len(self.axes) == len(self.yaxes):
@@ -295,6 +310,14 @@ class StackedTrajectoryMaker():
                     tix.append(val)
                 ax.set_yticks(tix)
                 ax.set_ylim([val3, val2])
+
+                val4 = self.xmins[i]
+                val5 = self.xmaxes[i]
+                val4 = float(val4)
+                val4 = round(val4, 1)
+                val5 = float(val5)
+                val5 = round(val5, 1)
+                ax.set_xlim([val4, val5])
                 i += 1
     
     # generate FRET efficiency graph
@@ -312,7 +335,7 @@ class StackedTrajectoryMaker():
             ax.plot(time, efret, color=self.color3, linewidth=self.linewidth3)
 
             # set axis options
-            ax.set_xlim([self.xmin, self.xmax])
+            #ax.set_xlim([self.xmin, self.xmax])
             ax.set_xticks([])
 
             # set ticks for y-axis
@@ -382,7 +405,7 @@ class StackedTrajectoryMaker():
 
     # return x and y limit for both the fluorophore intensity and FRET efficiency graphs
     def getMinMax(self):
-        return self.xmin, self.xmax, self.y2min, self.y2max, self.y2ticks
+        return self.y2min, self.y2max, self.y2ticks
 
     # calculate FRET efficiency
     def calculateEfret(self):
@@ -461,8 +484,8 @@ class StackedTrajectoryMaker():
         color 1: {self.color1}
         color 2: {self.color2}
         color 3: {self.color3}
-        x-axis max: {self.xmax}
-        x-axis min: {self.xmin}
+        x-axis maxes: {self.xmaxlbls}
+        x-axis mins: {self.xminlbls}
         y-axis 2 max: {self.y2max}
         y-axis 2 min: {self.y2min}
         e ticks: {self.y2ticks}

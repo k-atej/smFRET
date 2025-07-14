@@ -28,6 +28,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.yshift = []
         self.subtitle_inputs = []
         self.yaxis_inputs = []
+        self.xaxis_inputs = []
         for file in files:
             self.yshift.append(0.0)
 
@@ -119,28 +120,30 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # checkbox for displaying the efficiency plot
         self.efficiencytogg = tk.IntVar()
         self.toggle2 = tk.Checkbutton(self.tabFormat, text="Efficiency Plot", variable=self.efficiencytogg, onvalue=1, offvalue=0)
-        self.toggle2.grid(row=6, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
+        self.toggle2.grid(row=4, column=0, sticky="ew", padx=(10,10), pady=(10,5), columnspan=2)
         self.efficiencytogg.set(1)
 
+        '''
         # input area to designate maximum value on x axis
         self.xmax_label = tk.Label(self.tabFormat, text="X Max:")
-        self.xmax_label.grid(row=4, column=2, pady="5")
+        self.xmax_label.grid(row=5, column=2, pady="5")
         self.ref_xmax = tk.StringVar(self)
         self.ref_xmax.set("None")
 
         self.comboxmax = tk.Entry(self.tabFormat, textvariable=self.ref_xmax)
         self.comboxmax.config(width=9)
-        self.comboxmax.grid(row=4, column=3, sticky="ew", padx=(0, 10), pady="5")
+        self.comboxmax.grid(row=5, column=3, sticky="ew", padx=(0, 10), pady="5")
 
         # input area to designate minimum value on x axis
         self.xmin_label = tk.Label(self.tabFormat, text="X Min:")
-        self.xmin_label.grid(row=4, column=0, padx=(20,0), pady="5")
+        self.xmin_label.grid(row=5, column=0, padx=(20,0), pady="5")
         self.ref_xmin = tk.StringVar(self)
         self.ref_xmin.set("0")
 
         self.comboxmin = tk.Entry(self.tabFormat, textvariable=self.ref_xmin)
         self.comboxmin.config(width=9)
-        self.comboxmin.grid(row=4, column=1, sticky="ew", padx=(0, 10), pady="5")
+        self.comboxmin.grid(row=5, column=1, sticky="ew", padx=(0, 10), pady="5")
+        '''
         '''
         # input area to designate maximum value on y axis
         self.ymax_label = tk.Label(self.tabFormat, text="Y Max:")
@@ -457,10 +460,6 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.get_data()
 
         # typechecking for parameters
-        xmax = self.checkMinMax(self.ref_xmax.get())
-        xmin = self.checkMinMax(self.ref_xmin.get())
-        #ymax = self.checkMinMax(self.ref_ymax.get())
-        #ymin = self.checkMinMax(self.ref_ymin.get())
         y2max = self.checkMinMax(self.ref_y2max.get())
         y2min = self.checkMinMax(self.ref_y2min.get())
 
@@ -487,6 +486,13 @@ class stackedTrajectoryWindow(tk.Toplevel):
             ymaxes.append(imax.get())
             ymins.append(imin.get())
 
+        xmaxes = []
+        xmins = []
+        for axis in self.xaxis_inputs:
+            xmax, xmin = axis
+            xmaxes.append(xmax.get())
+            xmins.append(xmin.get())
+
         etext = self.ee.get()
         if etext != "":
             etext = etext.strip()
@@ -503,7 +509,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.trajectory = StackedTrajectoryMaker(self.all_data, self.subframeleft, self.figtitle, self.files, self.ref_color1.get(), 
                                           self.ref_color2.get(), self.ref_color3.get(), self.ref_title.get(), titlefontsize,
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
-                                          y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, 
+                                          y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmaxes, xmins, 
                                           y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
                                           self.subtogg.get(), self.sub2togg.get(), self.yshift,
                                           self.sub3togg.get(), subtitles, subtitlesizes, self.ref_linesize.get(), self.ref_linesize2.get(), 
@@ -516,10 +522,10 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.yaxisticks = self.trajectory.get_yticks()
         self.ymaxes = self.trajectory.get_ymaxes()
         self.ymins = self.trajectory.get_ymins()
+        self.xmaxes = self.trajectory.get_xmaxes()
+        self.xmins = self.trajectory.get_xmins()
 
-        xmin, xmax, y2min, y2max, y2ticks = self.trajectory.getMinMax()
-        self.ref_xmin.set(xmin)
-        self.ref_xmax.set(xmax)
+        y2min, y2max, y2ticks = self.trajectory.getMinMax()
         self.ref_y2min.set(y2min)
         self.ref_y2max.set(y2max)
         etext = y2ticks
@@ -543,6 +549,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
             self.ymaxes = self.ymaxes[::-1]
             self.ymins = self.ymins[::-1]
             self.makeYAxes()
+            self.makeXAxes()
 
         # reset subtitle input sizes
         if len(self.subtitle_inputs) == len(self.subtitles):
@@ -552,6 +559,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                 jfontsize.set(self.subtitlesizes[i])
         
         self.resetYAxes()
+        self.resetXAxes()
     
     def makeYAxes(self):
         self.makeYAxisInputs()
@@ -560,6 +568,14 @@ class stackedTrajectoryWindow(tk.Toplevel):
             itext.set(self.yaxisticks[i])
             imax.set(self.ymaxes[i])
             imin.set(self.ymins[i])
+
+    def makeXAxes(self):
+        self.makeXAxisInputs()
+        for i in range(len(self.xaxis_inputs)):
+            xmax, xmin = self.xaxis_inputs[i]
+            xmax.set(self.xmaxes[i])
+            xmin.set(self.xmins[i])
+
     
     def makeYAxisInputs(self):
         self.yaxis_inputs = []
@@ -596,6 +612,33 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
             self.yaxis_inputs.append((ii, itext, imax, imin))
 
+    def makeXAxisInputs(self):
+        self.xaxis_inputs = []
+        k = tk.Label(self.tabFormat,text="X-Axes:")
+        k.grid(row=6, column=0, sticky="w", padx=(5,0), pady="5", columnspan=2)
+        for i in range(self.subtitle_length):
+            # input area to designate minimum value on y axis
+            xmin_label = tk.Label(self.tabFormat, text=f"({i+1}) X Min:")
+            xmin_label.grid(row=(i+6), column=0, padx=(5,5))
+            xmin = tk.StringVar(self)
+            xmin.set('None')
+
+            comboxmin = tk.Entry(self.tabFormat, textvariable=xmin)
+            comboxmin.config(width=8)
+            comboxmin.grid(row=(i+6), column=1, sticky="w", padx=(0, 0), pady="5")
+            
+            # input area to designate maximum value on y axis
+            xmax_label = tk.Label(self.tabFormat, text="X Max:")
+            xmax_label.grid(row=(i+6), column=2, padx=(5,5))
+            xmax = tk.StringVar(self)
+            xmax.set('None')
+
+            comboxmax = tk.Entry(self.tabFormat, textvariable=xmax)
+            comboxmax.config(width=8)
+            comboxmax.grid(row=(i+6), column=3, sticky="w", padx=(0, 0), pady="5")
+
+            self.xaxis_inputs.append((xmax, xmin))
+
     # reset subtitle input sizes
     def resetYAxes(self):
         if len(self.yaxis_inputs) == len(self.yaxisticks):
@@ -611,6 +654,14 @@ class stackedTrajectoryWindow(tk.Toplevel):
                 temp = temp.strip()
                 temp = temp.strip(".")
                 itext.set(temp)
+    
+    # reset subtitle input sizes
+    def resetXAxes(self):
+        if len(self.xaxis_inputs) == len(self.xmins):
+            for i in range(len(self.xaxis_inputs)):
+                xmax, xmin = self.xaxis_inputs[i]
+                xmax.set(self.xmaxes[i])
+                xmin.set(self.xmins[i])
 
 
     # creates input areas and fontsize dropdowns based on length of data provided to histogram
