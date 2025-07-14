@@ -236,9 +236,9 @@ class StackedTrajectoryMaker():
             if self.subtitle == 1:
                 key = os.path.basename(self.files[i])
                 if len(self.subtitles) != 0:
-                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.8), xycoords='axes fraction')
                 else:
-                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.05), xycoords='axes fraction')
+                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.8), xycoords='axes fraction')
             
             #yticks = ax.get_yticklabels()
             #if self.zero == 0:
@@ -324,9 +324,9 @@ class StackedTrajectoryMaker():
                 key = os.path.basename(self.files[i])
 
                 if len(self.subtitles) != 0:
-                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.05), xycoords='axes fraction')
+                    ax.annotate(text=self.subtitles[i], fontsize=self.subtitlesizes[i], xy=(0.03, 0.8), xycoords='axes fraction')
                 else:
-                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.05), xycoords='axes fraction')
+                    ax.annotate(text=key.split(".")[0], fontsize=9, xy=(0.03, 0.8), xycoords='axes fraction')
             
   
             self.Eaxes.append(ax)
