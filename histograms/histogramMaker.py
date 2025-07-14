@@ -120,7 +120,6 @@ class HistMaker():
     
     def processTicks(self, f):
         if self.ticktext == "":
-            print("fetching ticks")
             self.ticktext = f.get_yticks()
         else:
             self.ticktext = self.ticktext.strip(",")
@@ -346,6 +345,7 @@ class HistMaker():
                       arrowprops=dict(arrowstyle='-', color=color, 
                                       linestyle=linestyle, linewidth=linewidth))
         canvas.draw()
+        print(f"x-value: {x}")
         
 
 

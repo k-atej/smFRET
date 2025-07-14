@@ -514,6 +514,7 @@ class StackedHistMaker():
                                                    linestyle=style, lw=lw))
         arrow_patch = annotation.arrow_patch               
         self.hist_canvas.draw()
+        print(f"x-value: {x}")
 
 
 
