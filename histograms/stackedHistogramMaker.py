@@ -483,6 +483,7 @@ class StackedHistMaker():
 
                     dbl=False
                     self.draw_annotations(axis, x, y, self.linecolor, self.linestyle, self.linewidth)
+                    print(f"x-value: {x}")
                     self.annotations.append((axis, x, y, dbl, self.linecolor, self.linestyle, self.linewidth))
     
     
@@ -497,6 +498,7 @@ class StackedHistMaker():
             if (ax0 != axis0):
                 dbl=True
                 self.draw_annotations(ax, x, y, self.linecolor, self.linestyle, self.linewidth)
+                print(f"x-value: {x}")
                 self.annotations.append((ax, x, y, dbl, self.linecolor, self.linestyle, self.linewidth))
 
 
@@ -514,7 +516,7 @@ class StackedHistMaker():
                                                    linestyle=style, lw=lw))
         arrow_patch = annotation.arrow_patch               
         self.hist_canvas.draw()
-        print(f"x-value: {x}")
+        
 
 
 

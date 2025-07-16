@@ -330,6 +330,7 @@ class HistMaker():
             if event.inaxes:
                 x = event.xdata
                 self.draw_annotations(event.inaxes, x, self.linecolor, self.linestyle, self.linewidth)
+                print(f"x-value: {x}")
                 self.annotations.append((x, self.linecolor, self.linestyle, self.linewidth))
     
     # draws lines on the matplotlib figure, parameters set in customization menu
@@ -345,7 +346,7 @@ class HistMaker():
                       arrowprops=dict(arrowstyle='-', color=color, 
                                       linestyle=linestyle, linewidth=linewidth))
         canvas.draw()
-        print(f"x-value: {x}")
+        
         
 
 
