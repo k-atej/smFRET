@@ -293,7 +293,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # dropdown for title font size
         self.titlef_label = tk.Label(self.tabText, text="Size:")
         self.titlef_label.grid(row=0, column=2)
-        titlef = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlef = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_titlefontsize = tk.IntVar(self)
         self.ref_titlefontsize.set(12)
 
@@ -350,7 +350,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # dropdown for x font size
         self.titlex_label = tk.Label(self.tabText, text="Size:")
         self.titlex_label.grid(row=2, column=2)
-        titlex = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlex = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
@@ -361,7 +361,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # dropdown for y font size
         self.titley_label = tk.Label(self.tabText, text="Size:")
         self.titley_label.grid(row=3, column=2)
-        titley = [8, 9, 10, 11, 12, 15, 20, 24]
+        titley = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
@@ -372,7 +372,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # dropdown for x2 font size
         self.titlex2_label = tk.Label(self.tabText, text="Size:")
         self.titlex2_label.grid(row=6, column=2)
-        titlex2 = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlex2 = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_x2fontsize = tk.StringVar(self)
         self.ref_x2fontsize.set("12")
 
@@ -383,7 +383,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         # dropdown for y2 font size
         self.titley2_label = tk.Label(self.tabText, text="Size:")
         self.titley2_label.grid(row=7, column=2)
-        titley2 = [8, 9, 10, 11, 12, 15, 20, 24]
+        titley2 = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_y2fontsize = tk.StringVar(self)
         self.ref_y2fontsize.set("12")
 
@@ -678,7 +678,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
             j.config(width=20)
             j.grid(row=i+1, column=1, sticky="ew", padx=(0, 10))
 
-            jfont = [6, 7, 8, 9, 10, 11, 12]
+            jfont = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
             jvar = tk.IntVar(self)
             jvar.set(9)
             jfontwidget = tk.OptionMenu(self.tabSub, jvar, *jfont)

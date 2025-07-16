@@ -384,7 +384,7 @@ class StackedHistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="w", padx=(0, 10), pady="5")
 
         # dropdown for title font size
-        titlef = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlef = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
@@ -417,7 +417,7 @@ class StackedHistApplication(tk.Toplevel):
         self.combo3.grid(row=3, column=1, sticky="w", padx=(0, 10), pady="5")
 
         # dropdown for x font size
-        titlex = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlex = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
@@ -426,7 +426,7 @@ class StackedHistApplication(tk.Toplevel):
         self.combo4.grid(row=2, column=2)
 
         # dropdown for y font size
-        titley = [8, 9, 10, 11, 12, 15, 20, 24]
+        titley = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
@@ -589,7 +589,7 @@ class StackedHistApplication(tk.Toplevel):
             j.config(width=15)
             j.grid(row=i+5, column=1, sticky="w", padx=(0, 5), pady="5")
 
-            jfont = [6, 7, 8, 9, 10, 11, 12]
+            jfont = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
             jvar = tk.IntVar(self)
             jvar.set(9)
             jfontwidget = tk.OptionMenu(self.tabText, jvar, *jfont)

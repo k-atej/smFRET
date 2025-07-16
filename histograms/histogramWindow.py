@@ -349,7 +349,7 @@ class HistApplication(tk.Toplevel):
         #dropdown for linewidth
         self.lw_label = tk.Label(self.tabStyle, text="Line Width:")
         self.lw_label.grid(row=8, column=0, sticky="w", padx=(20,0), pady="5")
-        lw = [1.0, 2.0, 3.0, 4.0]
+        lw = [1.0, 2.0, 3.0, 4.0] 
         self.ref_lw = tk.IntVar(self)
         self.ref_lw.set(1.0)
 
@@ -372,7 +372,7 @@ class HistApplication(tk.Toplevel):
         self.combo2.grid(row=0, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for title font size
-        titlef = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlef = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_titlefontsize = tk.StringVar(self)
         self.ref_titlefontsize.set("12")
 
@@ -405,7 +405,7 @@ class HistApplication(tk.Toplevel):
         self.combo3.grid(row=3, column=1, sticky="ew", padx=(0, 10), pady="5")
 
         # dropdown for x font size
-        titlex = [8, 9, 10, 11, 12, 15, 20, 24]
+        titlex = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_xfontsize = tk.StringVar(self)
         self.ref_xfontsize.set("12")
 
@@ -414,7 +414,7 @@ class HistApplication(tk.Toplevel):
         self.combo4.grid(row=2, column=2)
 
         # dropdown for y font size
-        titley = [8, 9, 10, 11, 12, 15, 20, 24]
+        titley = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
         self.ref_yfontsize = tk.StringVar(self)
         self.ref_yfontsize.set("12")
 
