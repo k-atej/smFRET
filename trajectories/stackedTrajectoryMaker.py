@@ -63,7 +63,7 @@ class StackedTrajectoryMaker():
             self.datacopy.append(datumcopy)
             datumcopy['donor'] = datumcopy['donor'] - self.yshift[i]
             datumcopy['acceptor'] = datumcopy['acceptor'] - self.yshift[i]
-            datumcopy['efret'] = datumcopy['efret'] - self.eyshift[i]
+            datumcopy['efret'] = datumcopy['efret'] - self.eyshift[i] # why is this returning as an object?
 
         # set subtitles
         self.subtitles = subtitles

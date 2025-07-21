@@ -296,7 +296,6 @@ class FileViewerMaker():
     #   - path: file path to which to save the data
     #   - ending: filetype to save the data as, default .csv
     def save(self, path, ending):
-        print(self.datacopy)
         path = path.rstrip("\\/")
         # make exact name of file
         self.title = str(self.tracenum) + " tr" + str(self.molnum)
@@ -311,7 +310,7 @@ class FileViewerMaker():
         if ending == ".csv":
             zoomed_df_dropped.to_csv(filename, index=False) 
         else:
-            col_widths = [20, 20, 20, 20]
+            col_widths = [30, 30, 30, 30]
             self.write_fwf(zoomed_df_dropped, filename, col_widths)
 
     # returns dataframe containing dwell time data

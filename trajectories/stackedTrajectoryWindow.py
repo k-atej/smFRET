@@ -444,9 +444,18 @@ class stackedTrajectoryWindow(tk.Toplevel):
             if ".csv" in self.type:
                 data = pd.read_csv(trajectory)
             else:
-                data = pd.read_fwf(trajectory, header=None)
+                data = pd.read_fwf(trajectory, header=None) #
                 data.columns = ["time", "donor", "acceptor", "efret"]
+                # Attempt to convert efret to float, force errors to NaN
+                # Strip whitespace before converting
+                data["efret"] = pd.to_numeric(data["efret"].astype(str).str.strip(), errors='coerce')
+                data["efret"] = pd.to_numeric(data["efret"], errors='coerce')
+                bad_efret = data[pd.to_numeric(data["efret"], errors='coerce').isna()]
+                if not bad_efret.empty:
+                    print(f"Non-numeric efret values for {file}: ")
+                    print(bad_efret)
             self.all_data.append(data)
+        
 
     # creates the trajectories and pastes them into the window
     def maketrajectory(self, event=None):
