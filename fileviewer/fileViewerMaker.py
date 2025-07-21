@@ -110,6 +110,9 @@ class FileViewerMaker():
         # generate zeroed data
         self.datacopy['donor'] = self.data['donor'] - self.yshift
         self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
+
+        # generate FRET efficiency values from fluorophore intensities
+        self.calculateEfret()
         
         self.start()
 
@@ -127,8 +130,6 @@ class FileViewerMaker():
 
     # generate graphs to add to figure
     def start(self):
-        # generate FRET efficiency values from fluorophore intensities
-        self.calculateEfret()
         # get the title from the input keys
         self.makeTitle()
         # generate the fluorophore intensity and FRET efficiency subplots
