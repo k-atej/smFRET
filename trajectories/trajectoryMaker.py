@@ -304,11 +304,7 @@ class TrajectoryMaker():
     #   - refpath: filepath input in save window; matches figure save filepath
     def annotate(self, refpath):
         text = self.getText()
-        refpath = refpath.split(".")[:-1]
-        pathway = ""
-        for path in refpath:
-            pathway += path
-        path = str(pathway) + ".txt"
+        path = str(refpath) + ".txt"
         f = open(path, "w")
         f.write(text)
         f.close()

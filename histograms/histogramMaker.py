@@ -262,18 +262,9 @@ class HistMaker():
     def annotate(self, refpath):
         # generate annotation text to save
         text = self.getText()
-        
-        # generate save path
-        refpath2 = refpath.split(".")[:-1]
-        pathway = ""
-        if len(refpath2) > 0:
-            for path in refpath2:
-                pathway += path
-        else:
-            pathway = refpath
 
         # write and save file
-        path = str(pathway) + ".txt"
+        path = str(refpath) + ".txt"
         f = open(path, "w")
         f.write(text)
         f.close()
