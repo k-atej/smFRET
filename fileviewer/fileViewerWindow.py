@@ -57,7 +57,9 @@ class FileViewerWindow(tk.Toplevel):
         self.index = 0
         self.trajectory = None
         self.yshift = 0
+        self.eyshift = 0
         self.generation = 0
+        self.label = None
 
         # dwell time analysis parameters
         self.dwellActive = False
@@ -269,7 +271,7 @@ class FileViewerWindow(tk.Toplevel):
                                           ACCEPTORCOLOR, EFFICIENCYCOLOR, title, TITLEFONT,
                                           "Time (s)", XFONT, "Time (s)", X2FONT, "I (A.U.)", YFONT, 
                                           "E", Y2FONT, 4.5, 6.0, INTENSITY, EFFICIENCY, LEGEND,
-                                          SUBTITLE, SUBTITLE2, self.yshift, self.sub3togg.get(), summ, 
+                                          SUBTITLE, SUBTITLE2, self.yshift, self.eyshift, self.sub3togg.get(), summ, 
                                           self.dwelltogg.get(), self.dwelltimedf, self.dwellseries, 
                                           self.tracenum, molnum)
 
@@ -286,7 +288,7 @@ class FileViewerWindow(tk.Toplevel):
         self.index -= 1
         if self.index < 0:
             self.index = self.numfiles - 1
-        self.trajectory.setShift(0.0)
+        self.trajectory.setShift(0.0, 0.0)
         self.maketrajectory()
 
     # proceed to next trajectory
@@ -295,11 +297,13 @@ class FileViewerWindow(tk.Toplevel):
         self.index += 1
         if self.index >= self.numfiles:
             self.index = 0
-        self.trajectory.setShift(0.0)
+        self.trajectory.setShift(0.0, 0.0)
         self.maketrajectory()
 
     # generate label displaying numerically which trajectory is being viewed
     def makeLabel(self):
+        if self.label != None:
+            self.label.destroy()
         self.label = tk.Label(self.subframetop, text=f"{self.index + 1} of {self.numfiles}")    
         self.label.grid(row=0, column=0, padx="10")
 
@@ -356,7 +360,8 @@ class FileViewerWindow(tk.Toplevel):
     # get shift data from trajectory
     # to be carried over to the next trajectory generation
     def updateZero(self, event=None):
-        self.yshift = self.trajectory.getShift()
+        self.yshift, self.eyshift = self.trajectory.getShift()
+
 
     # if click-to-zero is active, will set the zeroing to none
     # so displayed data is un-modified

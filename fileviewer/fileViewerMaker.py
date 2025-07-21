@@ -50,7 +50,7 @@ class FileViewerMaker():
                  refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  intensitytoggle, efficiencytoggle, legendtoggle, subtitletoggle, 
-                 subtitletoggle2, yshift, clicktogg, sumtogg,
+                 subtitletoggle2, yshift, eyshift, clicktogg, sumtogg,
                  dwellActive, dwelltimedf, series, tracenum, molnum):
         # designate data
         self.data = data
@@ -93,6 +93,7 @@ class FileViewerMaker():
 
         # set yshift
         self.yshift = yshift
+        self.eyshift = eyshift
         self.toolbar = None
 
         # set dwell time data
@@ -107,12 +108,13 @@ class FileViewerMaker():
         self.iaxis = None
         self.eaxis = None
 
+        # generate FRET efficiency values from fluorophore intensities
+        self.calculateEfret()
+
         # generate zeroed data
         self.datacopy['donor'] = self.data['donor'] - self.yshift
         self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
-
-        # generate FRET efficiency values from fluorophore intensities
-        self.calculateEfret()
+        self.datacopy['efret'] = self.data["efret"]- self.eyshift
         
         self.start()
 
@@ -122,11 +124,12 @@ class FileViewerMaker():
 
     # return y shift
     def getShift(self):
-        return self.yshift
+        return self.yshift, self.eyshift
     
     # set y shift
-    def setShift(self, yshift):
+    def setShift(self, yshift, eyshift):
         self.yshift = yshift
+        self.eyshift = eyshift
 
     # generate graphs to add to figure
     def start(self):
@@ -238,7 +241,7 @@ class FileViewerMaker():
         fig.plot(time, efret, color=self.color3, zorder=1)
         
         # set axis options
-        fig.set_ylim([0, 1]) 
+        fig.set_ylim([None, None]) 
         fig.set_xlim([self.xmin, None])
         fig.set_xlabel(self.x2label, fontsize=self.x2fontsize)
         fig.set_ylabel(self.y2label, fontsize=self.y2fontsize)
@@ -265,6 +268,10 @@ class FileViewerMaker():
                 self.datacopy['donor'] = self.data['donor'] - self.yshift
                 self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
                 self.start()
+            elif event.inaxes == self.eaxis:
+                self.eyshift += event.ydata
+                self.datacopy['efret'] = self.data['efret'] - self.eyshift
+                self.start()
 
         # if the click-to-select dwell times is active, tracks first and second clicks
         # records the difference between the clicks in a dataframe
@@ -283,7 +290,7 @@ class FileViewerMaker():
     # GAMMA can be altered to suit the needs of the user
     def calculateEfret(self):
         gamma = GAMMA
-        self.datacopy['efret'] = self.datacopy['acceptor'] / (self.datacopy['acceptor'] + (gamma * self.datacopy['donor']))
+        self.data['efret'] = self.data['acceptor'] / (self.data['acceptor'] + (gamma * self.data['donor']))
 
     # saves the data as a csv, including the time, donor, and acceptor columns
     #   - path: file path to which to save the data
