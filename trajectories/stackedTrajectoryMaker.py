@@ -361,7 +361,7 @@ class StackedTrajectoryMaker():
         if self.numdata == 2:
             self.fig.text((0.53+self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         else:
-            self.fig.text((0.1 + self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
+            self.fig.text((0.05 + self.leftpad/2), 0.5, self.y2label, ha="left", va="center", rotation="vertical", fontsize=self.y2fontsize)
         self.Eaxes.reverse()
 
 

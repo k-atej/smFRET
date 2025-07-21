@@ -183,13 +183,25 @@ class FileViewerWindow(tk.Toplevel):
         self.seriesButton = tk.Button(self.subframeright, text="+ Series", command=self.addSeries)
         self.seriesButton.grid(row=3, column=1, sticky="ew", padx=(10,10), pady="10")
 
+        # dwell time increment series button
+        self.seriesButton2 = tk.Button(self.subframeright, text="- Series", command=self.subtractSeries)
+        self.seriesButton2.grid(row=3, column=0, sticky="ew", padx=(10,10), pady="10")
+
         # ADD CURRENT SERIES LABEL? WHICH SHOWS WHAT THE SERIES IS WITHOUT HAVING TO REFRESH
         self.seriesLabel = tk.Label(self.subframeright, text=f"Current Series: {self.dwellseries}")
-        self.seriesLabel.grid(row=3, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.seriesLabel.grid(row=5, column=0, sticky="ew", padx=(10,10), pady="10")
 
         # dwell time save series data button
         self.seriesSaveButton = tk.Button(self.subframeright, text="Save", command=self.saveSeries)
         self.seriesSaveButton.grid(row=2, column=1, sticky="ew", padx=(10,20), pady="10")
+
+        # dwell time reset series data button
+        self.seriesResetButton = tk.Button(self.subframeright, text="Reset", command=self.resetSeries)
+        self.seriesResetButton.grid(row=4, column=0, sticky="ew", padx=(10,20), pady="10")
+
+        # dwell time undo series data button
+        self.seriesUndoButton = tk.Button(self.subframeright, text="Remove", command=self.undoSeries)
+        self.seriesUndoButton.grid(row=4, column=1, sticky="ew", padx=(10,20), pady="10")
 
         # save series data across trajectory generations
         self.dwellActive = True
@@ -201,6 +213,23 @@ class FileViewerWindow(tk.Toplevel):
         self.makeSeriesLabel()
         self.dwellseries += 1
         self.trajectory.incrementDwellSeries()
+    
+    # deccrements the series value displayed in the chart by 1
+    def subtractSeries(self):
+        self.makeSeriesLabel()
+        self.dwellseries -= 1
+        self.trajectory.decrementDwellSeries()
+
+    def resetSeries(self):
+        self.dwellseries = 0
+        self.makeSeriesLabel()
+        self.dwelltimedf = self.trajectory.resetDwellSeries()
+        self.updateDwellTable()
+    
+    def undoSeries(self):
+        self.trajectory.undoDwellSeries()
+        self.updateDwellTable()
+
 
     # parses the data file into a pandas dataframe
     def get_data(self):
@@ -350,7 +379,9 @@ class FileViewerWindow(tk.Toplevel):
         self.path_label = tk.Label(self.win, text="Save Filepath:")
         self.path_label.grid(row=0, column=0)
         self.ref_path = tk.StringVar(self.win)
-        self.ref_path.set(self.filepath)
+        filename = "dwelldata"
+        self.dwellfilepath = os.path.join(self.filepath, filename)
+        self.ref_path.set(self.dwellfilepath)
 
         self.combo6 = tk.Entry(self.win, textvariable=self.ref_path)
         self.combo6.config(width=50)
@@ -374,4 +405,4 @@ class FileViewerWindow(tk.Toplevel):
     def makeSeriesLabel(self, event=None):
         self.seriesLabel.destroy()
         self.seriesLabel = tk.Label(self.subframeright, text=f"Current Series: {self.dwellseries}")
-        self.seriesLabel.grid(row=3, column=0, sticky="ew", padx=(10,10), pady="10")
+        self.seriesLabel.grid(row=5, column=0, sticky="ew", padx=(10,10), pady="10")

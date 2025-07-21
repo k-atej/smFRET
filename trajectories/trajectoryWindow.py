@@ -625,7 +625,7 @@ class TrajectoryWindow(tk.Toplevel):
         self.qual_label.grid(row= 1, column=0)
         refqual = ["Low", "Medium", "High"]
         self.ref_qual = tk.StringVar(self)
-        self.ref_qual.set('Medium')
+        self.ref_qual.set('High')
 
         self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
         self.combo9.config(width=5)

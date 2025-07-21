@@ -311,12 +311,26 @@ class FileViewerMaker():
 
     # increments series value for dwell time analysis by one
     def incrementDwellSeries(self):
-        self.dwellseries += 1;
+        self.dwellseries += 1
+    
+    # decrements series value for dwell time analysis by one
+    def decrementDwellSeries(self):
+        self.dwellseries -= 1;
     
     # returns the series value for dwell time analysis
     def getDwellSeries(self):
         return self.dwellseries
     
+    def resetDwellSeries(self):
+        df_empty = self.dwelldf[0:0]
+        self.dwellseries = 0
+        self.dwelldf = df_empty
+        return self.dwelldf
+    
+    def undoDwellSeries(self):
+        self.dwelldf.drop(self.dwelldf.tail(1).index,inplace=True) # drop last n rows
+
+
     # saves the dwell time analysis data as a dataframe
     #   - filepath: filepath to which to save the dataframe, directly entered by the user
     #   - filetype: filetype to save the data as, default .csv

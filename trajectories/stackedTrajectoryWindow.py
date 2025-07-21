@@ -680,7 +680,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
 
             jfont = [4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
             jvar = tk.IntVar(self)
-            jvar.set(9)
+            jvar.set(10)
             jfontwidget = tk.OptionMenu(self.tabSub, jvar, *jfont)
             jfontwidget.grid(row=i+1, column=2)
             jfontwidget.config(width=2)
@@ -727,7 +727,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.qual_label.grid(row= 1, column=0)
         refqual = ["Low", "Medium", "High"]
         self.ref_qual = tk.StringVar(self)
-        self.ref_qual.set('Medium')
+        self.ref_qual.set('High')
 
         self.combo9 = tk.OptionMenu(self.win, self.ref_qual, *refqual)
         self.combo9.config(width=5)
