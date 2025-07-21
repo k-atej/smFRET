@@ -26,11 +26,13 @@ class stackedTrajectoryWindow(tk.Toplevel):
         self.trajectory = None
         self.generation = 0
         self.yshift = []
+        self.eyshift = []
         self.subtitle_inputs = []
         self.yaxis_inputs = []
         self.xaxis_inputs = []
         for file in files:
             self.yshift.append(0.0)
+            self.eyshift.append(0.0)
 
         #full window 
         self.frame = tk.Frame(self, background='white')
@@ -443,7 +445,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                 data = pd.read_csv(trajectory)
             else:
                 data = pd.read_fwf(trajectory, header=None)
-                data.columns = ["time", "donor", "acceptor"]
+                data.columns = ["time", "donor", "acceptor", "efret"]
             self.all_data.append(data)
 
     # creates the trajectories and pastes them into the window
@@ -511,7 +513,7 @@ class stackedTrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, self.ref_y2.get(),
                                           y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmaxes, xmins, 
                                           y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get(), self.yshift,
+                                          self.subtogg.get(), self.sub2togg.get(), self.yshift, self.eyshift,
                                           self.sub3togg.get(), subtitles, subtitlesizes, self.ref_linesize.get(), self.ref_linesize2.get(), 
                                           self.ref_linesize3.get(), yaxes, ymaxes, ymins, etext)
         
@@ -760,11 +762,11 @@ class stackedTrajectoryWindow(tk.Toplevel):
     # get shift data from trajectory
     # to be carried over to the next trajectory generation  
     def updateZero(self, event=None):
-        self.yshift = self.trajectory.getShift()
+        self.yshift, self.eyshift = self.trajectory.getShift()
     
     # if click-to-zero is active, will set the zeroing to none
     # so displayed data is un-modified
     def undo(self, event=None):
         if self.sub3togg.get() == 1:
-            self.trajectory.setShift(0.0)
+            self.trajectory.setShift(0.0, 0.0)
             self.maketrajectory()

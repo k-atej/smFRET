@@ -49,11 +49,12 @@ class StackedTrajectoryMaker():
     def __init__(self, all_data, master, title, files, refcolor1, refcolor2, refcolor3, 
                  graphtitle, graphtitlesize, x, xfontsize, x2, x2fontsize, y, yfontsize, y2, y2fontsize, 
                  height, width, xmax, xmin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg,
+                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, eyshift, clicktogg,
                  subtitles, subtitlesizes, linesize1, linesize2, linesize3, yaxes, ymaxes, ymins, y2ticks):
         # designate data
         self.all_data = all_data
         self.yshift = yshift
+        self.eyshift = eyshift
         self.datacopy = []
 
         for i in range(len(self.all_data)):
@@ -62,6 +63,7 @@ class StackedTrajectoryMaker():
             self.datacopy.append(datumcopy)
             datumcopy['donor'] = datumcopy['donor'] - self.yshift[i]
             datumcopy['acceptor'] = datumcopy['acceptor'] - self.yshift[i]
+            datumcopy['efret'] = datumcopy['efret'] - self.eyshift[i]
 
         # set subtitles
         self.subtitles = subtitles
@@ -146,8 +148,7 @@ class StackedTrajectoryMaker():
 
         # parse data
         self.processData()
-        # generate FRET efficiency values for fluorophore intensities
-        self.calculateEfret()
+        
 
         # toggle updates
         #if self.xmax == None:
@@ -411,12 +412,13 @@ class StackedTrajectoryMaker():
     
     # return y shift
     def getShift(self):
-        return self.yshift
+        return self.yshift, self.eyshift
     
     # set y shift
-    def setShift(self, yshift):
+    def setShift(self, yshift, eyshift):
         for i in range(len(self.yshift)):
             self.yshift[i] = yshift
+            self.eyshift[i] = eyshift
     
     # handles all click events
     def onclick(self, event):
@@ -427,6 +429,10 @@ class StackedTrajectoryMaker():
                         self.yshift[i] += event.ydata
                         self.datacopy[i]['donor'] = self.datacopy[i]['donor'] - event.ydata
                         self.datacopy[i]['acceptor'] = self.datacopy[i]['acceptor'] - event.ydata
+                        self.start()
+                    elif event.inaxes == self.Eaxes[i]: # will need to make this specific to each intensity subgraph
+                        self.eyshift[i] += event.ydata
+                        self.datacopy[i]['efret'] = self.datacopy[i]['efret'] - event.ydata
                         self.start()
 
     # return number of plots in stacked histogram
@@ -489,7 +495,7 @@ class StackedTrajectoryMaker():
         i maxes: {self.ymaxlbls}
         i mins: {self.yminlbls}
         
-        offset: {self.yshift}
+        offset: {self.yshift, self.eyshift}
         legend: {self.legend}
         figure width: {self.width}
         figure height: {self.height} 
