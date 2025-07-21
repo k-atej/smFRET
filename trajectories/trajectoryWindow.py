@@ -28,12 +28,14 @@ class TrajectoryWindow(tk.Toplevel):
         self.numfiles = len(self.paths)
         self.index = 0
         self.trajectory = None
+        self.label = None
 
         self.savepath = path.rstrip("\\/")
         
         self.titleset = os.path.basename(self.savepath) # final folder in the input path
         self.title(self.titleset)
         self.yshift = 0
+        self.eyshift = 0
         self.generation = 0
 
         #full window 
@@ -462,7 +464,7 @@ class TrajectoryWindow(tk.Toplevel):
             data = pd.read_csv(trajectories)
         else:
             data = pd.read_fwf(trajectories, header=None)
-            data.columns = ["time", "donor", "acceptor"]
+            data.columns = ["time", "donor", "acceptor", "efret"]
         self.df = data
 
     # creates the trajectories and pastes them into the window
@@ -525,7 +527,7 @@ class TrajectoryWindow(tk.Toplevel):
                                           self.ref_x.get(), xfontsize, self.ref_x2.get(), x2fontsize, self.ref_y.get(), yfontsize, 
                                           self.ref_y2.get(), y2fontsize, float(self.ref_height.get()), float(self.ref_width.get()), xmax, xmin, ymax, 
                                           ymin, y2max, y2min, self.intensitytogg.get(), self.efficiencytogg.get(), self.legendtogg.get(),
-                                          self.subtogg.get(), self.sub2togg.get(), self.yshift, self.sub3togg.get(),
+                                          self.subtogg.get(), self.sub2togg.get(), self.yshift, self.eyshift, self.sub3togg.get(),
                                           self.ref_linesize.get(), self.ref_linesize2.get(), self.ref_linesize3.get(), itext, etext)
 
         # update stored variables
@@ -576,7 +578,7 @@ class TrajectoryWindow(tk.Toplevel):
             self.index -= 1
             if self.index < 0:
                 self.index = self.numfiles - 1
-            self.trajectory.setShift(0.0)
+            self.trajectory.setShift(0.0, 0.0)
             self.maketrajectory()
 
     # proceed to next trajectory
@@ -586,11 +588,13 @@ class TrajectoryWindow(tk.Toplevel):
             self.index += 1
             if self.index >= self.numfiles:
                 self.index = 0
-            self.trajectory.setShift(0.0)
+            self.trajectory.setShift(0.0, 0.0)
             self.maketrajectory()
 
     # generate label displaying numerically which trajectory is being viewed
     def makeLabel(self):
+        if self.label != None:
+            self.label.destroy()
         self.label = tk.Label(self.subframetop, text=f"{self.index + 1} of {self.numfiles}")    
         self.label.grid(row=0, column=0, padx="10")
 
@@ -658,11 +662,11 @@ class TrajectoryWindow(tk.Toplevel):
     # get shift data from trajectory
     # to be carried over to the next trajectory generation  
     def updateZero(self, event=None):
-        self.yshift = self.trajectory.getShift()
+        self.yshift, self.eyshift = self.trajectory.getShift()
 
     # if click-to-zero is active, will set the zeroing to none
     # so displayed data is un-modified
     def undo(self, event=None):
         if self.sub3togg.get() == 1:
-            self.trajectory.setShift(0.0)
+            self.trajectory.setShift(0.0, 0.0)
             self.maketrajectory()

@@ -48,7 +48,7 @@ class TrajectoryMaker():
                  refcolor3, graphtitle, graphtitlefontsize, x, xfontsize,
                  x2, x2fontsize, y, yfontsize, y2, y2fontsize, height, width, 
                  xmax, xmin, ymax, ymin, y2max, y2min, intensitytoggle, efficiencytoggle,
-                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, clicktogg,
+                 legendtoggle, subtitletoggle, subtitletoggle2, yshift, eyshift, clicktogg,
                  linesize1, linesize2, linesize3, iticks, eticks):
         #designate data
         self.data = data
@@ -89,6 +89,7 @@ class TrajectoryMaker():
 
         # set yshift
         self.yshift = yshift
+        self.eyshift = eyshift
 
         # set axis variables
         self.xmax = xmax
@@ -119,6 +120,7 @@ class TrajectoryMaker():
         # generate zeroed data
         self.datacopy['donor'] = self.data['donor'] - self.yshift
         self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
+        self.datacopy['efret'] = self.data['efret'] - self.eyshift
         
         self.start()
 
@@ -128,16 +130,16 @@ class TrajectoryMaker():
 
     # return y shift
     def getShift(self):
-        return self.yshift
+        return self.yshift, self.eyshift
     
     # set y shift
-    def setShift(self, yshift):
+    def setShift(self, yshift, eyshift):
         self.yshift = yshift
+        self.eyshift = eyshift
+
 
     # generate graphs and add to figure
     def start(self):
-        # generate FRET efficiency values from fluorophore intensities
-        self.calculateEfret()
         # get the title from the input keys
         self.makeTitle()
         # configure size of figure
@@ -288,8 +290,12 @@ class TrajectoryMaker():
                 self.datacopy['donor'] = self.data['donor'] - self.yshift
                 self.datacopy['acceptor'] = self.data['acceptor'] - self.yshift
                 self.start()
+            elif event.inaxes == self.eaxis: # will need to make this specific to each graph
+                self.eyshift += event.ydata
+                self.datacopy['efret'] = self.data['efret'] - self.eyshift
+                self.start()
 
-    # calculate FRET efficiency
+    # calculate FRET efficiency, not currenly in use
     def calculateEfret(self):
         gamma = GAMMA
         self.datacopy['efret'] = self.datacopy['acceptor'] / (self.datacopy['acceptor'] + (gamma * self.datacopy['donor']))
@@ -334,7 +340,7 @@ class TrajectoryMaker():
         y-axis 2 max: {self.y2max}
         y-axis 2 min: {self.y2min}
         
-        offset: {self.yshift}
+        offset: {self.yshift, self.eyshift}
         legend: {self.legend}
         figure width: {self.width}
         figure height: {self.height} 
