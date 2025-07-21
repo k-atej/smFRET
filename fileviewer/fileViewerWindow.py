@@ -367,7 +367,7 @@ class FileViewerWindow(tk.Toplevel):
     # so displayed data is un-modified
     def undo(self, event=None):
         if self.sub3togg.get() == 1:
-            self.trajectory.setShift(0.0)
+            self.trajectory.setShift(0.0, 0.0)
             self.trajectory.destroyWidget()
             self.maketrajectory()
 
